@@ -1,98 +1,134 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
 
-class ChatTest{
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
-  @BeforeEach
-  void setUp( ){
+import static org.junit.jupiter.api.Assertions.*;
 
-  }
+@SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger", "HardCodedStringLiteral" } )
+@ActiveProfiles( "test" )
+@DataJpaTest
+public class ChatTest{
 
-  @AfterEach
-  void tearDown( ){
+  @Autowired
+  private TestEntityManager entityManager;
+
+  @Test
+  public void equals_sameId_equal( ){
+    // Arrange
+    val uuid = UUID.randomUUID( );
+    val chat1 = new Chat( );
+    chat1.id( uuid );
+    val chat2 = new Chat( );
+    chat2.id( uuid );
+    // Act & Assert
+    assertEquals( chat1, chat2 );
 
   }
 
   @Test
-  void id( ){
+  public void equals_differentId_notEqual( ){
+    // Arrange
+    val chat1 = new Chat( );
+    chat1.id( UUID.randomUUID( ) );
+    val chat2 = new Chat( );
+    chat2.id( UUID.randomUUID( ) );
+    // Act & Assert
+    assertNotEquals( chat1, chat2 );
 
   }
 
   @Test
-  void createdAt( ){
+  public void hashCode_sameId_equal( ){
+    // Arrange
+    val uuid = UUID.randomUUID( );
+    val chat1 = new Chat( );
+    chat1.id( uuid );
+    val chat2 = new Chat( );
+    chat2.id( uuid );
+    // Act
+    val chat1Hash = chat1.hashCode( );
+    val chat2Hash = chat2.hashCode( );
+    // Assert
+    assertEquals( chat1Hash, chat2Hash );
 
   }
 
   @Test
-  void modifiedAt( ){
+  public void hashCode_differentId_notEqual( ){
+    // Arrange
+    val chat1 = new Chat( );
+    chat1.id( UUID.randomUUID( ) );
+    val chat2 = new Chat( );
+    chat2.id( UUID.randomUUID( ) );
+    // Act
+    val chat1Hash = chat1.hashCode( );
+    val chat2Hash = chat2.hashCode( );
+    // Assert
+    assertNotEquals( chat1Hash, chat2Hash );
 
   }
 
   @Test
-  void name( ){
+  public void id_afterSave_notNull( ){
+    // Arrange
+    val chat = new Chat( );
+    // Act
+    val savedChat = this.entityManager.persistAndFlush( chat );
+    // Assert
+    assertNotNull( savedChat.id( ) );
 
   }
 
   @Test
-  void requests( ){
+  public void createdAt_afterCreation_recent( ){
+    // Arrange
+    val maxAllowedDifference = 30L;
+    val chat = new Chat( );
+    // Act
+    val savedChat = this.entityManager.persistAndFlush( chat );
+    // Assert
+    assertTrue( ChronoUnit.SECONDS.between( savedChat.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
 
   }
 
   @Test
-  void responses( ){
+  public void createdAt_afterModification_unchanged( ){
+    // Arrange
+    val initialName = "initial";
+    val updatedName = "updated";
+    val chat = new Chat( ).name( initialName );
+    val savedChat = this.entityManager.persistAndFlush( chat );
+    this.entityManager.refresh( savedChat );
+    val initialValue = savedChat.createdAt( );
+    // Act
+    chat.name( updatedName );
+    val updatedchat = this.entityManager.persistAndFlush( chat );
+    // Assert
+    assertEquals( initialValue, updatedchat.createdAt( ) );
 
   }
 
   @Test
-  void testId( ){
-
-  }
-
-  @Test
-  void testCreatedAt( ){
-
-  }
-
-  @Test
-  void testModifiedAt( ){
-
-  }
-
-  @Test
-  void testName( ){
-
-  }
-
-  @Test
-  void testRequests( ){
-
-  }
-
-  @Test
-  void testResponses( ){
-
-  }
-
-  @Test
-  void testToString( ){
-
-  }
-
-  @Test
-  void testEquals( ){
-
-  }
-
-  @Test
-  void canEqual( ){
-
-  }
-
-  @Test
-  void testHashCode( ){
+  public void modifiedAt_afterModification_updated( ){
+    // Arrange
+    val maxAllowedDifference = 30L;
+    val chat = new Chat( ).name( "initialName" );
+    val savedChat = this.entityManager.persistAndFlush( chat );
+    this.entityManager.refresh( savedChat );
+    // Act
+    savedChat.name( "updatedName" );
+    val updatedchat = this.entityManager.persistAndFlush( savedChat );
+    // Assert
+    assertTrue( ChronoUnit.SECONDS.between( updatedchat.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
 
   }
 

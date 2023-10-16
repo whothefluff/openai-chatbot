@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -34,13 +35,15 @@ public class Chat{
   @Column
   UUID id;
   @CreationTimestamp
-  @Column( updatable = false )
+  @Column( updatable = false,
+           nullable = false )
   Instant createdAt;
   @Version
   @UpdateTimestamp
   @Column( insertable = false )
   Instant modifiedAt;
   @Column( unique = true )
+  @NaturalId( mutable = true )
   String name;
   @OneToMany( mappedBy = ChatRequest_.CHAT )
   Set<ChatRequest> requests = new LinkedHashSet<>( 0 );

@@ -7,7 +7,8 @@ spring:
     properties:
       hibernate:
         show_sql: true
-logging:
+    open-in-view: true
+#logging:
 #level:
 #org.hibernate: DEBUG
 #org.springframework: DEBUG
