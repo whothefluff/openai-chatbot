@@ -103,14 +103,12 @@ public class ChatTest{
   @Test
   public void createdAt_afterModification_unchanged( ){
     // Arrange
-    val initialName = "initial";
-    val updatedName = "updated";
-    val chat = new Chat( ).name( initialName );
+    val chat = new Chat( ).name( "initial" );
     val savedChat = this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( savedChat );
     val initialValue = savedChat.createdAt( );
     // Act
-    chat.name( updatedName );
+    chat.name( "updated" );
     val updatedchat = this.entityManager.persistAndFlush( chat );
     // Assert
     assertEquals( initialValue, updatedchat.createdAt( ) );
@@ -121,11 +119,11 @@ public class ChatTest{
   public void modifiedAt_afterModification_updated( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( ).name( "initialName" );
+    val chat = new Chat( ).name( "initial" );
     val savedChat = this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( savedChat );
     // Act
-    savedChat.name( "updatedName" );
+    savedChat.name( "updated" );
     val updatedchat = this.entityManager.persistAndFlush( savedChat );
     // Assert
     assertTrue( ChronoUnit.SECONDS.between( updatedchat.createdAt( ), Instant.now( ) ) < maxAllowedDifference );

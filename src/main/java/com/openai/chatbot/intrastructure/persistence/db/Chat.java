@@ -16,9 +16,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings( { "com.haulmont.jpb.LombokDataInspection", "com.haulmont.jpb.LombokEqualsAndHashCodeInspection", "HardCodedStringLiteral", "ClassWithoutLogger", "MissingJavadoc" } )
+@SuppressWarnings( { "com.haulmont.jpb.LombokDataInspection", "com.haulmont.jpb.LombokEqualsAndHashCodeInspection", "HardCodedStringLiteral", "ClassWithoutLogger", "MissingJavadoc", "unused" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
@@ -29,6 +30,7 @@ import java.util.UUID;
 public class Chat{
 
   @EqualsAndHashCode.Include
+  @ToString.Include
   @GeneratedValue
   @UuidGenerator
   @Id
@@ -45,9 +47,47 @@ public class Chat{
   @Column( unique = true )
   @NaturalId( mutable = true )
   String name;
-  @OneToMany( mappedBy = ChatRequest_.CHAT )
+  @Getter( AccessLevel.PROTECTED )
+  @OneToMany( mappedBy = ChatRequest_.CHAT,
+              cascade = CascadeType.ALL,
+              orphanRemoval = true )
   Set<ChatRequest> requests = new LinkedHashSet<>( 0 );
-  @OneToMany( mappedBy = ChatResponse_.CHAT )
+  @Getter( AccessLevel.PROTECTED )
+  @OneToMany( mappedBy = ChatResponse_.CHAT,
+              cascade = CascadeType.ALL,
+              orphanRemoval = true )
   Set<ChatResponse> responses = new LinkedHashSet<>( 0 );
+
+  public Chat addRequest( final ChatRequest request ){
+
+    this.requests( ).add( request );
+    request.chat( this );
+    return this;
+
+  }
+
+  public Chat removeRequest( final ChatRequest request ){
+
+    this.requests( ).remove( request );
+    request.chat( null );
+    return this;
+
+  }
+
+  public Chat addResponse( final ChatResponse response ){
+
+    this.responses( ).add( response );
+    response.chat( this );
+    return this;
+
+  }
+
+  public Chat removeResponse( final ChatResponse response ){
+
+    this.responses( ).remove( response );
+    response.chat( null );
+    return this;
+
+  }
 
 }

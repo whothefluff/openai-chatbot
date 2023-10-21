@@ -7,8 +7,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,33 +21,40 @@ import java.util.Set;
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
                      "MissingJavadoc",
-                     "ClassWithTooManyFields" } )
+                     "ClassWithTooManyFields",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
 @Accessors( chain = true,
             fluent = true )
+@IdClass( ChatRequestId.class )
 @Entity
 @Table( name = "chat_requests" )
 public class ChatRequest{
 
   @EqualsAndHashCode.Include
-  @EmbeddedId
-  @AttributeOverride( name = "chatId",
-                      column = @Column( name = "chat_id" ) )
-  ChatRequestId key;
-  @MapsId
+  @ToString.Include
   @ManyToOne( fetch = FetchType.LAZY )
-  @JoinColumn( name = "chat_id",
-               referencedColumnName = "id",
-               nullable = false,
-               foreignKey = @ForeignKey( name = "FK_REQ_ON_CHAT" ) )
+  @JoinColumn( foreignKey = @ForeignKey( name = "FK_REQ_ON_CHAT" ) )
+  @Id
   Chat chat;
-  @Column
-  @GeneratedValue( strategy = GenerationType.IDENTITY )
+  @EqualsAndHashCode.Include
+  @ToString.Include
+  @GeneratedValue( strategy = GenerationType.TABLE )
+  @Id
   Integer id;
+  @CreationTimestamp
+  @Column( updatable = false,
+           nullable = false )
+  Instant createdAt;
+  @Version
+  @UpdateTimestamp
+  @Column( insertable = false )
+  Instant modifiedAt;
   @Column( nullable = false )
   String model;
   @Column
@@ -65,10 +75,9 @@ public class ChatRequest{
   BigDecimal frequencyPenalty;
   @Column
   String logitBias;
-  @Column
+  @Column( name = "\"user\"" )
   String user;
-  @OneToOne( fetch = FetchType.LAZY,
-             optional = false )
+  @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id",
                                        insertable = false,

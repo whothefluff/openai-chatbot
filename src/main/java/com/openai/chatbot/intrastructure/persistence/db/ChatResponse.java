@@ -24,25 +24,21 @@ import java.util.Set;
 @AllArgsConstructor
 @Accessors( chain = true,
             fluent = true )
+@IdClass( ChatResponseId.class )
 @Entity
 @Table( name = "chat_responses" )
 public class ChatResponse{
 
   @EqualsAndHashCode.Include
-  @EmbeddedId
-  @AttributeOverride( name = "chatId",
-                      column = @Column( name = "chat_id" ) )
-  ChatResponseId key;
-  @MapsId
   @ManyToOne( fetch = FetchType.LAZY,
               optional = false )
-  @JoinColumn( name = "chat_id",
-               referencedColumnName = "id",
-               nullable = false,
-               foreignKey = @ForeignKey( name = "FK_RES_ON_CHAT" ) )
+  @JoinColumn( foreignKey = @ForeignKey( name = "FK_RES_ON_CHAT" ) )
+  @Id
   Chat chat;
-  @Column
+  @EqualsAndHashCode.Include
+  @ToString.Include
   @GeneratedValue( strategy = GenerationType.IDENTITY )
+  @Id
   Integer id;
   @Column
   String object;
