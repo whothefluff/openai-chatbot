@@ -1,6 +1,5 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.domain.exception.ChatResponseChoiceMessage_;
 import com.openai.chatbot.intrastructure.persistence.db.id.ChatResponseChoiceId;
 import jakarta.persistence.*;
 import lombok.*;

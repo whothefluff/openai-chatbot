@@ -1,27 +1,28 @@
 package com.openai.chatbot.intrastructure.persistence.db.id;
 
-import jakarta.persistence.Embeddable;
+import com.openai.chatbot.intrastructure.persistence.db.ChatRequest;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.UUID;
 
 @SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger" } )
 @Data
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @Accessors( chain = true,
             fluent = true )
-@Embeddable
+@NoArgsConstructor( access = AccessLevel.PROTECTED )
+@AllArgsConstructor
 public class ChatRequestFunctionDefinitionId implements Serializable{
 
   @Serial
   private static final long serialVersionUID = -5499262376651780785L;
-  private UUID chatId;
-  private Integer requestId;
+  private ChatRequest request;
   private Integer id;
 
 }

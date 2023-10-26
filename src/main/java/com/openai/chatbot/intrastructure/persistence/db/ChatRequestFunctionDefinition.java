@@ -6,6 +6,10 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.Instant;
 
 import static org.hibernate.Length.LONG;
 
@@ -14,28 +18,24 @@ import static org.hibernate.Length.LONG;
                      "HardCodedStringLiteral",
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
-                     "MissingJavadoc" } )
+                     "MissingJavadoc",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
 @Accessors( chain = true,
             fluent = true )
+@IdClass( ChatRequestFunctionDefinitionId.class )
 @Entity
 @Table( name = "chat_request_function_definitions" )
 public class ChatRequestFunctionDefinition{
 
   @EqualsAndHashCode.Include
-  @EmbeddedId
-  @AttributeOverrides( { @AttributeOverride( name = "chatId",
-                                             column = @Column( name = "chat_id" ) ),
-                         @AttributeOverride( name = "requestId",
-                                             column = @Column( name = "request_id" ) ) } )
-  private ChatRequestFunctionDefinitionId key;
-  @MapsId( "chat_id" )
-  @ManyToOne( fetch = FetchType.LAZY,
-              optional = false )
+  @ToString.Include
+  @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id",
                                        nullable = false ),
@@ -43,16 +43,30 @@ public class ChatRequestFunctionDefinition{
                                        referencedColumnName = "id",
                                        nullable = false ) },
                 foreignKey = @ForeignKey( name = "FK_RFD_ON_CHAT_REQUEST" ) )
-  private ChatRequest chatRequest;
+  @Id
+  ChatRequest request;
+  @EqualsAndHashCode.Include
+  @ToString.Include
+  @GeneratedValue( strategy = GenerationType.TABLE )
+  @Id
+  Integer id;
+  @CreationTimestamp
+  @Column( updatable = false,
+           nullable = false )
+  Instant createdAt;
+  @Version
+  @UpdateTimestamp
+  @Column( insertable = false )
+  Instant modifiedAt;
   @Pattern( regexp = "^[a-zA-Z0-9_]{1,64}$",
             message = "Invalid function name. Only a-z, A-Z, 0-9, and underscores are allowed, with a maximum length of 64 characters." )
   @Column( length = 64,
            nullable = false )
-  private String name;
-  @Column( name = "description" )
-  private String description;
+  String name;
+  @Column
+  String description;
   @Column( nullable = false,
            length = LONG )
-  private String parameters;
+  String parameters;
 
 }

@@ -1,7 +1,5 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.domain.exception.ChatRequestFunctionDefinition_;
-import com.openai.chatbot.domain.exception.ChatRequestMessage_;
 import com.openai.chatbot.intrastructure.persistence.db.id.ChatRequestId;
 import jakarta.persistence.*;
 import lombok.*;
@@ -88,9 +86,43 @@ public class ChatRequest{
                                        updatable = false ) },
                 foreignKey = @ForeignKey( name = "FK_R_ON_CHAT_RESPONSE" ) )
   ChatResponse previousResponse;
-  @OneToMany( mappedBy = ChatRequestFunctionDefinition_.CHAT_REQUEST )
+  @OneToMany( mappedBy = ChatRequestFunctionDefinition_.REQUEST,
+              cascade = CascadeType.ALL,
+              orphanRemoval = true )
   Set<ChatRequestFunctionDefinition> chatRequestFunctionDefinitions = new LinkedHashSet<>( 0 );
   @OneToMany( mappedBy = ChatRequestMessage_.CHAT_REQUEST )
   Set<ChatRequestMessage> chatRequestMessages = new LinkedHashSet<>( 0 );
+
+  public ChatRequest addFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
+
+    this.chatRequestFunctionDefinitions( ).add( funcDefinition );
+    funcDefinition.request( this );
+    return this;
+
+  }
+
+  public ChatRequest removeFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
+
+    this.chatRequestFunctionDefinitions( ).remove( funcDefinition );
+    funcDefinition.request( null );
+    return this;
+
+  }
+
+  public ChatRequest addMessage( final ChatRequestMessage message ){
+
+    this.chatRequestMessages( ).add( message );
+    message.chatRequest( this );
+    return this;
+
+  }
+
+  public ChatRequest removeMessage( final ChatRequestMessage message ){
+
+    this.chatRequestMessages( ).remove( message );
+    message.chatRequest( null );
+    return this;
+
+  }
 
 }

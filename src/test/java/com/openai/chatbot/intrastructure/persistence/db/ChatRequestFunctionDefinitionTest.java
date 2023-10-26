@@ -15,10 +15,10 @@ import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
+@SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
 @DataJpaTest
-public class ChatRequestTest{
+class ChatRequestFunctionDefinitionTest{
 
   @Autowired
   private TestEntityManager entityManager;
@@ -27,11 +27,11 @@ public class ChatRequestTest{
   public void equals_sameChatAndId_equal( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val chat = new FakeEqualChat( );
-    val request1 = new ChatRequest( ).chat( chat ).id( id );
-    val request2 = new ChatRequest( ).chat( chat ).id( id );
+    val request = new ChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
+    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
     // Act & Assert
-    assertEquals( request1, request2 );
+    assertEquals( function1, function2 );
 
   }
 
@@ -39,12 +39,12 @@ public class ChatRequestTest{
   public void equals_differentChatAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val chat1 = new FakeDifferentChat( );
-    val request1 = new ChatRequest( ).chat( chat1 ).id( id );
-    val chat2 = new Chat( );
-    val request2 = new ChatRequest( ).chat( chat2 ).id( id );
+    val request1 = new ChatRequestFunctionDefinitionTest.FakeDifferentChatRequest( );
+    val function1 = new ChatRequestFunctionDefinition( ).request( request1 ).id( id );
+    val request2 = new ChatRequest( );
+    val function2 = new ChatRequestFunctionDefinition( ).request( request2 ).id( id );
     // Act & Assert
-    assertNotEquals( request1, request2 );
+    assertNotEquals( function1, function2 );
 
   }
 
@@ -52,11 +52,11 @@ public class ChatRequestTest{
   public void equals_sameChatAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val chat = new FakeEqualChat( );
-    val request1 = new ChatRequest( ).chat( chat ).id( id );
-    val request2 = new ChatRequest( ).chat( chat ).id( id + 1 );
+    val request = new ChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
+    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
     // Act & Assert
-    assertNotEquals( request1, request2 );
+    assertNotEquals( function1, function2 );
 
   }
 
@@ -64,14 +64,14 @@ public class ChatRequestTest{
   public void hashCode_sameChatAndId_equal( ){
     // Arrange
     val id = Integer.valueOf( new SecureRandom( ).nextInt( ) );
-    val chat = new FakeChat( );
-    val request1 = new ChatRequest( ).chat( chat ).id( id );
-    val request2 = new ChatRequest( ).chat( chat ).id( id );
+    val request = new ChatRequestFunctionDefinitionTest.FakeChatRequest( );
+    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
     // Act
-    val request1Hash = request1.hashCode( );
-    val request2Hash = request2.hashCode( );
+    val function1Hash = function1.hashCode( );
+    val function2Hash = function2.hashCode( );
     // Assert
-    assertEquals( request1Hash, request2Hash );
+    assertEquals( function1Hash, function2Hash );
 
   }
 
@@ -79,15 +79,15 @@ public class ChatRequestTest{
   public void hashCode_differentChatAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val chat1 = new FakeChat( 1 );
-    val request1 = new ChatRequest( ).chat( chat1 ).id( id );
-    val chat2 = new FakeChat( 2 );
-    val request2 = new ChatRequest( ).chat( chat2 ).id( id );
+    val request1 = new ChatRequestFunctionDefinitionTest.FakeChatRequest( 1 );
+    val function1 = new ChatRequestFunctionDefinition( ).request( request1 ).id( id );
+    val request2 = new ChatRequestFunctionDefinitionTest.FakeChatRequest( 2 );
+    val function2 = new ChatRequestFunctionDefinition( ).request( request2 ).id( id );
     // Act
-    val request1Hash = request1.hashCode( );
-    val request2Hash = request2.hashCode( );
+    val function1Hash = function1.hashCode( );
+    val function2Hash = function2.hashCode( );
     // Assert
-    assertNotEquals( request1Hash, request2Hash );
+    assertNotEquals( function1Hash, function2Hash );
 
   }
 
@@ -95,14 +95,14 @@ public class ChatRequestTest{
   public void hashCode_sameChatAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val chat = new FakeChat( );
-    val request1 = new ChatRequest( ).chat( chat ).id( id );
-    val request2 = new ChatRequest( ).chat( chat ).id( id + 1 );
+    val request = new ChatRequestFunctionDefinitionTest.FakeChatRequest( );
+    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
     // Act
-    val request1Hash = request1.hashCode( );
-    val request2Hash = request2.hashCode( );
+    val function1Hash = function1.hashCode( );
+    val function2Hash = function2.hashCode( );
     // Assert
-    assertNotEquals( request1Hash, request2Hash );
+    assertNotEquals( function1Hash, function2Hash );
 
   }
 
@@ -112,6 +112,8 @@ public class ChatRequestTest{
     val chat = new Chat( );
     val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
+    val function = new ChatRequestFunctionDefinition( ).name( "some_name" ).parameters( "{ some parameters }" );
+    request.addFunctionDefinition( function );
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
@@ -126,6 +128,8 @@ public class ChatRequestTest{
     val chat = new Chat( );
     val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
+    val function = new ChatRequestFunctionDefinition( ).name( "some_name" ).parameters( "{ some parameters }" );
+    request.addFunctionDefinition( function );
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
@@ -137,15 +141,17 @@ public class ChatRequestTest{
   public void createdAt_afterModification_unchanged( ){
     // Arrange
     val chat = new Chat( );
-    val request = new ChatRequest( ).model( "initial" );
+    val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
+    val function = new ChatRequestFunctionDefinition( ).name( "initial" ).parameters( "{ some parameters }" );
+    request.addFunctionDefinition( function );
     this.entityManager.persistAndFlush( chat );
-    this.entityManager.refresh( request );
-    val initialValue = request.createdAt( );
+    this.entityManager.refresh( function );
+    val initialValue = function.createdAt( );
     // Act
-    request.model( "updated" );
+    function.name( "updated" );
     this.entityManager.persistAndFlush( chat );
-    val valueAfterUpdate = request.createdAt( );
+    val valueAfterUpdate = function.createdAt( );
     // Assert
     assertEquals( initialValue, valueAfterUpdate );
 
@@ -156,14 +162,16 @@ public class ChatRequestTest{
     // Arrange
     val maxAllowedDifference = 30L;
     val chat = new Chat( );
-    val request = new ChatRequest( ).model( "initial" );
+    val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
+    val function = new ChatRequestFunctionDefinition( ).name( "initial" ).parameters( "{ some parameters }" );
+    request.addFunctionDefinition( function );
     this.entityManager.persistAndFlush( chat );
-    this.entityManager.refresh( request );
+    this.entityManager.refresh( function );
     // Act
-    request.model( "updated" );
+    function.name( "updated" );
     this.entityManager.persistAndFlush( chat );
-    val valueAfterUpdate = request.createdAt( );
+    val valueAfterUpdate = function.createdAt( );
     // Assert
     assertTrue( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) < maxAllowedDifference );
 
@@ -172,7 +180,7 @@ public class ChatRequestTest{
   @SuppressWarnings( { "NonFinalFieldReferencedInHashCode", "EqualsAndHashcode" } )
   @NoArgsConstructor
   @AllArgsConstructor
-  private static class FakeChat extends Chat{
+  private static class FakeChatRequest extends ChatRequest{
 
     protected int hashCode;
 
@@ -186,7 +194,7 @@ public class ChatRequestTest{
   }
 
   @SuppressWarnings( { "ClassTooDeepInInheritanceTree", "com.haulmont.jpb.EqualsDoesntCheckParameterClass", "EqualsAndHashcode" } )
-  private static class FakeEqualChat extends FakeChat{
+  private static class FakeEqualChatRequest extends ChatRequestFunctionDefinitionTest.FakeChatRequest{
 
     @Override
     public boolean equals( final Object o ){
@@ -198,7 +206,7 @@ public class ChatRequestTest{
   }
 
   @SuppressWarnings( { "ClassTooDeepInInheritanceTree", "EqualsAndHashcode" } )
-  private static class FakeDifferentChat extends FakeChat{
+  private static class FakeDifferentChatRequest extends ChatRequestFunctionDefinitionTest.FakeChatRequest{
 
     @Override
     public boolean equals( final Object o ){

@@ -1,6 +1,5 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.domain.exception.ChatRequestMessageFunctionCall_;
 import com.openai.chatbot.intrastructure.persistence.db.common.Role;
 import com.openai.chatbot.intrastructure.persistence.db.id.ChatRequestMessageId;
 import jakarta.persistence.*;

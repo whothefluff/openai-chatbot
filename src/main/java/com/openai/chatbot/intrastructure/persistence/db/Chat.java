@@ -1,7 +1,5 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.domain.exception.ChatRequest_;
-import com.openai.chatbot.domain.exception.ChatResponse_;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
