@@ -7,6 +7,10 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.Instant;
 
 import static org.hibernate.Length.LONG;
 
@@ -23,20 +27,14 @@ import static org.hibernate.Length.LONG;
 @AllArgsConstructor
 @Accessors( chain = true,
             fluent = true )
+@IdClass( ChatRequestMessageId.class )
 @Entity
 @Table( name = "chat_request_messages" )
 public class ChatRequestMessage{
 
   @EqualsAndHashCode.Include
-  @EmbeddedId
-  @AttributeOverrides( { @AttributeOverride( name = "chatId",
-                                             column = @Column( name = "chat_id" ) ),
-                         @AttributeOverride( name = "requestId",
-                                             column = @Column( name = "request_id" ) ) } )
-  ChatRequestMessageId key;
-  @ManyToOne( fetch = FetchType.LAZY,
-              optional = false )
-  @MapsId( "chat_id" )
+  @ToString.Include
+  @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id",
                                        insertable = false,
@@ -46,18 +44,29 @@ public class ChatRequestMessage{
                                        insertable = false,
                                        updatable = false ) },
                 foreignKey = @ForeignKey( name = "FK_RM_ON_CHAT_REQUEST" ) )
-  ChatRequest chatRequest;
-  @Enumerated( EnumType.STRING )
-  @Column( name = "role",
+  @Id
+  ChatRequest request;
+  @EqualsAndHashCode.Include
+  @ToString.Include
+  @GeneratedValue( strategy = GenerationType.TABLE )
+  @Id
+  Integer id;
+  @CreationTimestamp
+  @Column( updatable = false,
            nullable = false )
+  Instant createdAt;
+  @Version
+  @UpdateTimestamp
+  @Column( insertable = false )
+  Instant modifiedAt;
+  @Enumerated( EnumType.STRING )
+  @Column( nullable = false )
   Role role;
-  @Column( name = "content",
-           length = LONG )
+  @Column( length = LONG )
   String content;
   @Pattern( regexp = "^[a-zA-Z0-9_]{1,64}$",
             message = "Invalid function name. Only a-z, A-Z, 0-9, and underscores are allowed, with a maximum length of 64 characters." )
-  @Column( name = "name",
-           length = 64 )
+  @Column( length = 64 )
   String name;
   @OneToOne( cascade = CascadeType.ALL,
              orphanRemoval = true,

@@ -90,7 +90,9 @@ public class ChatRequest{
               cascade = CascadeType.ALL,
               orphanRemoval = true )
   Set<ChatRequestFunctionDefinition> chatRequestFunctionDefinitions = new LinkedHashSet<>( 0 );
-  @OneToMany( mappedBy = ChatRequestMessage_.CHAT_REQUEST )
+  @OneToMany( mappedBy = ChatRequestMessage_.REQUEST,
+              cascade = CascadeType.ALL,
+              orphanRemoval = true )
   Set<ChatRequestMessage> chatRequestMessages = new LinkedHashSet<>( 0 );
 
   public ChatRequest addFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
@@ -112,7 +114,7 @@ public class ChatRequest{
   public ChatRequest addMessage( final ChatRequestMessage message ){
 
     this.chatRequestMessages( ).add( message );
-    message.chatRequest( this );
+    message.request( this );
     return this;
 
   }
@@ -120,7 +122,7 @@ public class ChatRequest{
   public ChatRequest removeMessage( final ChatRequestMessage message ){
 
     this.chatRequestMessages( ).remove( message );
-    message.chatRequest( null );
+    message.request( null );
     return this;
 
   }
