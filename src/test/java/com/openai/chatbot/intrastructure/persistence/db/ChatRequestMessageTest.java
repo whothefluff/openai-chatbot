@@ -113,8 +113,8 @@ class ChatRequestMessageTest{
     val chat = new Chat( );
     val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestMessage( ).role( Role.user );
-    request.addMessage( function );
+    val message = new ChatRequestMessage( ).role( Role.user );
+    request.addMessage( message );
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
@@ -129,8 +129,8 @@ class ChatRequestMessageTest{
     val chat = new Chat( );
     val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestMessage( ).role( Role.user );
-    request.addMessage( function );
+    val message = new ChatRequestMessage( ).role( Role.user );
+    request.addMessage( message );
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
@@ -144,15 +144,15 @@ class ChatRequestMessageTest{
     val chat = new Chat( );
     val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestMessage( ).role( Role.user );
-    request.addMessage( function );
+    val message = new ChatRequestMessage( ).role( Role.user );
+    request.addMessage( message );
     this.entityManager.persistAndFlush( chat );
-    this.entityManager.refresh( function );
-    val initialValue = function.createdAt( );
+    this.entityManager.refresh( message );
+    val initialValue = message.createdAt( );
     // Act
-    function.role( Role.system );
+    message.role( Role.system );
     this.entityManager.persistAndFlush( chat );
-    val valueAfterUpdate = function.createdAt( );
+    val valueAfterUpdate = message.createdAt( );
     // Assert
     assertEquals( initialValue, valueAfterUpdate );
 
@@ -165,14 +165,14 @@ class ChatRequestMessageTest{
     val chat = new Chat( );
     val request = new ChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestMessage( ).role( Role.user );
-    request.addMessage( function );
+    val message = new ChatRequestMessage( ).role( Role.user );
+    request.addMessage( message );
     this.entityManager.persistAndFlush( chat );
-    this.entityManager.refresh( function );
+    this.entityManager.refresh( message );
     // Act
-    function.role( Role.system );
+    message.role( Role.system );
     this.entityManager.persistAndFlush( chat );
-    val valueAfterUpdate = function.createdAt( );
+    val valueAfterUpdate = message.createdAt( );
     // Assert
     assertTrue( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) < maxAllowedDifference );
 
