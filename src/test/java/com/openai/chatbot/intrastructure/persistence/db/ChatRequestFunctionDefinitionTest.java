@@ -24,7 +24,7 @@ class ChatRequestFunctionDefinitionTest{
   private TestEntityManager entityManager;
 
   @Test
-  public void equals_sameChatAndId_equal( ){
+  public void equals_sameRequestAndId_equal( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request = new ChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
@@ -36,7 +36,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @Test
-  public void equals_differentChatAndSameId_notEqual( ){
+  public void equals_differentRequestAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request1 = new ChatRequestFunctionDefinitionTest.FakeDifferentChatRequest( );
@@ -49,7 +49,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @Test
-  public void equals_sameChatAndDifferentId_notEqual( ){
+  public void equals_sameRequestAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request = new ChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
@@ -61,7 +61,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @Test
-  public void hashCode_sameChatAndId_equal( ){
+  public void hashCode_sameRequestAndId_equal( ){
     // Arrange
     val id = Integer.valueOf( new SecureRandom( ).nextInt( ) );
     val request = new ChatRequestFunctionDefinitionTest.FakeChatRequest( );
@@ -76,7 +76,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @Test
-  public void hashCode_differentChatAndSameId_notEqual( ){
+  public void hashCode_differentRequestAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request1 = new ChatRequestFunctionDefinitionTest.FakeChatRequest( 1 );
@@ -92,7 +92,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @Test
-  public void hashCode_sameChatAndDifferentId_notEqual( ){
+  public void hashCode_sameRequestAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request = new ChatRequestFunctionDefinitionTest.FakeChatRequest( );

@@ -25,7 +25,7 @@ class ChatRequestMessageTest{
   private TestEntityManager entityManager;
 
   @Test
-  public void equals_sameChatAndId_equal( ){
+  public void equals_sameRequestAndId_equal( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request = new ChatRequestMessageTest.FakeEqualChatRequest( );
@@ -37,7 +37,7 @@ class ChatRequestMessageTest{
   }
 
   @Test
-  public void equals_differentChatAndSameId_notEqual( ){
+  public void equals_differentRequestAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request1 = new ChatRequestMessageTest.FakeDifferentChatRequest( );
@@ -50,7 +50,7 @@ class ChatRequestMessageTest{
   }
 
   @Test
-  public void equals_sameChatAndDifferentId_notEqual( ){
+  public void equals_sameRequestAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request = new ChatRequestMessageTest.FakeEqualChatRequest( );
@@ -62,7 +62,7 @@ class ChatRequestMessageTest{
   }
 
   @Test
-  public void hashCode_sameChatAndId_equal( ){
+  public void hashCode_sameRequestAndId_equal( ){
     // Arrange
     val id = Integer.valueOf( new SecureRandom( ).nextInt( ) );
     val request = new ChatRequestMessageTest.FakeChatRequest( );
@@ -77,7 +77,7 @@ class ChatRequestMessageTest{
   }
 
   @Test
-  public void hashCode_differentChatAndSameId_notEqual( ){
+  public void hashCode_differentRequestAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request1 = new ChatRequestMessageTest.FakeChatRequest( 1 );
@@ -93,7 +93,7 @@ class ChatRequestMessageTest{
   }
 
   @Test
-  public void hashCode_sameChatAndDifferentId_notEqual( ){
+  public void hashCode_sameRequestAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
     val request = new ChatRequestMessageTest.FakeChatRequest( );

@@ -36,13 +36,9 @@ public class ChatRequestMessage{
   @ToString.Include
   @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
-                                       referencedColumnName = "chat_id",
-                                       insertable = false,
-                                       updatable = false ),
+                                       referencedColumnName = "chat_id" ),
                           @JoinColumn( name = "request_id",
-                                       referencedColumnName = "id",
-                                       insertable = false,
-                                       updatable = false ) },
+                                       referencedColumnName = "id" ) },
                 foreignKey = @ForeignKey( name = "FK_RM_ON_CHAT_REQUEST" ) )
   @Id
   ChatRequest request;
