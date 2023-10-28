@@ -10,9 +10,11 @@ import lombok.experimental.FieldDefaults;
                      "HardCodedStringLiteral",
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
-                     "MissingJavadoc" } )
+                     "MissingJavadoc",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor

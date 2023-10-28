@@ -17,9 +17,11 @@ import java.util.Set;
                      "HardCodedStringLiteral",
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
-                     "MissingJavadoc" } )
+                     "MissingJavadoc",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
@@ -32,8 +34,7 @@ public class ChatResponse{
 
   @EqualsAndHashCode.Include
   @ToString.Include
-  @ManyToOne( fetch = FetchType.LAZY,
-              optional = false )
+  @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumn( foreignKey = @ForeignKey( name = "FK_RES_ON_CHAT" ) )
   @Id
   Chat chat;
@@ -67,10 +68,30 @@ public class ChatResponse{
                                        updatable = false ) },
                 foreignKey = @ForeignKey( name = "FK_R_ON_CHAT_REQUEST" ) )
   ChatRequest previousRequest; // not nullable in the database
-  @OneToMany( mappedBy = ChatResponseChoice_.CHAT_RESPONSE )
+  @OneToMany( mappedBy = ChatResponseChoice_.RESPONSE,
+              cascade = CascadeType.ALL,
+              orphanRemoval = true )
   Set<ChatResponseChoice> choices = new LinkedHashSet<>( 0 );
-  @OneToOne( mappedBy = ChatResponseUsage_.CHAT_RESPONSE )
+  @OneToOne( mappedBy = ChatResponseUsage_.CHAT_RESPONSE,
+             cascade = CascadeType.ALL,
+             orphanRemoval = true )
   ChatResponseUsage usage;
+
+  public ChatResponse addChoice( final ChatResponseChoice choice ){
+
+    this.choices( ).add( choice );
+    choice.response( this );
+    return this;
+
+  }
+
+  public ChatResponse removeChoice( final ChatResponseChoice choice ){
+
+    this.choices( ).remove( choice );
+    choice.response( null );
+    return this;
+
+  }
 
   public ChatResponse usage( final ChatResponseUsage usage ){
 
