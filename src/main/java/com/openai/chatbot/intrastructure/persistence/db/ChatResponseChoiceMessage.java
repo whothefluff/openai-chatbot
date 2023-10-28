@@ -11,9 +11,11 @@ import lombok.experimental.FieldDefaults;
                      "HardCodedStringLiteral",
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
-                     "MissingJavadoc" } )
+                     "MissingJavadoc",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
@@ -24,9 +26,10 @@ import lombok.experimental.FieldDefaults;
 public class ChatResponseChoiceMessage{
 
   @EqualsAndHashCode.Include
+  @ToString.Include
   @Id
   @MapsId
-  @OneToOne( optional = false )
+  @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id",
                                        nullable = false ),
@@ -43,7 +46,9 @@ public class ChatResponseChoiceMessage{
   Role role;
   @Column
   String content;
-  @OneToOne( mappedBy = ChatResponseChoiceMessageFunctionCall_.UP )
+  @OneToOne( mappedBy = ChatResponseChoiceMessageFunctionCall_.UP,
+             cascade = CascadeType.ALL,
+             orphanRemoval = true )
   ChatResponseChoiceMessageFunctionCall chatResponseChoiceMessageFunctionCall;
 
 }

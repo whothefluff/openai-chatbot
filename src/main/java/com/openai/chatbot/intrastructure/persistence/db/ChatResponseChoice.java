@@ -60,6 +60,14 @@ public class ChatResponseChoice{
   @OneToOne( mappedBy = ChatResponseChoiceMessage_.UP,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
-  ChatResponseChoiceMessage chatResponseChoiceMessage;
+  ChatResponseChoiceMessage message;
+
+  public ChatResponseChoice message( final ChatResponseChoiceMessage message ){
+
+    this.message = message;
+    message.up( this );
+    return this;
+
+  }
 
 }
