@@ -72,4 +72,12 @@ public class ChatResponse{
   @OneToOne( mappedBy = ChatResponseUsage_.CHAT_RESPONSE )
   ChatResponseUsage usage;
 
+  public ChatResponse usage( final ChatResponseUsage usage ){
+
+    this.usage = usage;
+    usage.chatResponse( this );
+    return this;
+
+  }
+
 }

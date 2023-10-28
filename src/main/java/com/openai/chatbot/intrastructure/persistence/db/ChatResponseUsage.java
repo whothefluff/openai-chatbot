@@ -23,20 +23,21 @@ import lombok.experimental.FieldDefaults;
 public class ChatResponseUsage{
 
   @EqualsAndHashCode.Include
+  @ToString.Include
   @Id
   @MapsId
-  @OneToOne( optional = false )
+  @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id" ),
                           @JoinColumn( name = "response_id",
                                        referencedColumnName = "id" ), },
                 foreignKey = @ForeignKey( name = "FK_RU_ON_CHAT_RESPONSE" ) )
-  private ChatResponse chatResponse;
+  ChatResponse chatResponse;
   @Column
-  private Integer promptTokens;
+  Integer promptTokens;
   @Column
-  private Integer completionTokens;
+  Integer completionTokens;
   @Column
-  private Integer totalTokens;
+  Integer totalTokens;
 
 }
