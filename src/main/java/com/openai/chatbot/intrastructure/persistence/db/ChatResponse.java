@@ -5,7 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -28,6 +31,7 @@ import java.util.Set;
 public class ChatResponse{
 
   @EqualsAndHashCode.Include
+  @ToString.Include
   @ManyToOne( fetch = FetchType.LAZY,
               optional = false )
   @JoinColumn( foreignKey = @ForeignKey( name = "FK_RES_ON_CHAT" ) )
@@ -35,17 +39,24 @@ public class ChatResponse{
   Chat chat;
   @EqualsAndHashCode.Include
   @ToString.Include
-  @GeneratedValue( strategy = GenerationType.IDENTITY )
+  @GeneratedValue( strategy = GenerationType.SEQUENCE )
   @Id
   Integer id;
+  @CreationTimestamp
+  @Column( updatable = false,
+           nullable = false )
+  Instant createdAt;
+  @Version
+  @UpdateTimestamp
+  @Column( insertable = false )
+  Instant modifiedAt;
   @Column
   String object;
   @Column
   Integer created;
   @Column
   String model;
-  @OneToOne( fetch = FetchType.LAZY,
-             optional = false )
+  @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id",
                                        insertable = false,
@@ -55,10 +66,10 @@ public class ChatResponse{
                                        insertable = false,
                                        updatable = false ) },
                 foreignKey = @ForeignKey( name = "FK_R_ON_CHAT_REQUEST" ) )
-  ChatRequest previousRequest;
+  ChatRequest previousRequest; // not nullable in the database
   @OneToMany( mappedBy = ChatResponseChoice_.CHAT_RESPONSE )
-  Set<ChatResponseChoice> chatResponseChoices = new LinkedHashSet<>( 0 );
+  Set<ChatResponseChoice> choices = new LinkedHashSet<>( 0 );
   @OneToOne( mappedBy = ChatResponseUsage_.CHAT_RESPONSE )
-  ChatResponseUsage chatResponseUsage;
+  ChatResponseUsage usage;
 
 }

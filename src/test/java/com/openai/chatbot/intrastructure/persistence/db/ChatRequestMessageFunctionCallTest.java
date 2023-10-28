@@ -39,7 +39,6 @@ class ChatRequestMessageFunctionCallTest{
     assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
-  //
 
   @SuppressWarnings( { "com.haulmont.jpb.EqualsDoesntCheckParameterClass", "EqualsAndHashcode", "AutoUnboxing", "NonFinalFieldReferenceInEquals", "ObjectInstantiationInEqualsHashCode" } )
   @Getter

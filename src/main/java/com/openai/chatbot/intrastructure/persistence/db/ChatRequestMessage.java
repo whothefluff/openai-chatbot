@@ -44,7 +44,7 @@ public class ChatRequestMessage{
   ChatRequest request;
   @EqualsAndHashCode.Include
   @ToString.Include
-  @GeneratedValue( strategy = GenerationType.TABLE )
+  @GeneratedValue( strategy = GenerationType.SEQUENCE )
   @Id
   Integer id;
   @CreationTimestamp

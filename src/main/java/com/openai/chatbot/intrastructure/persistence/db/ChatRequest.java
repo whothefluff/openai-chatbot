@@ -42,7 +42,7 @@ public class ChatRequest{
   Chat chat;
   @EqualsAndHashCode.Include
   @ToString.Include
-  @GeneratedValue( strategy = GenerationType.TABLE )
+  @GeneratedValue( strategy = GenerationType.SEQUENCE )
   @Id
   Integer id;
   @CreationTimestamp
@@ -89,15 +89,15 @@ public class ChatRequest{
   @OneToMany( mappedBy = ChatRequestFunctionDefinition_.REQUEST,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatRequestFunctionDefinition> chatRequestFunctionDefinitions = new LinkedHashSet<>( 0 );
+  Set<ChatRequestFunctionDefinition> functionDefinitions = new LinkedHashSet<>( 0 );
   @OneToMany( mappedBy = ChatRequestMessage_.REQUEST,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatRequestMessage> chatRequestMessages = new LinkedHashSet<>( 0 );
+  Set<ChatRequestMessage> messages = new LinkedHashSet<>( 0 );
 
   public ChatRequest addFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
 
-    this.chatRequestFunctionDefinitions( ).add( funcDefinition );
+    this.functionDefinitions( ).add( funcDefinition );
     funcDefinition.request( this );
     return this;
 
@@ -105,7 +105,7 @@ public class ChatRequest{
 
   public ChatRequest removeFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
 
-    this.chatRequestFunctionDefinitions( ).remove( funcDefinition );
+    this.functionDefinitions( ).remove( funcDefinition );
     funcDefinition.request( null );
     return this;
 
@@ -113,7 +113,7 @@ public class ChatRequest{
 
   public ChatRequest addMessage( final ChatRequestMessage message ){
 
-    this.chatRequestMessages( ).add( message );
+    this.messages( ).add( message );
     message.request( this );
     return this;
 
@@ -121,7 +121,7 @@ public class ChatRequest{
 
   public ChatRequest removeMessage( final ChatRequestMessage message ){
 
-    this.chatRequestMessages( ).remove( message );
+    this.messages( ).remove( message );
     message.request( null );
     return this;
 
