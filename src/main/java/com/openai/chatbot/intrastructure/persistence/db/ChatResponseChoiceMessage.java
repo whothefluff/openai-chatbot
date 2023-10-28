@@ -31,14 +31,11 @@ public class ChatResponseChoiceMessage{
   @MapsId
   @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
-                                       referencedColumnName = "chat_id",
-                                       nullable = false ),
+                                       referencedColumnName = "chat_id" ),
                           @JoinColumn( name = "response_id",
-                                       referencedColumnName = "response_id",
-                                       nullable = false ),
+                                       referencedColumnName = "response_id" ),
                           @JoinColumn( name = "choice_id",
-                                       referencedColumnName = "id",
-                                       nullable = false ) },
+                                       referencedColumnName = "id" ) },
                 foreignKey = @ForeignKey( name = "FK_RCM_ON_CHAT_RESPONSE_CHOICE" ) )
   ChatResponseChoice up;
   @Enumerated( EnumType.STRING )
@@ -49,6 +46,14 @@ public class ChatResponseChoiceMessage{
   @OneToOne( mappedBy = ChatResponseChoiceMessageFunctionCall_.UP,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
-  ChatResponseChoiceMessageFunctionCall chatResponseChoiceMessageFunctionCall;
+  ChatResponseChoiceMessageFunctionCall functionCall;
+
+  public ChatResponseChoiceMessage functionCall( final ChatResponseChoiceMessageFunctionCall functionCall ){
+
+    this.functionCall = functionCall;
+    functionCall.up( this );
+    return this;
+    
+  }
 
 }

@@ -10,9 +10,11 @@ import lombok.experimental.FieldDefaults;
                      "HardCodedStringLiteral",
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
-                     "MissingJavadoc" } )
+                     "MissingJavadoc",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
@@ -23,10 +25,9 @@ import lombok.experimental.FieldDefaults;
 public class ChatResponseChoiceMessageFunctionCall{
 
   @EqualsAndHashCode.Include
-  @Id
+  @ToString.Include
   @MapsId
-  @OneToOne( targetEntity = ChatResponseChoiceMessage.class,
-             optional = false )
+  @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id",
                                        nullable = false ),
@@ -37,6 +38,7 @@ public class ChatResponseChoiceMessageFunctionCall{
                                        referencedColumnName = "choice_id",
                                        nullable = false ) },
                 foreignKey = @ForeignKey( name = "FK_RCMFC_ON_RESPONSE_CHOICE_MESSAGE" ) )
+  @Id
   ChatResponseChoiceMessage up;
   @Column( nullable = false )
   String name;
