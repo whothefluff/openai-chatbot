@@ -4,19 +4,17 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-@DataJpaTest
 class ChatResponseUsageTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
-  public void equals_instance_callsMessage( ){
+  public void equals_instance_callsParent( ){
     // Arrange
     val response = new EqualsSpyChatResponse( );
     val usage = new ChatResponseUsage( );
@@ -30,7 +28,7 @@ class ChatResponseUsageTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
-  public void hashCode_instance_callsMessage( ){
+  public void hashCode_instance_callsParent( ){
     // Arrange
     val response = new HashSpyChatResponse( );
     val usage = new ChatResponseUsage( );

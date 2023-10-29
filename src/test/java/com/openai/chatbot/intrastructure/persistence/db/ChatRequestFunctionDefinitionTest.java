@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
@@ -31,7 +31,7 @@ class ChatRequestFunctionDefinitionTest{
     val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
     val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
     // Act & Assert
-    assertEquals( function1, function2 );
+    assertThat( function1 ).isEqualTo( function2 );
 
   }
 
@@ -44,7 +44,7 @@ class ChatRequestFunctionDefinitionTest{
     val request2 = new ChatRequest( );
     val function2 = new ChatRequestFunctionDefinition( ).request( request2 ).id( id );
     // Act & Assert
-    assertNotEquals( function1, function2 );
+    assertThat( function1 ).isNotEqualTo( function2 );
 
   }
 
@@ -56,7 +56,7 @@ class ChatRequestFunctionDefinitionTest{
     val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
     val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
     // Act & Assert
-    assertNotEquals( function1, function2 );
+    assertThat( function1 ).isNotEqualTo( function2 );
 
   }
 
@@ -71,7 +71,7 @@ class ChatRequestFunctionDefinitionTest{
     val function1Hash = function1.hashCode( );
     val function2Hash = function2.hashCode( );
     // Assert
-    assertEquals( function1Hash, function2Hash );
+    assertThat( function1Hash ).isEqualTo( function2Hash );
 
   }
 
@@ -87,7 +87,7 @@ class ChatRequestFunctionDefinitionTest{
     val function1Hash = function1.hashCode( );
     val function2Hash = function2.hashCode( );
     // Assert
-    assertNotEquals( function1Hash, function2Hash );
+    assertThat( function1Hash ).isNotEqualTo( function2Hash );
 
   }
 
@@ -102,7 +102,7 @@ class ChatRequestFunctionDefinitionTest{
     val function1Hash = function1.hashCode( );
     val function2Hash = function2.hashCode( );
     // Assert
-    assertNotEquals( function1Hash, function2Hash );
+    assertThat( function1Hash ).isNotEqualTo( function2Hash );
 
   }
 
@@ -117,7 +117,7 @@ class ChatRequestFunctionDefinitionTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertNotNull( request.id( ) );
+    assertThat( request.id( ) ).isPositive( );
 
   }
 
@@ -133,7 +133,7 @@ class ChatRequestFunctionDefinitionTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( request.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( function.createdAt( ), Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 
@@ -153,7 +153,7 @@ class ChatRequestFunctionDefinitionTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = function.createdAt( );
     // Assert
-    assertEquals( initialValue, valueAfterUpdate );
+    assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
   }
 
@@ -173,7 +173,7 @@ class ChatRequestFunctionDefinitionTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = function.createdAt( );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 

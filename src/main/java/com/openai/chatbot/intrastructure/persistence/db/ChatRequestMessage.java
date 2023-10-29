@@ -64,9 +64,17 @@ public class ChatRequestMessage{
             message = "Invalid function name. Only a-z, A-Z, 0-9, and underscores are allowed, with a maximum length of 64 characters." )
   @Column( length = 64 )
   String name;
-  @OneToOne( cascade = CascadeType.ALL,
-             orphanRemoval = true,
-             mappedBy = ChatRequestMessageFunctionCall_.CHAT_REQUEST_MESSAGE )
+  @OneToOne( mappedBy = ChatRequestMessageFunctionCall_.CHAT_REQUEST_MESSAGE,
+             cascade = CascadeType.ALL,
+             orphanRemoval = true )
   ChatRequestMessageFunctionCall functionCall;
+
+  public ChatRequestMessage functionCall( final ChatRequestMessageFunctionCall functionCall ){
+
+    this.functionCall = functionCall;
+    functionCall.chatRequestMessage( this );
+    return this;
+
+  }
 
 }

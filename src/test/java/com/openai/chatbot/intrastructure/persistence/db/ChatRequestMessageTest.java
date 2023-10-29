@@ -14,7 +14,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
@@ -32,7 +32,7 @@ class ChatRequestMessageTest{
     val message1 = new ChatRequestMessage( ).request( request ).id( id );
     val message2 = new ChatRequestMessage( ).request( request ).id( id );
     // Act & Assert
-    assertEquals( message1, message2 );
+    assertThat( message1 ).isEqualTo( message2 );
 
   }
 
@@ -45,7 +45,7 @@ class ChatRequestMessageTest{
     val request2 = new ChatRequest( );
     val message2 = new ChatRequestMessage( ).request( request2 ).id( id );
     // Act & Assert
-    assertNotEquals( message1, message2 );
+    assertThat( message1 ).isNotEqualTo( message2 );
 
   }
 
@@ -57,7 +57,7 @@ class ChatRequestMessageTest{
     val message1 = new ChatRequestMessage( ).request( request ).id( id );
     val message2 = new ChatRequestMessage( ).request( request ).id( id + 1 );
     // Act & Assert
-    assertNotEquals( message1, message2 );
+    assertThat( message1 ).isNotEqualTo( message2 );
 
   }
 
@@ -72,7 +72,7 @@ class ChatRequestMessageTest{
     val message1Hash = message1.hashCode( );
     val message2Hash = message2.hashCode( );
     // Assert
-    assertEquals( message1Hash, message2Hash );
+    assertThat( message1Hash ).isEqualTo( message2Hash );
 
   }
 
@@ -88,7 +88,7 @@ class ChatRequestMessageTest{
     val message1Hash = message1.hashCode( );
     val message2Hash = message2.hashCode( );
     // Assert
-    assertNotEquals( message1Hash, message2Hash );
+    assertThat( message1Hash ).isNotEqualTo( message2Hash );
 
   }
 
@@ -103,7 +103,7 @@ class ChatRequestMessageTest{
     val message1Hash = message1.hashCode( );
     val message2Hash = message2.hashCode( );
     // Assert
-    assertNotEquals( message1Hash, message2Hash );
+    assertThat( message1Hash ).isNotEqualTo( message2Hash );
 
   }
 
@@ -118,7 +118,7 @@ class ChatRequestMessageTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertNotNull( request.id( ) );
+    assertThat( request.id( ) ).isPositive( );
 
   }
 
@@ -134,7 +134,7 @@ class ChatRequestMessageTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( request.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( message.createdAt( ), Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 
@@ -154,7 +154,7 @@ class ChatRequestMessageTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = message.createdAt( );
     // Assert
-    assertEquals( initialValue, valueAfterUpdate );
+    assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
   }
 
@@ -174,7 +174,7 @@ class ChatRequestMessageTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = message.createdAt( );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 

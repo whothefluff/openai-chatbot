@@ -34,7 +34,7 @@ public class ChatResponseUsage{
                           @JoinColumn( name = "response_id",
                                        referencedColumnName = "id" ), },
                 foreignKey = @ForeignKey( name = "FK_RU_ON_CHAT_RESPONSE" ) )
-  ChatResponse chatResponse;
+  ChatResponse response;
   @Column
   Integer promptTokens;
   @Column

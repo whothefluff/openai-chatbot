@@ -22,7 +22,7 @@ public class ChatRequestMessageId implements Serializable{
 
   @Serial
   private static final long serialVersionUID = -5662201856499417990L;
-  private ChatRequest request;
-  private Integer id;
+  ChatRequest request;
+  Integer id;
 
 }

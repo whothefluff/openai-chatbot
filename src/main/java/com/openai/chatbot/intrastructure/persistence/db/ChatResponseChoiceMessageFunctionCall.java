@@ -39,7 +39,7 @@ public class ChatResponseChoiceMessageFunctionCall{
                                        nullable = false ) },
                 foreignKey = @ForeignKey( name = "FK_RCMFC_ON_RESPONSE_CHOICE_MESSAGE" ) )
   @Id
-  ChatResponseChoiceMessage up;
+  ChatResponseChoiceMessage message;
   @Column( nullable = false )
   String name;
   @Column( nullable = false )

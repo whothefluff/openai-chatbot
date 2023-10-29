@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger", "HardCodedStringLiteral" } )
 @ActiveProfiles( "test" )
@@ -30,7 +30,7 @@ public class ChatTest{
     val chat2 = new Chat( );
     chat2.id( uuid );
     // Act & Assert
-    assertEquals( chat1, chat2 );
+    assertThat( chat1 ).isEqualTo( chat2 );
 
   }
 
@@ -42,7 +42,7 @@ public class ChatTest{
     val chat2 = new Chat( );
     chat2.id( UUID.randomUUID( ) );
     // Act & Assert
-    assertNotEquals( chat1, chat2 );
+    assertThat( chat1 ).isNotEqualTo( chat2 );
 
   }
 
@@ -58,7 +58,7 @@ public class ChatTest{
     val chat1Hash = chat1.hashCode( );
     val chat2Hash = chat2.hashCode( );
     // Assert
-    assertEquals( chat1Hash, chat2Hash );
+    assertThat( chat1Hash ).isEqualTo( chat2Hash );
 
   }
 
@@ -73,7 +73,7 @@ public class ChatTest{
     val chat1Hash = chat1.hashCode( );
     val chat2Hash = chat2.hashCode( );
     // Assert
-    assertNotEquals( chat1Hash, chat2Hash );
+    assertThat( chat1Hash ).isNotEqualTo( chat2Hash );
 
   }
 
@@ -84,7 +84,7 @@ public class ChatTest{
     // Act
     val savedChat = this.entityManager.persistAndFlush( chat );
     // Assert
-    assertNotNull( savedChat.id( ) );
+    assertThat( savedChat.id( ) ).isNotNull( );
 
   }
 
@@ -96,7 +96,7 @@ public class ChatTest{
     // Act
     val savedChat = this.entityManager.persistAndFlush( chat );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( savedChat.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( chat.createdAt( ), Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 
@@ -110,8 +110,9 @@ public class ChatTest{
     // Act
     chat.name( "updated" );
     val updatedchat = this.entityManager.persistAndFlush( chat );
+    val valueAfterUpdate = updatedchat.createdAt( );
     // Assert
-    assertEquals( initialValue, updatedchat.createdAt( ) );
+    assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
   }
 
@@ -125,8 +126,9 @@ public class ChatTest{
     // Act
     savedChat.name( "updated" );
     val updatedchat = this.entityManager.persistAndFlush( savedChat );
+    val valueAfterUpdate = updatedchat.createdAt( );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( updatedchat.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 

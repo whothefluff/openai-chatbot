@@ -4,22 +4,21 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-@DataJpaTest
 class ChatRequestMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
-  public void equals_instance_callsMessage( ){
+  public void equals_instance_callsParent( ){
     // Arrange
     val message = new EqualsSpyChatRequestMessage( );
-    val functionCall = new ChatRequestMessageFunctionCall( ).chatRequestMessage( message );
+    val functionCall = new ChatRequestMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
     functionCall.equals( new ChatRequestMessageFunctionCall( ) );
     // Assert
@@ -29,10 +28,11 @@ class ChatRequestMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
-  public void hashCode_instance_callsMessage( ){
+  public void hashCode_instance_callsParent( ){
     // Arrange
     val message = new HashSpyChatRequestMessage( );
-    val functionCall = new ChatRequestMessageFunctionCall( ).chatRequestMessage( message );
+    val functionCall = new ChatRequestMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
     functionCall.hashCode( );
     // Assert

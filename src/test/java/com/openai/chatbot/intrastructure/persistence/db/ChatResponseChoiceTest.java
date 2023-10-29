@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
@@ -31,7 +31,7 @@ class ChatResponseChoiceTest{
     val choice1 = new ChatResponseChoice( ).response( response ).id( id );
     val choice2 = new ChatResponseChoice( ).response( response ).id( id );
     // Act & Assert
-    assertEquals( choice1, choice2 );
+    assertThat( choice1 ).isEqualTo( choice2 );
 
   }
 
@@ -44,7 +44,7 @@ class ChatResponseChoiceTest{
     val response2 = new ChatResponse( );
     val choice2 = new ChatResponseChoice( ).response( response2 ).id( id );
     // Act & Assert
-    assertNotEquals( choice1, choice2 );
+    assertThat( choice1 ).isNotEqualTo( choice2 );
 
   }
 
@@ -56,7 +56,7 @@ class ChatResponseChoiceTest{
     val choice1 = new ChatResponseChoice( ).response( response ).id( id );
     val choice2 = new ChatResponseChoice( ).response( response ).id( id + 1 );
     // Act & Assert
-    assertNotEquals( choice1, choice2 );
+    assertThat( choice1 ).isNotEqualTo( choice2 );
 
   }
 
@@ -71,7 +71,7 @@ class ChatResponseChoiceTest{
     val choice1Hash = choice1.hashCode( );
     val choice2Hash = choice2.hashCode( );
     // Assert
-    assertEquals( choice1Hash, choice2Hash );
+    assertThat( choice1Hash ).isEqualTo( choice2Hash );
 
   }
 
@@ -87,7 +87,7 @@ class ChatResponseChoiceTest{
     val choice1Hash = choice1.hashCode( );
     val choice2Hash = choice2.hashCode( );
     // Assert
-    assertNotEquals( choice1Hash, choice2Hash );
+    assertThat( choice1Hash ).isNotEqualTo( choice2Hash );
 
   }
 
@@ -102,7 +102,7 @@ class ChatResponseChoiceTest{
     val choice1Hash = choice1.hashCode( );
     val choice2Hash = choice2.hashCode( );
     // Assert
-    assertNotEquals( choice1Hash, choice2Hash );
+    assertThat( choice1Hash ).isNotEqualTo( choice2Hash );
 
   }
 
@@ -117,7 +117,7 @@ class ChatResponseChoiceTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertNotNull( response.id( ) );
+    assertThat( response.id( ) ).isPositive( );
 
   }
 
@@ -133,7 +133,7 @@ class ChatResponseChoiceTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( response.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( choice.createdAt( ), Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 
@@ -153,7 +153,7 @@ class ChatResponseChoiceTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = choice.createdAt( );
     // Assert
-    assertEquals( initialValue, valueAfterUpdate );
+    assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
   }
 
@@ -173,7 +173,7 @@ class ChatResponseChoiceTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = choice.createdAt( );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 

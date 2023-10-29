@@ -57,7 +57,7 @@ public class ChatResponseChoice{
   Integer index;
   @Column
   String finishReason;
-  @OneToOne( mappedBy = ChatResponseChoiceMessage_.UP,
+  @OneToOne( mappedBy = ChatResponseChoiceMessage_.CHOICE,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
   ChatResponseChoiceMessage message;
@@ -65,7 +65,7 @@ public class ChatResponseChoice{
   public ChatResponseChoice message( final ChatResponseChoiceMessage message ){
 
     this.message = message;
-    message.up( this );
+    message.choice( this );
     return this;
 
   }

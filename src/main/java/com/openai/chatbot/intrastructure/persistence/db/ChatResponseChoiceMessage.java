@@ -37,13 +37,13 @@ public class ChatResponseChoiceMessage{
                           @JoinColumn( name = "choice_id",
                                        referencedColumnName = "id" ) },
                 foreignKey = @ForeignKey( name = "FK_RCM_ON_CHAT_RESPONSE_CHOICE" ) )
-  ChatResponseChoice up;
+  ChatResponseChoice choice;
   @Enumerated( EnumType.STRING )
   @Column( nullable = false )
   Role role;
   @Column
   String content;
-  @OneToOne( mappedBy = ChatResponseChoiceMessageFunctionCall_.UP,
+  @OneToOne( mappedBy = ChatResponseChoiceMessageFunctionCall_.MESSAGE,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
   ChatResponseChoiceMessageFunctionCall functionCall;
@@ -51,9 +51,9 @@ public class ChatResponseChoiceMessage{
   public ChatResponseChoiceMessage functionCall( final ChatResponseChoiceMessageFunctionCall functionCall ){
 
     this.functionCall = functionCall;
-    functionCall.up( this );
+    functionCall.message( this );
     return this;
-    
+
   }
 
 }

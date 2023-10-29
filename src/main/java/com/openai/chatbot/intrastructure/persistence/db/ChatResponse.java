@@ -72,7 +72,7 @@ public class ChatResponse{
               cascade = CascadeType.ALL,
               orphanRemoval = true )
   Set<ChatResponseChoice> choices = new LinkedHashSet<>( 0 );
-  @OneToOne( mappedBy = ChatResponseUsage_.CHAT_RESPONSE,
+  @OneToOne( mappedBy = ChatResponseUsage_.RESPONSE,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
   ChatResponseUsage usage;
@@ -96,7 +96,7 @@ public class ChatResponse{
   public ChatResponse usage( final ChatResponseUsage usage ){
 
     this.usage = usage;
-    usage.chatResponse( this );
+    usage.response( this );
     return this;
 
   }

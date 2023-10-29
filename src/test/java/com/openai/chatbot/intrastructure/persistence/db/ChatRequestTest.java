@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
@@ -31,7 +31,7 @@ public class ChatRequestTest{
     val request1 = new ChatRequest( ).chat( chat ).id( id );
     val request2 = new ChatRequest( ).chat( chat ).id( id );
     // Act & Assert
-    assertEquals( request1, request2 );
+    assertThat( request1 ).isEqualTo( request2 );
 
   }
 
@@ -44,7 +44,7 @@ public class ChatRequestTest{
     val chat2 = new Chat( );
     val request2 = new ChatRequest( ).chat( chat2 ).id( id );
     // Act & Assert
-    assertNotEquals( request1, request2 );
+    assertThat( request1 ).isNotEqualTo( request2 );
 
   }
 
@@ -56,7 +56,7 @@ public class ChatRequestTest{
     val request1 = new ChatRequest( ).chat( chat ).id( id );
     val request2 = new ChatRequest( ).chat( chat ).id( id + 1 );
     // Act & Assert
-    assertNotEquals( request1, request2 );
+    assertThat( request1 ).isNotEqualTo( request2 );
 
   }
 
@@ -71,7 +71,7 @@ public class ChatRequestTest{
     val request1Hash = request1.hashCode( );
     val request2Hash = request2.hashCode( );
     // Assert
-    assertEquals( request1Hash, request2Hash );
+    assertThat( request1Hash ).isEqualTo( request2Hash );
 
   }
 
@@ -87,7 +87,7 @@ public class ChatRequestTest{
     val request1Hash = request1.hashCode( );
     val request2Hash = request2.hashCode( );
     // Assert
-    assertNotEquals( request1Hash, request2Hash );
+    assertThat( request1Hash ).isNotEqualTo( request2Hash );
 
   }
 
@@ -102,7 +102,7 @@ public class ChatRequestTest{
     val request1Hash = request1.hashCode( );
     val request2Hash = request2.hashCode( );
     // Assert
-    assertNotEquals( request1Hash, request2Hash );
+    assertThat( request1Hash ).isNotEqualTo( request2Hash );
 
   }
 
@@ -115,7 +115,7 @@ public class ChatRequestTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertNotNull( request.id( ) );
+    assertThat( request.id( ) ).isPositive( );
 
   }
 
@@ -129,7 +129,7 @@ public class ChatRequestTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( request.createdAt( ), Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( request.createdAt( ), Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 
@@ -147,7 +147,7 @@ public class ChatRequestTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = request.createdAt( );
     // Assert
-    assertEquals( initialValue, valueAfterUpdate );
+    assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
   }
 
@@ -165,7 +165,7 @@ public class ChatRequestTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = request.createdAt( );
     // Assert
-    assertTrue( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) < maxAllowedDifference );
+    assertThat( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
   }
 

@@ -13,7 +13,8 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
@@ -31,7 +32,7 @@ class ChatResponseTest{
     val response1 = new ChatResponse( ).chat( chat ).id( id );
     val response2 = new ChatResponse( ).chat( chat ).id( id );
     // Act & Assert
-    assertEquals( response1, response2 );
+    assertThat( response1 ).isEqualTo( response2 );
 
   }
 
@@ -44,7 +45,7 @@ class ChatResponseTest{
     val chat2 = new Chat( );
     val response2 = new ChatResponse( ).chat( chat2 ).id( id );
     // Act & Assert
-    assertNotEquals( response1, response2 );
+    assertThat( response1 ).isNotEqualTo( response2 );
 
   }
 
@@ -56,7 +57,7 @@ class ChatResponseTest{
     val response1 = new ChatResponse( ).chat( chat ).id( id );
     val response2 = new ChatResponse( ).chat( chat ).id( id + 1 );
     // Act & Assert
-    assertNotEquals( response1, response2 );
+    assertThat( response1 ).isNotEqualTo( response2 );
 
   }
 
@@ -71,7 +72,7 @@ class ChatResponseTest{
     val response1Hash = response1.hashCode( );
     val response2Hash = response2.hashCode( );
     // Assert
-    assertEquals( response1Hash, response2Hash );
+    assertThat( response1Hash ).isEqualTo( response2Hash );
 
   }
 
@@ -87,7 +88,7 @@ class ChatResponseTest{
     val response1Hash = response1.hashCode( );
     val response2Hash = response2.hashCode( );
     // Assert
-    assertNotEquals( response1Hash, response2Hash );
+    assertThat( response1Hash ).isNotEqualTo( response2Hash );
 
   }
 
@@ -102,7 +103,7 @@ class ChatResponseTest{
     val response1Hash = response1.hashCode( );
     val response2Hash = response2.hashCode( );
     // Assert
-    assertNotEquals( response1Hash, response2Hash );
+    assertThat( response1Hash ).isNotEqualTo( response2Hash );
 
   }
 
@@ -115,7 +116,7 @@ class ChatResponseTest{
     // Act
     this.entityManager.persistAndFlush( chat );
     // Assert
-    assertNotNull( response.id( ) );
+    assertThat( response.id( ) ).isPositive( );
 
   }
 
@@ -147,7 +148,7 @@ class ChatResponseTest{
     this.entityManager.persistAndFlush( chat );
     val valueAfterUpdate = response.createdAt( );
     // Assert
-    assertEquals( initialValue, valueAfterUpdate );
+    assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
   }
 
