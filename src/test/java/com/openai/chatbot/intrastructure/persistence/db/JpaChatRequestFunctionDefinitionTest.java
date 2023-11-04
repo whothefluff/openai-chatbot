@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
 @DataJpaTest
-class ChatRequestFunctionDefinitionTest{
+class JpaChatRequestFunctionDefinitionTest{
 
   @Autowired
   private TestEntityManager entityManager;
@@ -27,9 +27,9 @@ class ChatRequestFunctionDefinitionTest{
   public void equals_sameRequestAndId_equal( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val request = new ChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
-    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
-    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
+    val request = new JpaChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
+    val function1 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id );
     // Act & Assert
     assertThat( function1 ).isEqualTo( function2 );
 
@@ -39,10 +39,10 @@ class ChatRequestFunctionDefinitionTest{
   public void equals_differentRequestAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val request1 = new ChatRequestFunctionDefinitionTest.FakeDifferentChatRequest( );
-    val function1 = new ChatRequestFunctionDefinition( ).request( request1 ).id( id );
-    val request2 = new ChatRequest( );
-    val function2 = new ChatRequestFunctionDefinition( ).request( request2 ).id( id );
+    val request1 = new JpaChatRequestFunctionDefinitionTest.FakeDifferentChatRequest( );
+    val function1 = new JpaChatRequestFunctionDefinition( ).request( request1 ).id( id );
+    val request2 = new JpaChatRequest( );
+    val function2 = new JpaChatRequestFunctionDefinition( ).request( request2 ).id( id );
     // Act & Assert
     assertThat( function1 ).isNotEqualTo( function2 );
 
@@ -52,9 +52,9 @@ class ChatRequestFunctionDefinitionTest{
   public void equals_sameRequestAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val request = new ChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
-    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
-    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
+    val request = new JpaChatRequestFunctionDefinitionTest.FakeEqualChatRequest( );
+    val function1 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
     // Act & Assert
     assertThat( function1 ).isNotEqualTo( function2 );
 
@@ -64,9 +64,9 @@ class ChatRequestFunctionDefinitionTest{
   public void hashCode_sameRequestAndId_equal( ){
     // Arrange
     val id = Integer.valueOf( new SecureRandom( ).nextInt( ) );
-    val request = new ChatRequestFunctionDefinitionTest.FakeChatRequest( );
-    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
-    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
+    val request = new JpaChatRequestFunctionDefinitionTest.FakeChatRequest( );
+    val function1 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id );
     // Act
     val function1Hash = function1.hashCode( );
     val function2Hash = function2.hashCode( );
@@ -79,10 +79,10 @@ class ChatRequestFunctionDefinitionTest{
   public void hashCode_differentRequestAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val request1 = new ChatRequestFunctionDefinitionTest.FakeChatRequest( 1 );
-    val function1 = new ChatRequestFunctionDefinition( ).request( request1 ).id( id );
-    val request2 = new ChatRequestFunctionDefinitionTest.FakeChatRequest( 2 );
-    val function2 = new ChatRequestFunctionDefinition( ).request( request2 ).id( id );
+    val request1 = new JpaChatRequestFunctionDefinitionTest.FakeChatRequest( 1 );
+    val function1 = new JpaChatRequestFunctionDefinition( ).request( request1 ).id( id );
+    val request2 = new JpaChatRequestFunctionDefinitionTest.FakeChatRequest( 2 );
+    val function2 = new JpaChatRequestFunctionDefinition( ).request( request2 ).id( id );
     // Act
     val function1Hash = function1.hashCode( );
     val function2Hash = function2.hashCode( );
@@ -95,9 +95,9 @@ class ChatRequestFunctionDefinitionTest{
   public void hashCode_sameRequestAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val request = new ChatRequestFunctionDefinitionTest.FakeChatRequest( );
-    val function1 = new ChatRequestFunctionDefinition( ).request( request ).id( id );
-    val function2 = new ChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
+    val request = new JpaChatRequestFunctionDefinitionTest.FakeChatRequest( );
+    val function1 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id );
+    val function2 = new JpaChatRequestFunctionDefinition( ).request( request ).id( id + 1 );
     // Act
     val function1Hash = function1.hashCode( );
     val function2Hash = function2.hashCode( );
@@ -109,10 +109,10 @@ class ChatRequestFunctionDefinitionTest{
   @Test
   public void id_afterSave_notNull( ){
     // Arrange
-    val chat = new Chat( );
-    val request = new ChatRequest( ).model( "some model" );
+    val chat = new JpaChat( );
+    val request = new JpaChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestFunctionDefinition( ).name( "some_name" ).parameters( "{ some parameters }" );
+    val function = new JpaChatRequestFunctionDefinition( ).name( "some_name" ).parameters( "{ some parameters }" );
     request.addFunctionDefinition( function );
     // Act
     this.entityManager.persistAndFlush( chat );
@@ -125,10 +125,10 @@ class ChatRequestFunctionDefinitionTest{
   public void createdAt_afterCreation_recent( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( );
-    val request = new ChatRequest( ).model( "some model" );
+    val chat = new JpaChat( );
+    val request = new JpaChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestFunctionDefinition( ).name( "some_name" ).parameters( "{ some parameters }" );
+    val function = new JpaChatRequestFunctionDefinition( ).name( "some_name" ).parameters( "{ some parameters }" );
     request.addFunctionDefinition( function );
     // Act
     this.entityManager.persistAndFlush( chat );
@@ -140,10 +140,10 @@ class ChatRequestFunctionDefinitionTest{
   @Test
   public void createdAt_afterModification_unchanged( ){
     // Arrange
-    val chat = new Chat( );
-    val request = new ChatRequest( ).model( "some model" );
+    val chat = new JpaChat( );
+    val request = new JpaChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestFunctionDefinition( ).name( "initial" ).parameters( "{ some parameters }" );
+    val function = new JpaChatRequestFunctionDefinition( ).name( "initial" ).parameters( "{ some parameters }" );
     request.addFunctionDefinition( function );
     this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( function );
@@ -161,10 +161,10 @@ class ChatRequestFunctionDefinitionTest{
   public void modifiedAt_afterModification_updated( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( );
-    val request = new ChatRequest( ).model( "some model" );
+    val chat = new JpaChat( );
+    val request = new JpaChatRequest( ).model( "some model" );
     chat.addRequest( request );
-    val function = new ChatRequestFunctionDefinition( ).name( "initial" ).parameters( "{ some parameters }" );
+    val function = new JpaChatRequestFunctionDefinition( ).name( "initial" ).parameters( "{ some parameters }" );
     request.addFunctionDefinition( function );
     this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( function );
@@ -180,7 +180,7 @@ class ChatRequestFunctionDefinitionTest{
   @SuppressWarnings( { "NonFinalFieldReferencedInHashCode", "EqualsAndHashcode" } )
   @NoArgsConstructor
   @AllArgsConstructor
-  private static class FakeChatRequest extends ChatRequest{
+  private static class FakeChatRequest extends JpaChatRequest{
 
     protected int hashCode;
 
@@ -194,7 +194,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @SuppressWarnings( { "ClassTooDeepInInheritanceTree", "com.haulmont.jpb.EqualsDoesntCheckParameterClass", "EqualsAndHashcode" } )
-  private static class FakeEqualChatRequest extends ChatRequestFunctionDefinitionTest.FakeChatRequest{
+  private static class FakeEqualChatRequest extends JpaChatRequestFunctionDefinitionTest.FakeChatRequest{
 
     @Override
     public boolean equals( final Object o ){
@@ -206,7 +206,7 @@ class ChatRequestFunctionDefinitionTest{
   }
 
   @SuppressWarnings( { "ClassTooDeepInInheritanceTree", "EqualsAndHashcode" } )
-  private static class FakeDifferentChatRequest extends ChatRequestFunctionDefinitionTest.FakeChatRequest{
+  private static class FakeDifferentChatRequest extends JpaChatRequestFunctionDefinitionTest.FakeChatRequest{
 
     @Override
     public boolean equals( final Object o ){

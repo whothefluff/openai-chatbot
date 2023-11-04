@@ -13,10 +13,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger", "HardCodedStringLiteral" } )
+@SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral" } )
 @ActiveProfiles( "test" )
 @DataJpaTest
-public class ChatTest{
+class JpaChatTest{
 
   @Autowired
   private TestEntityManager entityManager;
@@ -25,9 +25,9 @@ public class ChatTest{
   public void equals_sameId_equal( ){
     // Arrange
     val uuid = UUID.randomUUID( );
-    val chat1 = new Chat( );
+    val chat1 = new JpaChat( );
     chat1.id( uuid );
-    val chat2 = new Chat( );
+    val chat2 = new JpaChat( );
     chat2.id( uuid );
     // Act & Assert
     assertThat( chat1 ).isEqualTo( chat2 );
@@ -37,9 +37,9 @@ public class ChatTest{
   @Test
   public void equals_differentId_notEqual( ){
     // Arrange
-    val chat1 = new Chat( );
+    val chat1 = new JpaChat( );
     chat1.id( UUID.randomUUID( ) );
-    val chat2 = new Chat( );
+    val chat2 = new JpaChat( );
     chat2.id( UUID.randomUUID( ) );
     // Act & Assert
     assertThat( chat1 ).isNotEqualTo( chat2 );
@@ -50,9 +50,9 @@ public class ChatTest{
   public void hashCode_sameId_equal( ){
     // Arrange
     val uuid = UUID.randomUUID( );
-    val chat1 = new Chat( );
+    val chat1 = new JpaChat( );
     chat1.id( uuid );
-    val chat2 = new Chat( );
+    val chat2 = new JpaChat( );
     chat2.id( uuid );
     // Act
     val chat1Hash = chat1.hashCode( );
@@ -65,9 +65,9 @@ public class ChatTest{
   @Test
   public void hashCode_differentId_notEqual( ){
     // Arrange
-    val chat1 = new Chat( );
+    val chat1 = new JpaChat( );
     chat1.id( UUID.randomUUID( ) );
-    val chat2 = new Chat( );
+    val chat2 = new JpaChat( );
     chat2.id( UUID.randomUUID( ) );
     // Act
     val chat1Hash = chat1.hashCode( );
@@ -80,7 +80,7 @@ public class ChatTest{
   @Test
   public void id_afterSave_notNull( ){
     // Arrange
-    val chat = new Chat( );
+    val chat = new JpaChat( );
     // Act
     val savedChat = this.entityManager.persistAndFlush( chat );
     // Assert
@@ -92,7 +92,7 @@ public class ChatTest{
   public void createdAt_afterCreation_recent( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( );
+    val chat = new JpaChat( );
     // Act
     val savedChat = this.entityManager.persistAndFlush( chat );
     // Assert
@@ -103,7 +103,7 @@ public class ChatTest{
   @Test
   public void createdAt_afterModification_unchanged( ){
     // Arrange
-    val chat = new Chat( ).name( "initial" );
+    val chat = new JpaChat( ).name( "initial" );
     val savedChat = this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( savedChat );
     val initialValue = savedChat.createdAt( );
@@ -120,7 +120,7 @@ public class ChatTest{
   public void modifiedAt_afterModification_updated( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( ).name( "initial" );
+    val chat = new JpaChat( ).name( "initial" );
     val savedChat = this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( savedChat );
     // Act

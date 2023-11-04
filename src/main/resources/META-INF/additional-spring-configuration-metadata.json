@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "openai.api-key",
+      "type": "java.lang.String",
+      "description": "An env var."
+    },
+    {
+      "name": "openai.endpoint",
+      "type": "java.lang.String",
+      "description": "API endpoint."
+    }
+  ]
+}

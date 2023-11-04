@@ -10,17 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-class ChatResponseChoiceMessageFunctionCallTest{
+class JpaChatResponseChoiceMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
   public void equals_instance_callsParent( ){
     // Arrange
-    val message = new ChatResponseChoiceMessageFunctionCallTest.EqualsSpyChatResponseChoiceMessage( );
-    val functionCall = new ChatResponseChoiceMessageFunctionCall( );
+    val message = new JpaChatResponseChoiceMessageFunctionCallTest.EqualsSpyChatResponseChoiceMessage( );
+    val functionCall = new JpaChatResponseChoiceMessageFunctionCall( );
     message.functionCall( functionCall );
     // Act
-    functionCall.equals( new ChatResponseChoiceMessageFunctionCall( ) );
+    functionCall.equals( new JpaChatResponseChoiceMessageFunctionCall( ) );
     // Assert
     assertThat( message.calls( ) ).isEqualTo( 1 );
 
@@ -30,8 +30,8 @@ class ChatResponseChoiceMessageFunctionCallTest{
   @Test
   public void hashCode_instance_callsParent( ){
     // Arrange
-    val message = new ChatResponseChoiceMessageFunctionCallTest.HashSpyChatResponseChoiceMessage( );
-    val functionCall = new ChatResponseChoiceMessageFunctionCall( );
+    val message = new JpaChatResponseChoiceMessageFunctionCallTest.HashSpyChatResponseChoiceMessage( );
+    val functionCall = new JpaChatResponseChoiceMessageFunctionCall( );
     message.functionCall( functionCall );
     // Act
     functionCall.hashCode( );
@@ -44,7 +44,7 @@ class ChatResponseChoiceMessageFunctionCallTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class EqualsSpyChatResponseChoiceMessage extends ChatResponseChoiceMessage{
+  private static class EqualsSpyChatResponseChoiceMessage extends JpaChatResponseChoiceMessage{
 
     Integer calls = 0;
 
@@ -62,7 +62,7 @@ class ChatResponseChoiceMessageFunctionCallTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class HashSpyChatResponseChoiceMessage extends ChatResponseChoiceMessage{
+  private static class HashSpyChatResponseChoiceMessage extends JpaChatResponseChoiceMessage{
 
     Integer calls = 0;
 

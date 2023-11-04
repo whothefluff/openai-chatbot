@@ -1,14 +1,10 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.intrastructure.persistence.db.id.ChatResponseChoiceId;
+import com.openai.chatbot.intrastructure.persistence.db.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.Instant;
 
 @SuppressWarnings( { "com.haulmont.jpb.LombokDataInspection",
                      "com.haulmont.jpb.LombokEqualsAndHashCodeInspection",
@@ -25,47 +21,37 @@ import java.time.Instant;
 @AllArgsConstructor
 @Accessors( chain = true,
             fluent = true )
-@IdClass( ChatResponseChoiceId.class )
 @Entity
-@Table( name = "chat_response_choices" )
-public class ChatResponseChoice{
+@Table( name = "chat_response_choice_messages" )
+public class JpaChatResponseChoiceMessage{
 
   @EqualsAndHashCode.Include
   @ToString.Include
-  @ManyToOne( fetch = FetchType.LAZY )
+  @Id
+  @MapsId
+  @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
                                        referencedColumnName = "chat_id" ),
                           @JoinColumn( name = "response_id",
+                                       referencedColumnName = "response_id" ),
+                          @JoinColumn( name = "choice_id",
                                        referencedColumnName = "id" ) },
-                foreignKey = @ForeignKey( name = "FK_RC_ON_CHAT_RESPONSE" ) )
-  @Id
-  ChatResponse response;
-  @EqualsAndHashCode.Include
-  @ToString.Include
-  @GeneratedValue( strategy = GenerationType.SEQUENCE )
-  @Id
-  Integer id;
-  @CreationTimestamp
-  @Column( updatable = false,
-           nullable = false )
-  Instant createdAt;
-  @Version
-  @UpdateTimestamp
-  @Column( insertable = false )
-  Instant modifiedAt;
+                foreignKey = @ForeignKey( name = "FK_RCM_ON_CHAT_RESPONSE_CHOICE" ) )
+  JpaChatResponseChoice choice;
+  @Enumerated( EnumType.STRING )
+  @Column( nullable = false )
+  Role role;
   @Column
-  Integer index;
-  @Column
-  String finishReason;
-  @OneToOne( mappedBy = ChatResponseChoiceMessage_.CHOICE,
+  String content;
+  @OneToOne( mappedBy = JpaChatResponseChoiceMessageFunctionCall_.MESSAGE,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
-  ChatResponseChoiceMessage message;
+  JpaChatResponseChoiceMessageFunctionCall functionCall;
 
-  public ChatResponseChoice message( final ChatResponseChoiceMessage message ){
+  public JpaChatResponseChoiceMessage functionCall( final JpaChatResponseChoiceMessageFunctionCall functionCall ){
 
-    this.message = message;
-    message.choice( this );
+    this.functionCall = functionCall;
+    functionCall.message( this );
     return this;
 
   }

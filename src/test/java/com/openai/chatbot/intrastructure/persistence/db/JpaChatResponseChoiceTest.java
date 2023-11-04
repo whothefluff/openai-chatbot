@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
 @DataJpaTest
-class ChatResponseChoiceTest{
+class JpaChatResponseChoiceTest{
 
   @Autowired
   private TestEntityManager entityManager;
@@ -27,9 +27,9 @@ class ChatResponseChoiceTest{
   public void equals_sameResponseAndId_equal( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val response = new ChatResponseChoiceTest.FakeEqualChatResponse( );
-    val choice1 = new ChatResponseChoice( ).response( response ).id( id );
-    val choice2 = new ChatResponseChoice( ).response( response ).id( id );
+    val response = new JpaChatResponseChoiceTest.FakeEqualChatResponse( );
+    val choice1 = new JpaChatResponseChoice( ).response( response ).id( id );
+    val choice2 = new JpaChatResponseChoice( ).response( response ).id( id );
     // Act & Assert
     assertThat( choice1 ).isEqualTo( choice2 );
 
@@ -39,10 +39,10 @@ class ChatResponseChoiceTest{
   public void equals_differentResponseAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val response1 = new ChatResponseChoiceTest.FakeDifferentChatResponse( );
-    val choice1 = new ChatResponseChoice( ).response( response1 ).id( id );
-    val response2 = new ChatResponse( );
-    val choice2 = new ChatResponseChoice( ).response( response2 ).id( id );
+    val response1 = new JpaChatResponseChoiceTest.FakeDifferentChatResponse( );
+    val choice1 = new JpaChatResponseChoice( ).response( response1 ).id( id );
+    val response2 = new JpaChatResponse( );
+    val choice2 = new JpaChatResponseChoice( ).response( response2 ).id( id );
     // Act & Assert
     assertThat( choice1 ).isNotEqualTo( choice2 );
 
@@ -52,9 +52,9 @@ class ChatResponseChoiceTest{
   public void equals_sameResponseAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val response = new ChatResponseChoiceTest.FakeEqualChatResponse( );
-    val choice1 = new ChatResponseChoice( ).response( response ).id( id );
-    val choice2 = new ChatResponseChoice( ).response( response ).id( id + 1 );
+    val response = new JpaChatResponseChoiceTest.FakeEqualChatResponse( );
+    val choice1 = new JpaChatResponseChoice( ).response( response ).id( id );
+    val choice2 = new JpaChatResponseChoice( ).response( response ).id( id + 1 );
     // Act & Assert
     assertThat( choice1 ).isNotEqualTo( choice2 );
 
@@ -64,9 +64,9 @@ class ChatResponseChoiceTest{
   public void hashCode_sameResponseAndId_equal( ){
     // Arrange
     val id = Integer.valueOf( new SecureRandom( ).nextInt( ) );
-    val response = new ChatResponseChoiceTest.FakeChatResponse( );
-    val choice1 = new ChatResponseChoice( ).response( response ).id( id );
-    val choice2 = new ChatResponseChoice( ).response( response ).id( id );
+    val response = new JpaChatResponseChoiceTest.FakeChatResponse( );
+    val choice1 = new JpaChatResponseChoice( ).response( response ).id( id );
+    val choice2 = new JpaChatResponseChoice( ).response( response ).id( id );
     // Act
     val choice1Hash = choice1.hashCode( );
     val choice2Hash = choice2.hashCode( );
@@ -79,10 +79,10 @@ class ChatResponseChoiceTest{
   public void hashCode_differentResponseAndSameId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val response1 = new ChatResponseChoiceTest.FakeChatResponse( 1 );
-    val choice1 = new ChatResponseChoice( ).response( response1 ).id( id );
-    val response2 = new ChatResponseChoiceTest.FakeChatResponse( 2 );
-    val choice2 = new ChatResponseChoice( ).response( response2 ).id( id );
+    val response1 = new JpaChatResponseChoiceTest.FakeChatResponse( 1 );
+    val choice1 = new JpaChatResponseChoice( ).response( response1 ).id( id );
+    val response2 = new JpaChatResponseChoiceTest.FakeChatResponse( 2 );
+    val choice2 = new JpaChatResponseChoice( ).response( response2 ).id( id );
     // Act
     val choice1Hash = choice1.hashCode( );
     val choice2Hash = choice2.hashCode( );
@@ -95,9 +95,9 @@ class ChatResponseChoiceTest{
   public void hashCode_sameResponseAndDifferentId_notEqual( ){
     // Arrange
     val id = new SecureRandom( ).nextInt( );
-    val response = new ChatResponseChoiceTest.FakeChatResponse( );
-    val choice1 = new ChatResponseChoice( ).response( response ).id( id );
-    val choice2 = new ChatResponseChoice( ).response( response ).id( id + 1 );
+    val response = new JpaChatResponseChoiceTest.FakeChatResponse( );
+    val choice1 = new JpaChatResponseChoice( ).response( response ).id( id );
+    val choice2 = new JpaChatResponseChoice( ).response( response ).id( id + 1 );
     // Act
     val choice1Hash = choice1.hashCode( );
     val choice2Hash = choice2.hashCode( );
@@ -109,10 +109,10 @@ class ChatResponseChoiceTest{
   @Test
   public void id_afterSave_notNull( ){
     // Arrange
-    val chat = new Chat( );
-    val response = new ChatResponse( );
+    val chat = new JpaChat( );
+    val response = new JpaChatResponse( );
     chat.addResponse( response );
-    val choice = new ChatResponseChoice( );
+    val choice = new JpaChatResponseChoice( );
     response.addChoice( choice );
     // Act
     this.entityManager.persistAndFlush( chat );
@@ -125,10 +125,10 @@ class ChatResponseChoiceTest{
   public void createdAt_afterCreation_recent( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( );
-    val response = new ChatResponse( );
+    val chat = new JpaChat( );
+    val response = new JpaChatResponse( );
     chat.addResponse( response );
-    val choice = new ChatResponseChoice( );
+    val choice = new JpaChatResponseChoice( );
     response.addChoice( choice );
     // Act
     this.entityManager.persistAndFlush( chat );
@@ -140,10 +140,10 @@ class ChatResponseChoiceTest{
   @Test
   public void createdAt_afterModification_unchanged( ){
     // Arrange
-    val chat = new Chat( );
-    val response = new ChatResponse( );
+    val chat = new JpaChat( );
+    val response = new JpaChatResponse( );
     chat.addResponse( response );
-    val choice = new ChatResponseChoice( ).index( 1 );
+    val choice = new JpaChatResponseChoice( ).index( 1 );
     response.addChoice( choice );
     this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( choice );
@@ -161,10 +161,10 @@ class ChatResponseChoiceTest{
   public void modifiedAt_afterModification_updated( ){
     // Arrange
     val maxAllowedDifference = 30L;
-    val chat = new Chat( );
-    val response = new ChatResponse( );
+    val chat = new JpaChat( );
+    val response = new JpaChatResponse( );
     chat.addResponse( response );
-    val choice = new ChatResponseChoice( ).index( 1 );
+    val choice = new JpaChatResponseChoice( ).index( 1 );
     response.addChoice( choice );
     this.entityManager.persistAndFlush( chat );
     this.entityManager.refresh( choice );
@@ -180,7 +180,7 @@ class ChatResponseChoiceTest{
   @SuppressWarnings( { "NonFinalFieldReferencedInHashCode", "EqualsAndHashcode" } )
   @NoArgsConstructor
   @AllArgsConstructor
-  private static class FakeChatResponse extends ChatResponse{
+  private static class FakeChatResponse extends JpaChatResponse{
 
     protected int hashCode;
 
@@ -194,7 +194,7 @@ class ChatResponseChoiceTest{
   }
 
   @SuppressWarnings( { "ClassTooDeepInInheritanceTree", "com.haulmont.jpb.EqualsDoesntCheckParameterClass", "EqualsAndHashcode" } )
-  private static class FakeEqualChatResponse extends ChatResponseChoiceTest.FakeChatResponse{
+  private static class FakeEqualChatResponse extends JpaChatResponseChoiceTest.FakeChatResponse{
 
     @Override
     public boolean equals( final Object o ){
@@ -206,7 +206,7 @@ class ChatResponseChoiceTest{
   }
 
   @SuppressWarnings( { "ClassTooDeepInInheritanceTree", "EqualsAndHashcode" } )
-  private static class FakeDifferentChatResponse extends ChatResponseChoiceTest.FakeChatResponse{
+  private static class FakeDifferentChatResponse extends JpaChatResponseChoiceTest.FakeChatResponse{
 
     @Override
     public boolean equals( final Object o ){

@@ -1,7 +1,6 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.intrastructure.persistence.db.common.Role;
-import com.openai.chatbot.intrastructure.persistence.db.id.ChatRequestMessageId;
+import com.openai.chatbot.intrastructure.persistence.db.id.ChatRequestFunctionDefinitionId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -19,29 +18,33 @@ import static org.hibernate.Length.LONG;
                      "HardCodedStringLiteral",
                      "UseOfConcreteClass",
                      "ClassWithoutLogger",
-                     "MissingJavadoc" } )
+                     "MissingJavadoc",
+                     "com.haulmont.jpb.LombokToStringIncludeInspection" } )
 @Data
 @EqualsAndHashCode( onlyExplicitlyIncluded = true )
+@ToString( onlyExplicitlyIncluded = true )
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @NoArgsConstructor( access = AccessLevel.PROTECTED )
 @AllArgsConstructor
 @Accessors( chain = true,
             fluent = true )
-@IdClass( ChatRequestMessageId.class )
+@IdClass( ChatRequestFunctionDefinitionId.class )
 @Entity
-@Table( name = "chat_request_messages" )
-public class ChatRequestMessage{
+@Table( name = "chat_request_function_definitions" )
+public class JpaChatRequestFunctionDefinition{
 
   @EqualsAndHashCode.Include
   @ToString.Include
   @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
-                                       referencedColumnName = "chat_id" ),
+                                       referencedColumnName = "chat_id",
+                                       nullable = false ),
                           @JoinColumn( name = "request_id",
-                                       referencedColumnName = "id" ) },
-                foreignKey = @ForeignKey( name = "FK_RM_ON_CHAT_REQUEST" ) )
+                                       referencedColumnName = "id",
+                                       nullable = false ) },
+                foreignKey = @ForeignKey( name = "FK_RFD_ON_CHAT_REQUEST" ) )
   @Id
-  ChatRequest request;
+  JpaChatRequest request;
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
@@ -55,26 +58,15 @@ public class ChatRequestMessage{
   @UpdateTimestamp
   @Column( insertable = false )
   Instant modifiedAt;
-  @Enumerated( EnumType.STRING )
-  @Column( nullable = false )
-  Role role;
-  @Column( length = LONG )
-  String content;
   @Pattern( regexp = "^[a-zA-Z0-9_]{1,64}$",
             message = "Invalid function name. Only a-z, A-Z, 0-9, and underscores are allowed, with a maximum length of 64 characters." )
-  @Column( length = 64 )
+  @Column( length = 64,
+           nullable = false )
   String name;
-  @OneToOne( mappedBy = ChatRequestMessageFunctionCall_.CHAT_REQUEST_MESSAGE,
-             cascade = CascadeType.ALL,
-             orphanRemoval = true )
-  ChatRequestMessageFunctionCall functionCall;
-
-  public ChatRequestMessage functionCall( final ChatRequestMessageFunctionCall functionCall ){
-
-    this.functionCall = functionCall;
-    functionCall.chatRequestMessage( this );
-    return this;
-
-  }
+  @Column
+  String description;
+  @Column( nullable = false,
+           length = LONG )
+  String parameters;
 
 }

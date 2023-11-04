@@ -30,14 +30,14 @@ import java.util.Set;
 @IdClass( ChatResponseId.class )
 @Entity
 @Table( name = "chat_responses" )
-public class ChatResponse{
+public class JpaChatResponse{
 
   @EqualsAndHashCode.Include
   @ToString.Include
   @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumn( foreignKey = @ForeignKey( name = "FK_RES_ON_CHAT" ) )
   @Id
-  Chat chat;
+  JpaChat chat;
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
@@ -67,17 +67,17 @@ public class ChatResponse{
                                        insertable = false,
                                        updatable = false ) },
                 foreignKey = @ForeignKey( name = "FK_R_ON_CHAT_REQUEST" ) )
-  ChatRequest previousRequest; // not nullable in the database
-  @OneToMany( mappedBy = ChatResponseChoice_.RESPONSE,
+  JpaChatRequest previousRequest; // not nullable in the database
+  @OneToMany( mappedBy = JpaChatResponseChoice_.RESPONSE,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatResponseChoice> choices = new LinkedHashSet<>( 0 );
-  @OneToOne( mappedBy = ChatResponseUsage_.RESPONSE,
+  Set<JpaChatResponseChoice> choices = new LinkedHashSet<>( 0 );
+  @OneToOne( mappedBy = JpaChatResponseUsage_.RESPONSE,
              cascade = CascadeType.ALL,
              orphanRemoval = true )
-  ChatResponseUsage usage;
+  JpaChatResponseUsage usage;
 
-  public ChatResponse addChoice( final ChatResponseChoice choice ){
+  public JpaChatResponse addChoice( final JpaChatResponseChoice choice ){
 
     this.choices( ).add( choice );
     choice.response( this );
@@ -85,7 +85,7 @@ public class ChatResponse{
 
   }
 
-  public ChatResponse removeChoice( final ChatResponseChoice choice ){
+  public JpaChatResponse removeChoice( final JpaChatResponseChoice choice ){
 
     this.choices( ).remove( choice );
     choice.response( null );
@@ -93,7 +93,7 @@ public class ChatResponse{
 
   }
 
-  public ChatResponse usage( final ChatResponseUsage usage ){
+  public JpaChatResponse usage( final JpaChatResponseUsage usage ){
 
     this.usage = usage;
     usage.response( this );

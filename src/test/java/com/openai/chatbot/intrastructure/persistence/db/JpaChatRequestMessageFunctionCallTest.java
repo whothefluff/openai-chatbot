@@ -10,19 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-class ChatResponseUsageTest{
+class JpaChatRequestMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
   public void equals_instance_callsParent( ){
     // Arrange
-    val response = new EqualsSpyChatResponse( );
-    val usage = new ChatResponseUsage( );
-    response.usage( usage );
+    val message = new EqualsSpyChatRequestMessage( );
+    val functionCall = new JpaChatRequestMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
-    usage.equals( new ChatResponseUsage( ) );
+    functionCall.equals( new JpaChatRequestMessageFunctionCall( ) );
     // Assert
-    assertThat( response.calls( ) ).isEqualTo( 1 );
+    assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -30,13 +30,13 @@ class ChatResponseUsageTest{
   @Test
   public void hashCode_instance_callsParent( ){
     // Arrange
-    val response = new HashSpyChatResponse( );
-    val usage = new ChatResponseUsage( );
-    response.usage( usage );
+    val message = new HashSpyChatRequestMessage( );
+    val functionCall = new JpaChatRequestMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
-    usage.hashCode( );
+    functionCall.hashCode( );
     // Assert
-    assertThat( response.calls( ) ).isEqualTo( 1 );
+    assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -44,7 +44,7 @@ class ChatResponseUsageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class EqualsSpyChatResponse extends ChatResponse{
+  private static class EqualsSpyChatRequestMessage extends JpaChatRequestMessage{
 
     Integer calls = 0;
 
@@ -62,7 +62,7 @@ class ChatResponseUsageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class HashSpyChatResponse extends ChatResponse{
+  private static class HashSpyChatRequestMessage extends JpaChatRequestMessage{
 
     Integer calls = 0;
 

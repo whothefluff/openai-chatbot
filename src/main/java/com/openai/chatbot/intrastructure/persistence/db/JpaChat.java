@@ -25,7 +25,7 @@ import java.util.UUID;
             fluent = true )
 @Entity
 @Table( name = "chats" )
-public class Chat{
+public class JpaChat{
 
   @EqualsAndHashCode.Include
   @ToString.Include
@@ -46,17 +46,17 @@ public class Chat{
   @NaturalId( mutable = true )
   String name;
   @Getter( AccessLevel.PROTECTED )
-  @OneToMany( mappedBy = ChatRequest_.CHAT,
+  @OneToMany( mappedBy = JpaChatRequest_.CHAT,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatRequest> requests = new LinkedHashSet<>( 0 );
+  Set<JpaChatRequest> requests = new LinkedHashSet<>( 0 );
   @Getter( AccessLevel.PROTECTED )
-  @OneToMany( mappedBy = ChatResponse_.CHAT,
+  @OneToMany( mappedBy = JpaChatResponse_.CHAT,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatResponse> responses = new LinkedHashSet<>( 0 );
+  Set<JpaChatResponse> responses = new LinkedHashSet<>( 0 );
 
-  public Chat addRequest( final ChatRequest request ){
+  public JpaChat addRequest( final JpaChatRequest request ){
 
     this.requests( ).add( request );
     request.chat( this );
@@ -64,7 +64,7 @@ public class Chat{
 
   }
 
-  public Chat removeRequest( final ChatRequest request ){
+  public JpaChat removeRequest( final JpaChatRequest request ){
 
     this.requests( ).remove( request );
     request.chat( null );
@@ -72,7 +72,7 @@ public class Chat{
 
   }
 
-  public Chat addResponse( final ChatResponse response ){
+  public JpaChat addResponse( final JpaChatResponse response ){
 
     this.responses( ).add( response );
     response.chat( this );
@@ -80,7 +80,7 @@ public class Chat{
 
   }
 
-  public Chat removeResponse( final ChatResponse response ){
+  public JpaChat removeResponse( final JpaChatResponse response ){
 
     this.responses( ).remove( response );
     response.chat( null );

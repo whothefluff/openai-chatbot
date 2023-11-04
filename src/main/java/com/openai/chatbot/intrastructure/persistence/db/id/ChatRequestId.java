@@ -1,6 +1,6 @@
 package com.openai.chatbot.intrastructure.persistence.db.id;
 
-import com.openai.chatbot.intrastructure.persistence.db.Chat;
+import com.openai.chatbot.intrastructure.persistence.db.JpaChat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +22,7 @@ public class ChatRequestId implements Serializable{
 
   @Serial
   private static final long serialVersionUID = -7420305192706802053L;
-  Chat chat;
+  JpaChat chat;
   Integer id;
 
 }

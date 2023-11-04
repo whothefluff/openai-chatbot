@@ -21,28 +21,25 @@ import lombok.experimental.FieldDefaults;
 @Accessors( chain = true,
             fluent = true )
 @Entity
-@Table( name = "chat_response_choice_message_function_calls" )
-public class ChatResponseChoiceMessageFunctionCall{
+@Table( name = "chat_response_usages" )
+public class JpaChatResponseUsage{
 
   @EqualsAndHashCode.Include
   @ToString.Include
+  @Id
   @MapsId
   @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
-                                       referencedColumnName = "chat_id",
-                                       nullable = false ),
+                                       referencedColumnName = "chat_id" ),
                           @JoinColumn( name = "response_id",
-                                       referencedColumnName = "response_id",
-                                       nullable = false ),
-                          @JoinColumn( name = "choice_id",
-                                       referencedColumnName = "choice_id",
-                                       nullable = false ) },
-                foreignKey = @ForeignKey( name = "FK_RCMFC_ON_RESPONSE_CHOICE_MESSAGE" ) )
-  @Id
-  ChatResponseChoiceMessage message;
-  @Column( nullable = false )
-  String name;
-  @Column( nullable = false )
-  String arguments;
+                                       referencedColumnName = "id" ), },
+                foreignKey = @ForeignKey( name = "FK_RU_ON_CHAT_RESPONSE" ) )
+  JpaChatResponse response;
+  @Column
+  Integer promptTokens;
+  @Column
+  Integer completionTokens;
+  @Column
+  Integer totalTokens;
 
 }

@@ -10,19 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-class ChatResponseChoiceMessageTest{
+class JpaChatResponseUsageTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
   public void equals_instance_callsParent( ){
     // Arrange
-    val choice = new ChatResponseChoiceMessageTest.EqualsSpyChatResponseChoice( );
-    val message = new ChatResponseChoiceMessage( );
-    choice.message( message );
+    val response = new EqualsSpyChatResponse( );
+    val usage = new JpaChatResponseUsage( );
+    response.usage( usage );
     // Act
-    message.equals( new ChatResponseChoiceMessage( ) );
+    usage.equals( new JpaChatResponseUsage( ) );
     // Assert
-    assertThat( choice.calls( ) ).isEqualTo( 1 );
+    assertThat( response.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -30,13 +30,13 @@ class ChatResponseChoiceMessageTest{
   @Test
   public void hashCode_instance_callsParent( ){
     // Arrange
-    val choice = new ChatResponseChoiceMessageTest.HashSpyChatResponseChoice( );
-    val message = new ChatResponseChoiceMessage( );
-    choice.message( message );
+    val response = new HashSpyChatResponse( );
+    val usage = new JpaChatResponseUsage( );
+    response.usage( usage );
     // Act
-    message.hashCode( );
+    usage.hashCode( );
     // Assert
-    assertThat( choice.calls( ) ).isEqualTo( 1 );
+    assertThat( response.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -44,7 +44,7 @@ class ChatResponseChoiceMessageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class EqualsSpyChatResponseChoice extends ChatResponseChoice{
+  private static class EqualsSpyChatResponse extends JpaChatResponse{
 
     Integer calls = 0;
 
@@ -62,7 +62,7 @@ class ChatResponseChoiceMessageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class HashSpyChatResponseChoice extends ChatResponseChoice{
+  private static class HashSpyChatResponse extends JpaChatResponse{
 
     Integer calls = 0;
 

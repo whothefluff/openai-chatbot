@@ -32,14 +32,14 @@ import java.util.Set;
 @IdClass( ChatRequestId.class )
 @Entity
 @Table( name = "chat_requests" )
-public class ChatRequest{
+public class JpaChatRequest{
 
   @EqualsAndHashCode.Include
   @ToString.Include
   @ManyToOne( fetch = FetchType.LAZY )
   @JoinColumn( foreignKey = @ForeignKey( name = "FK_REQ_ON_CHAT" ) )
   @Id
-  Chat chat;
+  JpaChat chat;
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
@@ -85,17 +85,17 @@ public class ChatRequest{
                                        insertable = false,
                                        updatable = false ) },
                 foreignKey = @ForeignKey( name = "FK_R_ON_CHAT_RESPONSE" ) )
-  ChatResponse previousResponse;
-  @OneToMany( mappedBy = ChatRequestFunctionDefinition_.REQUEST,
+  JpaChatResponse previousResponse;
+  @OneToMany( mappedBy = JpaChatRequestFunctionDefinition_.REQUEST,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatRequestFunctionDefinition> functionDefinitions = new LinkedHashSet<>( 0 );
-  @OneToMany( mappedBy = ChatRequestMessage_.REQUEST,
+  Set<JpaChatRequestFunctionDefinition> functionDefinitions = new LinkedHashSet<>( 0 );
+  @OneToMany( mappedBy = JpaChatRequestMessage_.REQUEST,
               cascade = CascadeType.ALL,
               orphanRemoval = true )
-  Set<ChatRequestMessage> messages = new LinkedHashSet<>( 0 );
+  Set<JpaChatRequestMessage> messages = new LinkedHashSet<>( 0 );
 
-  public ChatRequest addFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
+  public JpaChatRequest addFunctionDefinition( final JpaChatRequestFunctionDefinition funcDefinition ){
 
     this.functionDefinitions( ).add( funcDefinition );
     funcDefinition.request( this );
@@ -103,7 +103,7 @@ public class ChatRequest{
 
   }
 
-  public ChatRequest removeFunctionDefinition( final ChatRequestFunctionDefinition funcDefinition ){
+  public JpaChatRequest removeFunctionDefinition( final JpaChatRequestFunctionDefinition funcDefinition ){
 
     this.functionDefinitions( ).remove( funcDefinition );
     funcDefinition.request( null );
@@ -111,7 +111,7 @@ public class ChatRequest{
 
   }
 
-  public ChatRequest addMessage( final ChatRequestMessage message ){
+  public JpaChatRequest addMessage( final JpaChatRequestMessage message ){
 
     this.messages( ).add( message );
     message.request( this );
@@ -119,7 +119,7 @@ public class ChatRequest{
 
   }
 
-  public ChatRequest removeMessage( final ChatRequestMessage message ){
+  public JpaChatRequest removeMessage( final JpaChatRequestMessage message ){
 
     this.messages( ).remove( message );
     message.request( null );

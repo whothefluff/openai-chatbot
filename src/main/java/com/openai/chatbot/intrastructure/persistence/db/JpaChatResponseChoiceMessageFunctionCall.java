@@ -1,6 +1,5 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.intrastructure.persistence.db.common.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -22,38 +21,28 @@ import lombok.experimental.FieldDefaults;
 @Accessors( chain = true,
             fluent = true )
 @Entity
-@Table( name = "chat_response_choice_messages" )
-public class ChatResponseChoiceMessage{
+@Table( name = "chat_response_choice_message_function_calls" )
+public class JpaChatResponseChoiceMessageFunctionCall{
 
   @EqualsAndHashCode.Include
   @ToString.Include
-  @Id
   @MapsId
   @OneToOne( fetch = FetchType.LAZY )
   @JoinColumns( value = { @JoinColumn( name = "chat_id",
-                                       referencedColumnName = "chat_id" ),
+                                       referencedColumnName = "chat_id",
+                                       nullable = false ),
                           @JoinColumn( name = "response_id",
-                                       referencedColumnName = "response_id" ),
+                                       referencedColumnName = "response_id",
+                                       nullable = false ),
                           @JoinColumn( name = "choice_id",
-                                       referencedColumnName = "id" ) },
-                foreignKey = @ForeignKey( name = "FK_RCM_ON_CHAT_RESPONSE_CHOICE" ) )
-  ChatResponseChoice choice;
-  @Enumerated( EnumType.STRING )
+                                       referencedColumnName = "choice_id",
+                                       nullable = false ) },
+                foreignKey = @ForeignKey( name = "FK_RCMFC_ON_RESPONSE_CHOICE_MESSAGE" ) )
+  @Id
+  JpaChatResponseChoiceMessage message;
   @Column( nullable = false )
-  Role role;
-  @Column
-  String content;
-  @OneToOne( mappedBy = ChatResponseChoiceMessageFunctionCall_.MESSAGE,
-             cascade = CascadeType.ALL,
-             orphanRemoval = true )
-  ChatResponseChoiceMessageFunctionCall functionCall;
-
-  public ChatResponseChoiceMessage functionCall( final ChatResponseChoiceMessageFunctionCall functionCall ){
-
-    this.functionCall = functionCall;
-    functionCall.message( this );
-    return this;
-
-  }
+  String name;
+  @Column( nullable = false )
+  String arguments;
 
 }
