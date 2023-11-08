@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Chat Interface</title>
+    <style>
+
+        body {
+            padding-bottom: 70px; /* for sticky footer */
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 70px; /* Set the fixed height of the footer */
+            line-height: 70px; /* Vertically center the text */
+            background-color: #f5f5f5;
+        }
+
+    </style>
+    <link rel="stylesheet" th:href="@{/css/chat.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <div class="container-fluid">
+        <div class="col-1">
+            <button aria-controls="navbarNavLeft" aria-expanded="false" aria-label="Toggle navigation"
+                    class="navbar-toggler"
+                    data-target="#navbarNavLeft" data-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div class="col-8 text-center">
+            <a class="navbar-brand mx-auto" href="#">Brand</a>
+        </div>
+        <div class="col-1">
+            <button aria-controls="navbarNavRight" aria-expanded="false" aria-label="Toggle navigation"
+                    class="navbar-toggler"
+                    data-target="#navbarNavRight" data-toggle="collapse" type="button">
+                <i class="bi bi-three-dots"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavRight">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">X</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Y</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-md-4">
+    <div class="row">
+        <div class="col-lg-2 d-none d-lg-block">
+            <p>conv1</p>
+            <p>conv2</p>
+            <p>conv3</p>
+        </div>
+        <div class="col-lg-8">
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+            <p class="">Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf
+                jaslkdf lkajsdf</p>
+        </div>
+        <div class="col-lg-2 d-none d-lg-block">
+            <!-- Insert right column content here -->
+            <!-- Button Z -->
+            <div class="nav-item">
+                <a class="nav-link" href="#">Z</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer text-center">
+    footer
+</footer>
+<!-- Bootstrap Bundle JS which includes Popper for Tooltips -->
+<script crossorigin="anonymous"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/../static/js/chat.js"></script>
+<!-- Tooltip Initialization Script -->
+<script>
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+</body>
+</html>
