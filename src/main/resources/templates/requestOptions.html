@@ -1,0 +1,153 @@
+<button aria-controls="advancedSettings" aria-expanded="false"
+        class="btn btn-outline-primary ps-lg-2"
+        data-bs-target="#advancedSettings" data-bs-toggle="collapse"
+        type="button">
+    <span id="bd-theme-text">Request options</span>
+</button>
+<div class="collapse" id="advancedSettings">
+    <div class="container my-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3">
+                    <p>
+                        <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                               for="top_p_slider"
+                               title="An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered">Top
+                            P:
+                            <span id="top_p_value">1</span>
+                        </label>
+                        <input class="form-range" id="top_p_slider" max="2.0" min="0.0"
+                               name="top_p"
+                               oninput="updateSliderValue('top_p_slider', 'top_p_value')"
+                               step="0.1" type="range" value="1">
+                    </p>
+                    <p>
+                        <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                               for="temperature_slider"
+                               title="Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic">Temperature:
+                            <span
+                                    id="temperature_value">1</span></label>
+                        <input class="form-range" id="temperature_slider" max="2.0" min="0.0"
+                               name="temperature"
+                               oninput="updateSliderValue('temperature_slider', 'temperature_value')"
+                               step="0.1" type="range" value="1">
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <label data-bs-placement="top" data-bs-toggle="tooltip"
+                           for="n_input"
+                           title="How many response choices to generate after a user message">Number
+                        of Responses:</label>
+                    <input class="form-control" id="n_input" min="1" name="n" step="1"
+                           type="number" value="1">
+                </div>
+
+                <div class="mb-3" hidden>
+                    <label for="stream_checkbox">Stream:</label>
+                    <input checked class="form-check-input" id="stream_checkbox"
+                           name="stream" type="checkbox">
+                </div>
+
+                <div class="mb-3">
+                    <div>
+                        <input class="form-check-input"
+                               id="toggleStopSequences"
+                               onchange="toggleContainerInputs(this, 'stop_sequences_container')"
+                               type="checkbox">
+                        <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                               for="toggleStopSequences"
+                               title="Up to 4 sequences where the API will stop generating further tokens">Set
+                            Stop Sequences</label>
+                    </div>
+                    <div class="d-none" id="stop_sequences_container">
+                        <label for="stop_sequence_1" hidden></label>
+                        <input class="form-control" id="stop_sequence_1" name="stop1"
+                               placeholder="Stop sequence 1"
+                               type="text">
+                        <label for="stop_sequence_2" hidden></label>
+                        <input class="form-control" id="stop_sequence_2" name="stop2"
+                               placeholder="Stop sequence 2"
+                               type="text">
+                        <label for="stop_sequence_3" hidden></label>
+                        <input class="form-control" id="stop_sequence_3" name="stop3"
+                               placeholder="Stop sequence 3"
+                               type="text">
+                        <label for="stop_sequence_4" hidden></label>
+                        <input class="form-control" id="stop_sequence_4" name="stop4"
+                               placeholder="Stop sequence 4"
+                               type="text">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div>
+                        <input class="form-check-input"
+                               id="toggleMaxTokens"
+                               onchange="toggleContainerInputs(this, 'max_tokens_container')"
+                               type="checkbox">
+                        <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                               for="toggleMaxTokens"
+                               title="The maximum number of tokens to generate in the chat completion">Set
+                            Max Tokens</label>
+                    </div>
+                    <div class="d-none" id="max_tokens_container">
+                        <label for="max_tokens_input" hidden></label>
+                        <input class="form-control" id="max_tokens_input" min="1"
+                               name="max_tokens"
+                               type="number">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                           for="presence_penalty_slider"
+                           title="Positive values increase teh model's likelihood to talk about new topics">Presence
+                        Penalty: <span
+                                id="presence_penalty_value">0</span></label>
+                    <input class="form-range" id="presence_penalty_slider" max="2.0"
+                           min="-2.0" name="presence_penalty"
+                           oninput="updateSliderValue('presence_penalty_slider', 'presence_penalty_value')"
+                           step="0.1"
+                           type="range"
+                           value="0">
+                </div>
+                <div class="mb-3">
+                    <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                           for="frequency_penalty_slider"
+                           title="Positive values decrease the model's likelihood to repeat the same line verbatim">Frequency
+                        Penalty: <span
+                                id="frequency_penalty_value">0</span>
+                    </label>
+                    <input class="form-range" id="frequency_penalty_slider" max="2.0"
+                           min="-2.0" name="frequency_penalty"
+                           oninput="updateSliderValue('frequency_penalty_slider', 'frequency_penalty_value')"
+                           step="0.1"
+                           type="range" value="0">
+                </div>
+
+                <div class="mb-3">
+                    <div>
+                        <input class="form-check-input"
+                               id="toggleLogitBias"
+                               onchange="toggleContainerInputs(this, 'logit_bias_container')"
+                               type="checkbox">
+                        <label class="w-75" data-bs-placement="top" data-bs-toggle="tooltip"
+                               for="toggleLogitBias"
+                               title="Modify the likelihood of specified tokens appearing in the completion">Set
+                            Logit Bias</label>
+                    </div>
+                    <div class="d-none" id="logit_bias_container">
+                        <label for="logit_bias_textarea" hidden></label>
+                        <textarea class="form-control" disabled id="logit_bias_textarea"
+                                  name="logit_bias" onblur="formatJson(this);" rows="4">{
+  "5000": 50,
+  "6000": -50
+}
+                                                </textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
