@@ -41,3 +41,53 @@ function initializeTooltips() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 }
+
+function isThisWeek(date) {
+    const now = new Date();
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+    const endOfWeek = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate() + 7);
+    return date >= startOfWeek && date < endOfWeek;
+}
+
+function displayTime(timestamp) {
+    const now = new Date()
+    const timestampDate = new Date(timestamp);
+    if (isThisWeek(timestampDate) && timestampDate < now) {
+        // Relative time format for current week timestamps
+        const diff = now - timestampDate;
+        if (diff < 3600000) { // less than 1 hour
+            const minutes = Math.round(diff / 60000);
+            return minutes + ' minutes ago';
+        } else if (diff < 86400000) { // less than 24 hours
+            const hours = Math.round(diff / 3600000);
+            return hours + ' hours ago';
+        } else {
+            // Show the weekday for dates within the current week
+            const options = {weekday: 'long'};
+            return 'on ' + timestampDate.toLocaleDateString(undefined, options);
+        }
+    } else {
+        // Localized format for dates not in the current week
+        const options = {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        };
+        return timestampDate.toLocaleString(undefined, options);
+    }
+}
+
+//I'd think temporary until I get the real value from the DB
+function formatTimestamps() {
+    // Find all elements with a specific class
+    const timestamps = document.querySelectorAll('[data-format-timestamp="true"]');
+    for (let i = 0; i < timestamps.length; i++) {
+        const timestamp = timestamps[i].textContent.trim().replace(/"/g, '');
+        timestamps[i].textContent = displayTime(timestamp);
+    }
+}
+
+window.onload = formatTimestamps;
