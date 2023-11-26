@@ -1,0 +1,35 @@
+@media (min-width: 992px) {
+    /* Bootstrap's large breakpoint */
+    .bd-sidebar {
+        background-color: #7f7f7f;
+    }
+}
+
+@media (min-width: 992px) {
+    .bd-toc {
+        position: sticky;
+        top: 5rem;
+        right: 0;
+        z-index: 2;
+        height: calc(100vh - 7rem);
+        overflow-y: auto
+    }
+}
+
+@media (min-width: 992px) {
+    .bd-sidebar {
+        position: sticky;
+        top: 5rem;
+        height: calc(100vh - 6rem);
+        overflow-y: auto
+    }
+}
+
+@media (min-width: 992px) {
+    .custom-sidebar {
+        position: sticky;
+        top: 1rem;
+        height: calc(100vh - 2rem);
+        overflow-y: auto
+    }
+}
