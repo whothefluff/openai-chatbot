@@ -1,6 +1,9 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
-import com.openai.chatbot.intrastructure.persistence.db.common.Role;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChat;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatRequest;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatRequestMessage;
+import com.openai.chatbot.intrastructure.persistence.db.model.common.Role;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.val;

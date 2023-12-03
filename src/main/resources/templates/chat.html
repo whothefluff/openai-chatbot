@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Chat Interface</title>
+
+    <style>
+
+        body {
+            padding-bottom: 110px; /* for sticky footer */
+        }
+
+        @media (min-width: 992px) {
+            .custom-sidebar {
+                position: sticky;
+                top: 1rem;
+                height: calc(100vh - 2rem);
+                overflow-y: auto
+            }
+        }
+
+    </style>
+
+    <link rel="stylesheet" th:href="@{/css/chat.css}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+          rel="stylesheet">
+    <link crossorigin="anonymous"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+          rel="stylesheet">
+</head>
+<body>
+<header class="sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light pt-1">
+        <div class="container-fluid">
+            <div class="col-1">
+                <button aria-controls="navbarNavLeft"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                        class="navbar-toggler p-2"
+                        data-bs-target="#navbarNavLeft"
+                        data-bs-toggle="offcanvas"
+                        type="button">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+            <div class="col-8 text-center">
+                <a class="navbar-brand mx-auto" href="#">ChatBot</a>
+                <div class="text-truncate fw-lighter lh-1" id="currentConversationName">
+                    sub
+                </div>
+            </div>
+            <div class="col-1 d-flex flex-column align-items-end">
+                <button aria-controls="navbarNavRight"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                        class="navbar-toggler p-2"
+                        data-bs-target="#navbarNavRight"
+                        data-bs-toggle="offcanvas"
+                        type="button">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li>
+                            <div class="p-2 ps-1" role="button">Rename</div>
+                        </li>
+                        <li>
+                            <div class="p-2 text-danger ps-1" role="button">Delete</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<main class="container-fluid my-3 my-md-4">
+    <div class="row">
+        <aside aria-labelledby="navbarNavLeftLabel"
+               class="custom-sidebar col-lg-2 bdSidebar offcanvas-lg offcanvas-start"
+               id="navbarNavLeft"
+               tabindex="-1">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="navbarNavLeftLabel">History</h5>
+                <button aria-label="Close"
+                        class="btn-close"
+                        data-bs-dismiss="offcanvas"
+                        data-bs-target="#navbarNavLeft"
+                        type="button"></button>
+            </div>
+            <div class="offcanvas-body d-flex flex-column">
+                <div>
+                    <form>
+                        <div class="input-group pt-3 pb-4">
+                            <label class="visually-hidden" for="search"></label>
+                            <input class="form-control rounded-start" id="search" placeholder="Search..." type="search">
+                            <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <ul class="list-unstyled">
+                        <li class="pt-1">
+                            <div class="text-truncate lh-1">conv1</div>
+                            <small class="text-muted fw-lighter ms-3"
+                                   data-bs-placement="right"
+                                   data-bs-toggle="tooltip"
+                                   title="Created on 2023-11-23">
+                                <span class="d-inline d-lg-none d-xxl-inline">Last message</span>
+                                <time data-format-timestamp="true"
+                                      datetime="2023-11-24T21:00:00">2023-11-24T21:00:00
+                                </time>
+                            </small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+        <div class="col-lg-8">
+            <div id="conversation">
+                <p class="">1 Chat Interface jakldflka sldkfja slñkdjf asldkjf al1 Chat Interface jakldflka sldkfja
+                    slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf jaslkdf lkajsdf1 Chat Interface
+                    jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf jaslkdf lkajsdf1 Chat
+                    Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf jaslkdf
+                    lkajsdf1 Chat Interface jakldflka sldkfja slñkdjf asldkjf alñskdjf lkañsdjf lkasjdf lkasjdflk
+                    jasdlkf jaslkdf lkajsdfñskdjf lkañsdjf lkasjdf lkasjdflk jasdlkf jaslkdf lkajsdf</p>
+            </div>
+            <div class="row bg-light fixed-bottom text-center d-flex" id="userMessage">
+                <form class="col-lg-8 mx-auto" id="message-form" method="post">
+                    <div class="form-group px-2">
+                        <label class="w-100 pt-2">
+                            <textarea class="form-control" oninput="autoGrow(this,300)"></textarea>
+                        </label>
+                        <button class="btn btn-toolbar mx-auto pt-0 w-100 justify-content-center" type="submit">Send
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-2 bdSidebar offcanvas-lg offcanvas-end"
+             id="navbarNavRight"
+             tabindex="-1">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="navbarNavRightLabel">Settings</h5>
+                <button aria-label="Close"
+                        class="btn-close"
+                        data-bs-dismiss="offcanvas"
+                        data-bs-target="#navbarNavRight"
+                        type="button"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-left flex-grow-1 p-lg-0 p-1">
+                    <li>
+                        <div class="p-2 ps-1 d-lg-none" role="button">Rename</div>
+                    </li>
+                    <li>
+                        <div class="p-2 ps-1 d-lg-none text-danger" role="button">Delete</div>
+                    </li>
+                    <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto d-lg-none">
+                        <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="d-flex align-items-end flex-column" id="insert-requestOptions"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Bootstrap Bundle JS which includes Popper for Tooltips -->
+<script crossorigin="anonymous"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Too much HTML for too little visual stuff -->
+<script>
+    fetch('requestOptions.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('insert-requestOptions').innerHTML = data;
+            // Reinitialize tooltips for new content
+            initializeTooltips();
+        });
+</script>
+<!--  -->
+<script src="/../static/js/chat.js"></script>
+<!-- Tooltip Initialization Script -->
+<script>
+    initializeTooltips();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
+</body>
+</html>
+<!--
+TODO reposition request button on small screens
+TODO add "new conversation" button
+TODO add independent scroll to sidebars + fix minimal content scroll
+  add display:grid to "row", add class to side bars
+-->

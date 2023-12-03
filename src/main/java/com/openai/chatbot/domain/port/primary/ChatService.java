@@ -1,20 +1,35 @@
 package com.openai.chatbot.domain.port.primary;
 
-import com.openai.chatbot.domain.port.secondary.chatcompletions.Chat;
-import com.openai.chatbot.domain.port.secondary.chatcompletions.ChatResponse;
+import com.openai.chatbot.domain.entity.ChatRequest;
+import com.openai.chatbot.domain.entity.ChatResponse;
+import com.openai.chatbot.domain.entity.Conversation;
+import com.openai.chatbot.domain.exception.ChatServiceException;
 
 import java.util.Collection;
 import java.util.UUID;
 
+/**
+ * Chat related operations
+ */
 public interface ChatService{
 
-  //TODO revise needs (step 4)
-  UUID startConversation( );
+  Conversation startConversation( String name, String systemMessage )
+    throws ChatServiceException;
 
-  ChatResponse addUserMessage( UUID chatId, String userMessage );
+  Collection<Conversation> getConversations( );
 
-  Collection<Chat> getChatHistory( UUID chatId );
+  Conversation getConversation( UUID id );
 
-  void endConversation( UUID chatId );
+  Conversation updateConversation( UUID id, Conversation conversation );
+
+  void deleteConversation( UUID chatId );
+
+  ChatResponse addUserMessage( UUID chatId, ChatRequest userMessage );
+
+  Collection<?> getConversationMessages( UUID chatId );
+
+  void deleteBotMessage( UUID chatId, Integer messageId );
+
+  void deleteUserMessage( UUID chatId, Integer messageId );
 
 }

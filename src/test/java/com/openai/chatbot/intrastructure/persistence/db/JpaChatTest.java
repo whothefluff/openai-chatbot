@@ -1,5 +1,6 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChat;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

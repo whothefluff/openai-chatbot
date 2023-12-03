@@ -15,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 @ToString
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @Validated
-@ConfigurationProperties( prefix = "openai" )
+@ConfigurationProperties( prefix = "openai" ) // NON-NLS
 public class OpenAIProperties{
 
   @NotBlank String endpoint;

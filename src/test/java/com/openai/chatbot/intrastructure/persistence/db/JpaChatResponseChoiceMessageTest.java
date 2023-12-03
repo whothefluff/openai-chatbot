@@ -1,5 +1,7 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseChoice;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseChoiceMessage;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -40,7 +42,11 @@ class JpaChatResponseChoiceMessageTest{
 
   }
 
-  @SuppressWarnings( { "com.haulmont.jpb.EqualsDoesntCheckParameterClass", "EqualsAndHashcode", "AutoUnboxing", "NonFinalFieldReferenceInEquals", "ObjectInstantiationInEqualsHashCode" } )
+  @SuppressWarnings( { "com.haulmont.jpb.EqualsDoesntCheckParameterClass",
+                       "EqualsAndHashcode",
+                       "AutoUnboxing",
+                       "NonFinalFieldReferenceInEquals",
+                       "ObjectInstantiationInEqualsHashCode" } )
   @Getter
   @Accessors( chain = true,
               fluent = true )

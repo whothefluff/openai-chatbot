@@ -1,10 +1,14 @@
 package com.openai.chatbot.intrastructure.persistence.db;
 
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatRequestMessage;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatRequestMessageFunctionCall;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.io.Serial;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,12 +44,18 @@ class JpaChatRequestMessageFunctionCallTest{
 
   }
 
-  @SuppressWarnings( { "com.haulmont.jpb.EqualsDoesntCheckParameterClass", "EqualsAndHashcode", "AutoUnboxing", "NonFinalFieldReferenceInEquals", "ObjectInstantiationInEqualsHashCode" } )
+  @SuppressWarnings( { "com.haulmont.jpb.EqualsDoesntCheckParameterClass",
+                       "EqualsAndHashcode",
+                       "AutoUnboxing",
+                       "NonFinalFieldReferenceInEquals",
+                       "ObjectInstantiationInEqualsHashCode" } )
   @Getter
   @Accessors( chain = true,
               fluent = true )
   private static class EqualsSpyChatRequestMessage extends JpaChatRequestMessage{
 
+    @Serial
+    private static final long serialVersionUID = 8296074535186537575L;
     Integer calls = 0;
 
     @Override
@@ -64,6 +74,8 @@ class JpaChatRequestMessageFunctionCallTest{
               fluent = true )
   private static class HashSpyChatRequestMessage extends JpaChatRequestMessage{
 
+    @Serial
+    private static final long serialVersionUID = 3520723138234176845L;
     Integer calls = 0;
 
     @Override
