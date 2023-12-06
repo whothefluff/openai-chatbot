@@ -7,10 +7,12 @@ import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
+import lombok.val;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,9 +26,8 @@ import java.util.function.Function;
  */
 @SuppressWarnings( { "UseOfConcreteClass", "SerializableStoresNonSerializable" } )
 @Data
-@EqualsAndHashCode
-@ToString
-@FieldDefaults( level = AccessLevel.PROTECTED )
+@FieldDefaults( level = AccessLevel.PROTECTED,
+                makeFinal = true )
 @Accessors( chain = true,
             fluent = true )
 @XSlf4j

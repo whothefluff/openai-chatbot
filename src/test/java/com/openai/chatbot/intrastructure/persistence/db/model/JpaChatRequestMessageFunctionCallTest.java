@@ -1,30 +1,30 @@
-package com.openai.chatbot.intrastructure.persistence.db;
+package com.openai.chatbot.intrastructure.persistence.db.model;
 
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseChoice;
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseChoiceMessage;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.Serial;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-class JpaChatResponseChoiceMessageTest{
+class JpaChatRequestMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
   public void equals_instance_callsParent( ){
     // Arrange
-    val choice = new JpaChatResponseChoiceMessageTest.EqualsSpyChatResponseChoice( );
-    val message = new JpaChatResponseChoiceMessage( );
-    choice.message( message );
+    val message = new EqualsSpyChatRequestMessage( );
+    val functionCall = new JpaChatRequestMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
-    message.equals( new JpaChatResponseChoiceMessage( ) );
+    functionCall.equals( new JpaChatRequestMessageFunctionCall( ) );
     // Assert
-    assertThat( choice.calls( ) ).isEqualTo( 1 );
+    assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -32,13 +32,13 @@ class JpaChatResponseChoiceMessageTest{
   @Test
   public void hashCode_instance_callsParent( ){
     // Arrange
-    val choice = new JpaChatResponseChoiceMessageTest.HashSpyChatResponseChoice( );
-    val message = new JpaChatResponseChoiceMessage( );
-    choice.message( message );
+    val message = new HashSpyChatRequestMessage( );
+    val functionCall = new JpaChatRequestMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
-    message.hashCode( );
+    functionCall.hashCode( );
     // Assert
-    assertThat( choice.calls( ) ).isEqualTo( 1 );
+    assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -50,8 +50,10 @@ class JpaChatResponseChoiceMessageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class EqualsSpyChatResponseChoice extends JpaChatResponseChoice{
+  private static class EqualsSpyChatRequestMessage extends JpaChatRequestMessage{
 
+    @Serial
+    private static final long serialVersionUID = 8296074535186537575L;
     Integer calls = 0;
 
     @Override
@@ -68,8 +70,10 @@ class JpaChatResponseChoiceMessageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class HashSpyChatResponseChoice extends JpaChatResponseChoice{
+  private static class HashSpyChatRequestMessage extends JpaChatRequestMessage{
 
+    @Serial
+    private static final long serialVersionUID = 3520723138234176845L;
     Integer calls = 0;
 
     @Override

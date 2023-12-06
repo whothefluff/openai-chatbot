@@ -1,7 +1,5 @@
-package com.openai.chatbot.intrastructure.persistence.db;
+package com.openai.chatbot.intrastructure.persistence.db.model;
 
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponse;
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseUsage;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
@@ -12,19 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
 @ActiveProfiles( "test" )
-class JpaChatResponseUsageTest{
+class JpaChatResponseChoiceMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )
   @Test
   public void equals_instance_callsParent( ){
     // Arrange
-    val response = new EqualsSpyChatResponse( );
-    val usage = new JpaChatResponseUsage( );
-    response.usage( usage );
+    val message = new JpaChatResponseChoiceMessageFunctionCallTest.EqualsSpyChatResponseChoiceMessage( );
+    val functionCall = new JpaChatResponseChoiceMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
-    usage.equals( new JpaChatResponseUsage( ) );
+    functionCall.equals( new JpaChatResponseChoiceMessageFunctionCall( ) );
     // Assert
-    assertThat( response.calls( ) ).isEqualTo( 1 );
+    assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -32,13 +30,13 @@ class JpaChatResponseUsageTest{
   @Test
   public void hashCode_instance_callsParent( ){
     // Arrange
-    val response = new HashSpyChatResponse( );
-    val usage = new JpaChatResponseUsage( );
-    response.usage( usage );
+    val message = new JpaChatResponseChoiceMessageFunctionCallTest.HashSpyChatResponseChoiceMessage( );
+    val functionCall = new JpaChatResponseChoiceMessageFunctionCall( );
+    message.functionCall( functionCall );
     // Act
-    usage.hashCode( );
+    functionCall.hashCode( );
     // Assert
-    assertThat( response.calls( ) ).isEqualTo( 1 );
+    assertThat( message.calls( ) ).isEqualTo( 1 );
 
   }
 
@@ -50,7 +48,7 @@ class JpaChatResponseUsageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class EqualsSpyChatResponse extends JpaChatResponse{
+  private static class EqualsSpyChatResponseChoiceMessage extends JpaChatResponseChoiceMessage{
 
     Integer calls = 0;
 
@@ -68,7 +66,7 @@ class JpaChatResponseUsageTest{
   @Getter
   @Accessors( chain = true,
               fluent = true )
-  private static class HashSpyChatResponse extends JpaChatResponse{
+  private static class HashSpyChatResponseChoiceMessage extends JpaChatResponseChoiceMessage{
 
     Integer calls = 0;
 

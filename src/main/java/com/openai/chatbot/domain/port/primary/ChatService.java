@@ -26,7 +26,7 @@ public interface ChatService{
 
   ChatResponse addUserMessage( UUID chatId, ChatRequest userMessage );
 
-  Collection<?> getConversationMessages( UUID chatId );
+  Collection<?> getConversationMessages( UUID chatId ); //TODO revise
 
   void deleteBotMessage( UUID chatId, Integer messageId );
 
