@@ -1,5 +1,6 @@
 package com.openai.chatbot.domain.service;
 
+import com.openai.chatbot.domain.entity.ChatMessageRole;
 import com.openai.chatbot.domain.entity.ChatRequest;
 import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
@@ -19,7 +20,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Function;
 
-import static com.openai.chatbot.domain.entity.ChatMessageRoles.SYSTEM;
+import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 
 /**
  * Chat related operations using OpenAI
@@ -47,7 +48,7 @@ public class OpenAiChatService implements ChatService{
         val conversation = new Conversation( ).name( name );
         val request = new ChatRequest( );
         conversation.requests( ).add( request );
-        val msgReq = new ChatRequest.Message( ).role( SYSTEM ).content( systemMessage );
+        val msgReq = new ChatRequest.Message( ).role( system ).content( systemMessage );
         request.messages( ).add( msgReq );
         return this.repository.saveNewConversation( conversation, request );
       };

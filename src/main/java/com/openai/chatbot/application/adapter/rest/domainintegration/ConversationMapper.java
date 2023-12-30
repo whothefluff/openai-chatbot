@@ -7,13 +7,9 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
 
 @SuppressWarnings( { "MissingJavadoc", "UseOfConcreteClass", "unused" } )
-@Mapper( unmappedTargetPolicy = ReportingPolicy.IGNORE,
-         componentModel = MappingConstants.ComponentModel.SPRING,
-         implementationName = "RestConversationMapper" )
+@Mapper( implementationName = "RestConversationMapper" )
 public interface ConversationMapper{
 
-  @Mapping( target = "id",
-            source = "id" )
   ConversationBody toDto( Conversation entity );
 
   Conversation toEntity( ConversationBody dto );

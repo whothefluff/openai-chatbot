@@ -1,10 +1,11 @@
 package com.openai.chatbot.intrastructure.persistence.db.domainintegration;
 
-import com.openai.chatbot.domain.entity.ChatResponse;
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseChoiceMessage;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
+
+import com.openai.chatbot.domain.entity.ChatResponse;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponseChoiceMessage;
 
 /**
  * Conversions between {@link ChatResponse.Choice.Message} and {@link JpaChatResponseChoiceMessage}.
