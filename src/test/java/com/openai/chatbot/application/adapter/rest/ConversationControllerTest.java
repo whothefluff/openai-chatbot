@@ -1,5 +1,13 @@
 package com.openai.chatbot.application.adapter.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collection;
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
@@ -8,73 +16,102 @@ import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.val;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( "MissingJavadoc" )
-@SpringBootTest
+@SpringBootTest 
 public class ConversationControllerTest{
 
-  @Autowired
-  private ConversationController controller;
-  @Autowired
-  private ConversationMapper mapper;
-
-  //TODO finish tests (also add naming check logic to chat entity)
   @Test
-  public void createConversationSuccessTest( ){
-
+  public void createConversation_validConversationStart_returnsSuccessfulResponse( ){
+    // Arrange
     val someName = "Test Name"; // NON-NLS
     val someMsg = "Test System Message"; // NON-NLS
-    val conversationStarterBody = new ConversationStarterBody( ).name( someName ).systemMessage( someMsg );
     val id = UUID.randomUUID( );
+    val fakeConversationBody = new ConversationBody( ).id( id ).name( someName );
     val successfulChatService = new FakeSuccessfulChatService( id );
-    val responseEntity = new ConversationController( successfulChatService, this.mapper ).createConversation( conversationStarterBody );
-    assertThat( responseEntity.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
-    val createdConversationBody = new ConversationBody( ).id( id ).name( conversationStarterBody.name( ) );
-    assertThat( responseEntity.getBody( ) ).isEqualTo( createdConversationBody );
-    /*
-    val someName = "Test Name"; // NON-NLS
-    val someMsg = "Test System Message"; // NON-NLS
+    val mapper = new FakeConversationBodyMapper( fakeConversationBody );
     val conversationStarterBody = new ConversationStarterBody( ).name( someName ).systemMessage( someMsg );
-    val successfulChatService = new FakeSuccessfulChatService( UUID.randomUUID( ), someMsg );
-    val responseEntity = new ConversationController( successfulChatService, this.mapper ).createConversation( conversationStarterBody );
+    val createdConversationBody = new ConversationBody( ).id( id ).name( conversationStarterBody.name( ) );
+
+    // Act
+    val responseEntity = new ConversationController( successfulChatService, mapper ).createConversation( conversationStarterBody );
+
+    // Assert
     assertThat( responseEntity.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
-    val createdConversationBody = new ConversationBody( ).id( UUID.randomUUID( ) ).name( conversationStarterBody.name( ) );
     assertThat( responseEntity.getBody( ) ).isEqualTo( createdConversationBody );
-*/
+    
   }
 
   @Test
-  public void createConversationBadRequestTest( ){
+  public void createConversation_wrongConversationStart_returnsBadRequestResponse( ){
+    // Arrange
+    val someErrorMsg = "Test Bad Request Message"; // NON-NLS
+    val failedChatService = new FakeFailedChatService( someErrorMsg );
+    val mapper = new FakeConversationMapper( );
+    val conversationStarterBody = new ConversationStarterBody( );
 
-    ConversationStarterBody conversationStarterBody = new ConversationStarterBody( );
-    conversationStarterBody.name( null );
-    conversationStarterBody.systemMessage( null );
-    ResponseEntity<?> responseEntity = this.controller.createConversation( conversationStarterBody );
+    // Act
+    val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
+
+    // Assert
     assertThat( responseEntity.getStatusCode( ).is4xxClientError( ) ).isTrue( );
+    assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
 
   }
 
   @Test
-  public void createConversationServerErrorTest( ){
+  public void createConversation_UnexpectedExceptionThrown_returnsServerErrorResponse( ){
+    // Arrange
+    val someErrorMsg = "Test Server Error Message"; // NON-NLS
+    val failedChatService = new FakeChatServiceWithUnexpectedProblem( someErrorMsg );
+    val mapper = new FakeConversationMapper( );
+    val conversationStarterBody = new ConversationStarterBody( );
 
-    ConversationStarterBody conversationStarterBody = new ConversationStarterBody( );
-    conversationStarterBody.name( "Test Name" );
-    conversationStarterBody.systemMessage( "Test System Message" );
-    ResponseEntity<?> responseEntity = this.controller.createConversation( conversationStarterBody );
+    // Act
+    val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
+
+    // Assert
     assertThat( responseEntity.getStatusCode( ).is5xxServerError( ) ).isTrue( );
+    assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
+
+  }
+
+  //##############################################################################################################
+
+  private static class FakeConversationMapper implements ConversationMapper{
+
+    @Override
+    public ConversationBody toDto( final Conversation entity ){
+
+      return null;
+
+    }
+
+    @Override
+    public Conversation toEntity( final ConversationBody dto ){
+
+      return null;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class FakeConversationBodyMapper extends FakeConversationMapper{
+
+    final ConversationBody conversationBody;
+
+    @Override
+    public ConversationBody toDto( final Conversation entity ){
+
+      return conversationBody;
+
+    }
 
   }
 
@@ -144,14 +181,45 @@ public class ConversationControllerTest{
     final UUID id;
 
     @Override
-    public Conversation startConversation( final String name, final String systemMessage )
+    public Conversation startConversation( final String name, 
+                                           final String systemMessage )
       throws ChatServiceException{
 
-      val request = new ChatRequest( ).messages( new ArrayList<>( 0 ) );
-      request.messages( ).add( new ChatRequest.Message( ).content( systemMessage ) );
-      val conversation = new Conversation( ).requests( new ArrayList<>( 0 ) ).id( this.id ).name( name );
-      conversation.requests( ).add( request );
-      return conversation;
+      return new Conversation( );
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class FakeFailedChatService extends FakeChatService{
+
+    final String errorMessage;
+
+    @Override
+    public Conversation startConversation( final String name, 
+                                           final String systemMessage )
+      throws ChatServiceException{
+
+      throw new ChatServiceException( errorMessage );
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class FakeChatServiceWithUnexpectedProblem extends FakeChatService{
+
+    final String errorMessage;
+
+    @Override
+    public Conversation startConversation( final String name, 
+                                           final String systemMessage )
+      throws ChatServiceException{
+
+      throw new RuntimeException( errorMessage );
 
     }
 

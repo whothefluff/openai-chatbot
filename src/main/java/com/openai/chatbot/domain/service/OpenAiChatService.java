@@ -61,7 +61,7 @@ public class OpenAiChatService implements ChatService{
       };
     val result = Try.of( saveConv ).getOrElseThrow( chatServiceException );
     log.exit( result );
-    return result; //TODO test method
+    return result; //TODO test method and add naming check logic to chat entity so that names are not duplicated or null
 
   }
 

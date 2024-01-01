@@ -11,7 +11,6 @@ import java.io.Serial;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
-@ActiveProfiles( "test" )
 class JpaChatRequestMessageFunctionCallTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )

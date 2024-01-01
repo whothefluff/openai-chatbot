@@ -9,7 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
-@ActiveProfiles( "test" )
 class JpaChatResponseChoiceMessageTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )

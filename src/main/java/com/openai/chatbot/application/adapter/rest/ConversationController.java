@@ -72,7 +72,7 @@ class ConversationController{
                       .recover( ChatServiceException.class, returnServiceError )
                       .getOrElseGet( internalError );
     log.exit( response );
-    return response; //TODO test method
+    return response;
 
   }
 

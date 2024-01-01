@@ -16,7 +16,6 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
-@ActiveProfiles( "test" )
 @DataJpaTest
 class JpaChatRequestFunctionDefinitionTest{
 
