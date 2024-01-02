@@ -1,17 +1,16 @@
 package com.openai.chatbot.intrastructure.persistence.db.domainintegration;
 
-import com.openai.chatbot.domain.entity.ChatResponse;
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.ReportingPolicy;
+
+import com.openai.chatbot.domain.entity.ChatResponse;
+import com.openai.chatbot.intrastructure.configuration.CentralConfig;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatResponse;
 
 /**
  * Conversions between {@link ChatResponse} and {@link JpaChatResponse}.
  */
 @SuppressWarnings( "MissingJavadoc" )
-@Mapper( unmappedTargetPolicy = ReportingPolicy.IGNORE,
-         componentModel = MappingConstants.ComponentModel.SPRING,
+@Mapper( config = CentralConfig.class,
          uses = { ChatResponseChoiceMapper.class, ChatResponseUsageMapper.class } )
 public interface ChatResponseMapper{
 

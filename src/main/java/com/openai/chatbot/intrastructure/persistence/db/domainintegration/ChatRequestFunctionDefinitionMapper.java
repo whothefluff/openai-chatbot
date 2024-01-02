@@ -1,17 +1,16 @@
 package com.openai.chatbot.intrastructure.persistence.db.domainintegration;
 
-import com.openai.chatbot.domain.entity.ChatRequest;
-import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatRequestFunctionDefinition;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.ReportingPolicy;
+
+import com.openai.chatbot.domain.entity.ChatRequest;
+import com.openai.chatbot.intrastructure.configuration.CentralConfig;
+import com.openai.chatbot.intrastructure.persistence.db.model.JpaChatRequestFunctionDefinition;
 
 /**
  * Conversions between {@link ChatRequest.FunctionDefinition} and {@link JpaChatRequestFunctionDefinition}.
  */
 @SuppressWarnings( "MissingJavadoc" )
-@Mapper( unmappedTargetPolicy = ReportingPolicy.IGNORE,
-         componentModel = MappingConstants.ComponentModel.SPRING )
+@Mapper( config = CentralConfig.class )
 public interface ChatRequestFunctionDefinitionMapper{
 
   JpaChatRequestFunctionDefinition toJpa( ChatRequest.FunctionDefinition domainEntity );

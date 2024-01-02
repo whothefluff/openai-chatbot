@@ -10,6 +10,7 @@ import lombok.extern.slf4j.XSlf4j;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.UUID;
 
 /**
@@ -28,7 +29,15 @@ public class Conversation{
   Instant createdAt;
   Instant modifiedAt;
   String name;
-  Collection<ChatRequest> requests;
-  Collection<ChatResponse> responses;
+  Collection<ChatRequest> requests = new LinkedHashSet<>( );
+  Collection<ChatResponse> responses = new LinkedHashSet<>( );
+
+  public Conversation addRequest( ChatRequest request ){
+
+    log.entry( request );
+    this.requests.add( request );
+    return log.exit( this );
+    
+  }
 
 }

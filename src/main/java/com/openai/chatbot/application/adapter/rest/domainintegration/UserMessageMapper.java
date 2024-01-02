@@ -1,19 +1,14 @@
 package com.openai.chatbot.application.adapter.rest.domainintegration;
 
-import com.openai.chatbot.domain.entity.ChatMessageRole;
-import com.openai.chatbot.domain.entity.ChatRequest;
-
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
-import org.mapstruct.ValueMapping;
+
+import com.openai.chatbot.domain.entity.ChatRequest;
+import com.openai.chatbot.intrastructure.configuration.CentralConfig;
 
 @SuppressWarnings( { "MissingJavadoc", "UseOfConcreteClass", "unused" } )
-@Mapper( unmappedTargetPolicy = ReportingPolicy.IGNORE,
-         componentModel = MappingConstants.ComponentModel.SPRING )
+@Mapper( config = CentralConfig.class )
 public interface UserMessageMapper{
 
   ChatRequest toEntity( UserMessageBody dto );

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.XSlf4j;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 /**
  * Asks for a model response for the given chat conversation
@@ -41,8 +42,16 @@ public class ChatRequest{
   String logitBias;
   String user;
   ChatResponse previousResponse;
-  Collection<FunctionDefinition> functionDefinitions;
-  Collection<ChatRequest.Message> messages;
+  Collection<FunctionDefinition> functionDefinitions = new LinkedHashSet<>( );
+  Collection<ChatRequest.Message> messages = new LinkedHashSet<>( );
+
+  public ChatRequest addMessage( ChatRequest.Message message ){
+
+    log.entry( message );
+    this.messages.add( message );
+    return log.exit( this );
+
+  }
 
   /**
    * A function the model may generate JSON inputs for
