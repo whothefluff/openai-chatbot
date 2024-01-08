@@ -15,11 +15,10 @@ public interface ChatRepository{
   /**
    * Saves a new chat with a system message
    * @param chat        the chat to save
-   * @param chatRequest the request to add to the chat
    * @return the saved chat
    * @throws ChatRepositoryException if there is an error saving the chat
    */
-  Conversation saveNewConversation( Conversation chat, ChatRequest chatRequest )
+  Conversation saveNewConversation( Conversation chat )
     throws ChatRepositoryException;
 
   void deleteConversation( Conversation chat )

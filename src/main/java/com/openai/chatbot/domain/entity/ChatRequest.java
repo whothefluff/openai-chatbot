@@ -42,13 +42,21 @@ public class ChatRequest{
   String logitBias;
   String user;
   ChatResponse previousResponse;
-  Collection<FunctionDefinition> functionDefinitions = new LinkedHashSet<>( );
+  Collection<ChatRequest.FunctionDefinition> functionDefinitions = new LinkedHashSet<>( );
   Collection<ChatRequest.Message> messages = new LinkedHashSet<>( );
 
   public ChatRequest addMessage( ChatRequest.Message message ){
 
     log.entry( message );
     this.messages.add( message );
+    return log.exit( this );
+
+  }
+
+  public ChatRequest functionDefinition( ChatRequest.FunctionDefinition functionDefinition ){
+
+    log.entry( functionDefinition );
+    this.functionDefinitions.add( functionDefinition );
     return log.exit( this );
 
   }

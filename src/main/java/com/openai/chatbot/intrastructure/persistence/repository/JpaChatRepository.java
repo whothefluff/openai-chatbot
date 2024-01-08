@@ -40,15 +40,13 @@ public class JpaChatRepository implements ChatRepository{
   ChatRequestMapper chatRequestMapper;
 
   @Override
-  public Conversation saveNewConversation( final Conversation chat, final ChatRequest systemRequest )
+  public Conversation saveNewConversation( final Conversation chat )
     throws ChatRepositoryException{
 
-    log.entry( chat, systemRequest );
+    log.entry( chat );
     val saveConv = ( CheckedFunction0<Conversation> )( ) ->
       {
         val jpaChat = this.conversationMapper.toJpa( chat );
-        val jpaChatRequest = this.chatRequestMapper.toJpa( systemRequest );
-        jpaChat.addRequest( jpaChatRequest );
         this.JpaRepository.save( jpaChat );
         return this.conversationMapper.toDomain( jpaChat );
       };

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.XSlf4j;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 /**
  * A chat completion response returned by model, based on the provided input
@@ -30,8 +31,16 @@ public class ChatResponse{
   String object;
   Integer created;
   String model;
-  Collection<Choice> choices;
+  Collection<ChatResponse.Choice> choices = new LinkedHashSet<>( );
   ChatResponse.Usage usage;
+
+  public ChatResponse addChoice( ChatResponse.Choice choice ){
+
+    log.entry( choice );
+    this.choices.add( choice );
+    return log.exit( this );
+
+  }
 
   /**
    * One choice of the chat completion
@@ -42,7 +51,6 @@ public class ChatResponse{
   @FieldDefaults( level = AccessLevel.PROTECTED )
   @Accessors( chain = true,
               fluent = true )
-  @XSlf4j
   public static class Choice{
 
     Integer id;
@@ -61,7 +69,6 @@ public class ChatResponse{
     @FieldDefaults( level = AccessLevel.PROTECTED )
     @Accessors( chain = true,
                 fluent = true )
-    @XSlf4j
     public static class Message{
 
       ChatMessageRole role;
@@ -77,7 +84,6 @@ public class ChatResponse{
       @FieldDefaults( level = AccessLevel.PROTECTED )
       @Accessors( chain = true,
                   fluent = true )
-      @XSlf4j
       public static class FunctionCall{
 
         String name;
@@ -98,7 +104,6 @@ public class ChatResponse{
   @FieldDefaults( level = AccessLevel.PROTECTED )
   @Accessors( chain = true,
               fluent = true )
-  @XSlf4j
   public static class Usage{
 
     Integer promptTokens;

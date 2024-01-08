@@ -1,6 +1,11 @@
 package com.openai.chatbot.domain.service;
 
-import com.openai.chatbot.domain.entity.ChatMessageRole;
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Function;
+
+import org.springframework.stereotype.Service;
+
 import com.openai.chatbot.domain.entity.ChatRequest;
 import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
@@ -8,19 +13,17 @@ import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import com.openai.chatbot.domain.port.secondary.ChatCompletionsService;
 import com.openai.chatbot.domain.port.secondary.ChatRepository;
+
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Try;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.val;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.UUID;
-import java.util.function.Function;
-
-import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 
 /**
  * Chat related operations using OpenAI
@@ -45,12 +48,8 @@ public class OpenAiChatService implements ChatService{
     log.entry( name, systemMessage );
     val saveConv = ( CheckedFunction0<Conversation> )( ) ->
       {
-        val conversation = new Conversation( ).name( name );
-        val request = new ChatRequest( );
-        conversation.requests( ).add( request );
-        val msgReq = new ChatRequest.Message( ).role( system ).content( systemMessage );
-        request.messages( ).add( msgReq );
-        return this.repository.saveNewConversation( conversation, request );
+        val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage ).build( );
+        return this.repository.saveNewConversation( conversation );
       };
     val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) ->
       {
@@ -61,7 +60,7 @@ public class OpenAiChatService implements ChatService{
       };
     val result = Try.of( saveConv ).getOrElseThrow( chatServiceException );
     log.exit( result );
-    return result; //TODO test method
+    return result;
 
   }
 
