@@ -32,8 +32,8 @@ public class ConversationControllerTest{
     val someMsg = "Test System Message"; // NON-NLS
     val id = UUID.randomUUID( );
     val fakeConversationBody = new ConversationBody( ).id( id ).name( someName );
-    val successfulChatService = new FakeSuccessfulChatService( id );
-    val mapper = new FakeConversationBodyMapper( fakeConversationBody );
+    val successfulChatService = new SuccessfulConversationStartStub( id );
+    val mapper = new ConversationBodyMapperStub( fakeConversationBody );
     val conversationStarterBody = new ConversationStarterBody( ).name( someName ).systemMessage( someMsg );
     val createdConversationBody = new ConversationBody( ).id( id ).name( conversationStarterBody.name( ) );
 
@@ -50,8 +50,8 @@ public class ConversationControllerTest{
   public void createConversation_wrongConversationStart_returnsBadRequestResponse( ){
     // Arrange
     val someErrorMsg = "Test Bad Request Message"; // NON-NLS
-    val failedChatService = new FakeFailedChatService( someErrorMsg );
-    val mapper = new FakeConversationMapper( );
+    val failedChatService = new FailedConversationStartStub( someErrorMsg );
+    val mapper = new ConversationMapperDummy( );
     val conversationStarterBody = new ConversationStarterBody( );
 
     // Act
@@ -67,8 +67,8 @@ public class ConversationControllerTest{
   public void createConversation_UnexpectedExceptionThrown_returnsServerErrorResponse( ){
     // Arrange
     val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new FakeChatServiceWithUnexpectedProblem( someErrorMsg );
-    val mapper = new FakeConversationMapper( );
+    val failedChatService = new UnexpectedFailedConversationStartStub( someErrorMsg );
+    val mapper = new ConversationMapperDummy( );
     val conversationStarterBody = new ConversationStarterBody( );
 
     // Act
@@ -80,9 +80,55 @@ public class ConversationControllerTest{
 
   }
 
+  @Test
+  public void deleteConversation_SuccessfulDeletion_NoContentReturned( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val successfulChatService = new SuccessfulConversationStartStub( id );
+    val mapper = new ConversationMapperDummy( );
+        
+    // Act
+    val response = new ConversationController( successfulChatService, mapper ).deleteConversation( id );
+
+    // Assert
+    assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
+
+  }
+
+  @Test
+  public void deleteConversation_ServiceError_NotFoundReturned( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val failedChatService = new FailedConversationDeleteStub(  );
+    val mapper = new ConversationMapperDummy( );
+
+    // Act
+    val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
+
+    // Assert
+    assertThat( response.getStatusCode( ).is4xxClientError( ) ).isTrue( );
+
+  }
+
+  @Test
+  public void deleteConversation_InternalError_InternalServerErrorReturned( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val someErrorMsg = "Test Server Error Message"; // NON-NLS
+    val failedChatService = new UnexpectedFailedConversationDeleteStub( someErrorMsg );
+    val mapper = new ConversationMapperDummy( );
+
+    // Act
+    val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
+
+    // Assert
+    assertThat( response.getStatusCode( ).is5xxServerError( ) ).isTrue( );
+
+    }
+
   //##############################################################################################################
 
-  private static class FakeConversationMapper implements ConversationMapper{
+  private static class ConversationMapperDouble implements ConversationMapper{
 
     @Override
     public ConversationBody toDto( final Conversation entity ){
@@ -100,9 +146,13 @@ public class ConversationControllerTest{
 
   }
 
+  private static class ConversationMapperDummy extends ConversationMapperDouble{
+
+  }
+
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class FakeConversationBodyMapper extends FakeConversationMapper{
+  private static class ConversationBodyMapperStub extends ConversationMapperDouble{
 
     final ConversationBody conversationBody;
 
@@ -115,7 +165,7 @@ public class ConversationControllerTest{
 
   }
 
-  private static class FakeChatService implements ChatService{
+  private static class ChatServiceDouble implements ChatService{
 
     @Override
     public Conversation startConversation( final String name, final String systemMessage )
@@ -144,7 +194,8 @@ public class ConversationControllerTest{
     }
 
     @Override
-    public void deleteConversation( final UUID chatId ){
+    public void deleteConversation( final UUID chatId )
+      throws ChatServiceException{
 
     }
 
@@ -176,7 +227,7 @@ public class ConversationControllerTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class FakeSuccessfulChatService extends FakeChatService{
+  private static class SuccessfulConversationStartStub extends ChatServiceDouble{
 
     final UUID id;
 
@@ -193,7 +244,23 @@ public class ConversationControllerTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class FakeFailedChatService extends FakeChatService{
+  private static class SuccessfulConversationDeleteStub extends ChatServiceDouble{
+
+    final UUID id;
+
+    @Override
+    public void deleteConversation( final UUID chatId )
+      throws ChatServiceException{ 
+
+      return;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class FailedConversationStartStub extends ChatServiceDouble{
 
     final String errorMessage;
 
@@ -209,8 +276,21 @@ public class ConversationControllerTest{
   }
 
   @EqualsAndHashCode( callSuper = true )
+  private static class FailedConversationDeleteStub extends ChatServiceDouble{
+
+    @Override
+    public void deleteConversation( final UUID chatId )
+      throws ChatServiceException{ 
+
+      throw new ChatServiceException( );
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class FakeChatServiceWithUnexpectedProblem extends FakeChatService{
+  private static class UnexpectedFailedConversationStartStub extends ChatServiceDouble{
 
     final String errorMessage;
 
@@ -218,6 +298,22 @@ public class ConversationControllerTest{
     public Conversation startConversation( final String name, 
                                            final String systemMessage )
       throws ChatServiceException{
+
+      throw new RuntimeException( errorMessage );
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class UnexpectedFailedConversationDeleteStub extends ChatServiceDouble{
+
+    final String errorMessage;
+
+    @Override
+    public void deleteConversation( final UUID chatId )
+      throws ChatServiceException{ 
 
       throw new RuntimeException( errorMessage );
 

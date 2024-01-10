@@ -22,7 +22,8 @@ public interface ChatService{
 
   Conversation updateConversation( UUID id, Conversation conversation );
 
-  void deleteConversation( UUID chatId );
+  void deleteConversation( UUID chatId )
+    throws ChatServiceException;
 
   ChatResponse addUserMessage( UUID chatId, ChatRequest userMessage );
 

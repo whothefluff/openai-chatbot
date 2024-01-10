@@ -61,7 +61,7 @@ public class Conversation{
 
   public static InitialStateBuilder initialStateBuilder( ){
 
-    return new InitialStateBuilder( );
+    return log.exit( new InitialStateBuilder( ) );
 
   }
 
@@ -78,15 +78,20 @@ public class Conversation{
 
     public Conversation build( ){
 
+      log.entry( );
       val nameValidation = Option.of( name ).filter( StringUtils::hasText ).toValidation( "Name must not be empty" );
       val systemMessageValidation = Option.of( systemMessage ).filter( StringUtils::hasText ).toValidation( "System message must not be empty" );
       val returnConversation = ( Function2<String, String, Conversation> )( name, systemMessage ) -> {
         val requestMsg = new ChatRequest.Message( ).role( system ).content( systemMessage );
         val request = new ChatRequest( ).addMessage( requestMsg );
-        return new Conversation( ).name( name ).addRequest( request );
+        val conv = new Conversation( ).name( name ).addRequest( request );
+        return log.exit( conv );
       };
       val validation = Validation.combine( nameValidation, systemMessageValidation ).ap( returnConversation );
-      illegalArgs = ( ) -> new IllegalArgumentException( validation.getError( ).mkString( ", " ) );
+      illegalArgs = ( ) -> {
+        val error = new IllegalArgumentException( validation.getError( ).mkString( ", " ) );
+        return log.throwing( error );
+      };
       return Try.of( validation::get ).getOrElseThrow( illegalArgs );
 
     }

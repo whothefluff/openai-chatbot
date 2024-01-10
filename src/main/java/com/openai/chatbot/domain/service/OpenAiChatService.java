@@ -46,21 +46,17 @@ public class OpenAiChatService implements ChatService{
     throws ChatServiceException{
 
     log.entry( name, systemMessage );
-    val saveConv = ( CheckedFunction0<Conversation> )( ) ->
-      {
+    val saveConv = ( CheckedFunction0<Conversation> )( ) -> {
         val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage ).build( );
         return this.repository.saveNewConversation( conversation );
-      };
-    val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) ->
-      {
+    };
+    val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) -> {
         log.catching( e );
         val exception = new ChatServiceException( e );
-        log.throwing( exception );
-        return exception;
-      };
-    val result = Try.of( saveConv ).getOrElseThrow( chatServiceException );
-    log.exit( result );
-    return result;
+        return log.throwing( exception );
+    };
+    val savedConv = Try.of( saveConv ).getOrElseThrow( chatServiceException );
+    return log.exit( savedConv );
 
   }
 

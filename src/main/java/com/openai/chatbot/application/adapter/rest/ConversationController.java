@@ -6,6 +6,8 @@ import com.openai.chatbot.application.adapter.rest.domainintegration.Conversatio
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import io.vavr.CheckedFunction0;
+import io.vavr.CheckedRunnable;
+import io.vavr.Function1;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Controller for chats
@@ -47,32 +50,27 @@ class ConversationController{
   public ResponseEntity<?> createConversation( @RequestBody final ConversationStarterBody conversationStarterBody ){
 
     log.entry( conversationStarterBody );
-    val getNewConversation = ( CheckedFunction0<ConversationBody> )( ) ->
-      {
-        val createdConversation = this.chatService.startConversation( conversationStarterBody.name( ), conversationStarterBody.systemMessage( ) );
-        return this.mapper.toDto( createdConversation );
-      };
-    val returnResponse = ( Function<ConversationBody, ResponseEntity<?>> )( conversationBody ) ->
-      {
-        val location = ServletUriComponentsBuilder.fromCurrentRequest( ).path( "/{id}" ).buildAndExpand( conversationBody.id( ) ).toUri( ); //NON-NLS
-        return ResponseEntity.created( location ).body( conversationBody );
-      };
-    val returnServiceError = ( Function<ChatServiceException, ResponseEntity<String>> )( e ) ->
-      {
-        log.catching( e );
-        return ResponseEntity.badRequest( ).body( e.getMessage( ) );
-      };
-    val internalError = ( Function<Throwable, ResponseEntity<?>> )( e ) ->
-      {
-        log.catching( e );
-        return ResponseEntity.internalServerError( ).body( e.getMessage( ) );
-      };
+    val getNewConversation = ( CheckedFunction0<ConversationBody> )( ) -> {
+      val createdConversation = this.chatService.startConversation( conversationStarterBody.name( ), conversationStarterBody.systemMessage( ) );
+      return this.mapper.toDto( createdConversation );
+    };
+    val returnResponse = ( Function<ConversationBody, ResponseEntity<?>> )( conversationBody ) -> {
+      val location = ServletUriComponentsBuilder.fromCurrentRequest( ).path( "/{id}" ).buildAndExpand( conversationBody.id( ) ).toUri( ); //NON-NLS
+      return ResponseEntity.created( location ).body( conversationBody );
+    };
+    val returnServiceError = ( Function<ChatServiceException, ResponseEntity<String>> )( e ) -> {
+      log.catching( e );
+      return ResponseEntity.badRequest( ).body( e.getMessage( ) );
+    };
+    val internalError = ( Function<Throwable, ResponseEntity<?>> )( e ) -> {
+      log.catching( e );
+      return ResponseEntity.internalServerError( ).body( e.getMessage( ) );
+    };
     val response = Try.of( getNewConversation )
                       .map( returnResponse )
                       .recover( ChatServiceException.class, returnServiceError )
                       .getOrElseGet( internalError );
-    log.exit( response );
-    return response;
+    return log.exit( response );
 
   }
 
@@ -118,15 +116,26 @@ class ConversationController{
    */
   @DeleteMapping( "/conversation/{id}" ) //NON-NLS
   public ResponseEntity<?> deleteConversation( @PathVariable final UUID id ){
-    //chatService.deleteConversation( null );
-    val deletionSuccessful = true;
-    val optionalTest = java.util.Optional.of( "test" ); // NON-NLS
-    if( deletionSuccessful ){
+    
+    val deleteConversation = ( CheckedRunnable )( ) -> {
+      this.chatService.deleteConversation( id );
+    };
+    val returnResponse = ( Function<Void, ResponseEntity<?>> )( v ) -> {
       return ResponseEntity.noContent( ).build( );
-    }
-    else{  //chat not found, error during deletion, ...
+    };
+    val returnServiceError = ( Function<Throwable, ResponseEntity<?>> )( e ) -> {
+      log.catching( e );
       return ResponseEntity.notFound( ).build( );
-    }
+    };
+    val internalError = ( Function<Throwable, ResponseEntity<?>> )( e ) -> {
+      log.catching( e );
+      return ResponseEntity.internalServerError( ).body( e.getMessage( ) );
+    };
+    val response = Try.run( deleteConversation )
+                      .map( returnResponse )
+                      .recover( ChatServiceException.class, returnServiceError )
+                      .getOrElseGet( internalError );
+    return log.exit( response );                      
 
   }
 
