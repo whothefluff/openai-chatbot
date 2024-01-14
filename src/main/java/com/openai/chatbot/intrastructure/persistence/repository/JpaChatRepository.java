@@ -9,6 +9,7 @@ import com.openai.chatbot.intrastructure.persistence.db.domainintegration.ChatRe
 import com.openai.chatbot.intrastructure.persistence.db.domainintegration.ConversationMapper;
 import com.openai.chatbot.intrastructure.persistence.db.model.JpaChat;
 import io.vavr.CheckedFunction0;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Access information of the chats through a JPA repository
@@ -64,11 +66,15 @@ public class JpaChatRepository implements ChatRepository{
   }
 
   @Override
-  public void deleteConversation( final Conversation chat )
+  public void deleteConversation( final UUID id )
     throws ChatRepositoryException{
 
-    val jpaChat = this.conversationMapper.toJpa( chat );
-    this.JpaRepository.delete( jpaChat );
+    log.entry( id );
+    val notFound = ( Supplier<ChatRepositoryException> )( ) -> log.throwing( new ChatRepositoryException( "Chat not found" ) );
+    Option.ofOptional( this.JpaRepository.findById( id ) )
+          .peek( this.JpaRepository::delete )
+          .getOrElseThrow( notFound );
+    log.exit( );
 
   }
 
@@ -112,6 +118,14 @@ public class JpaChatRepository implements ChatRepository{
   public Collection<Conversation> searchChatByContent( final String content )
     throws ChatRepositoryException{
 
+    return null;
+
+  }
+
+  @Override
+  public Conversation retrieveConversation( UUID id ) 
+    throws ChatRepositoryException {
+    
     return null;
 
   }

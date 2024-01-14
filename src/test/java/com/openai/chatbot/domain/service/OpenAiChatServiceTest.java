@@ -1,11 +1,13 @@
 package com.openai.chatbot.domain.service;
 
 import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
+import java.util.UUID;
 
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +41,7 @@ public class OpenAiChatServiceTest {
     val createdConversation = new OpenAiChatService( new FakeChatCompletionsService( ), new FakeSuccessfulChatRepository( ) ).startConversation( name, systemMessage );
 
     // Assert
-    assertEquals( expectedConversation, createdConversation );
+    assertThat( createdConversation ).isEqualTo( expectedConversation );
 
   }
 
@@ -48,13 +50,34 @@ public class OpenAiChatServiceTest {
     // Arrange
     val name = "testName";
     val systemMessage = "testSystemMessage";
-    val startConversationWithNoName = ( Executable )( ) -> new OpenAiChatService( new FakeChatCompletionsService( ), new FakeUnsuccessfulChatRepository( ) ).startConversation( name, systemMessage );
+    val startConversationWithNoName = ( ThrowingCallable  )( ) -> new OpenAiChatService( new FakeChatCompletionsService( ), new FakeUnsuccessfulChatRepository( ) ).startConversation( name, systemMessage );
 
     // Act & Assert
-    assertThrows( ChatServiceException.class, 
-                  startConversationWithNoName );
+    assertThatThrownBy( startConversationWithNoName ).isInstanceOf( ChatServiceException.class );
 
   }
+
+  @Test
+  void deleteConversation_SuccessfulCase_NothingReturned( ) throws ChatServiceException {
+    // Arrange
+    val id = UUID.randomUUID( );
+    val deleteConversation = ( Executable )( ) -> new OpenAiChatService( new FakeChatCompletionsService( ), new FakeSuccessfulChatRepository( ) ).deleteConversation( id );
+
+    // Act & Assert
+    assertThat( 1 ).isEqualTo( 2 );
+
+  }
+
+  @Test
+  void deleteConversation_ErrorOccurs_ThrowsChatServiceException( ) {
+    // Arrange
+    val id = UUID.randomUUID( );
+    val deleteConversation = ( Executable )( ) -> new OpenAiChatService( new FakeChatCompletionsService( ), new FakeUnsuccessfulChatRepository( ) ).deleteConversation( id );
+    
+    // Act & Assert
+    assertThat( 1 ).isEqualTo( 2 );
+    
+    }
 
   //##############################################################################################################
 
@@ -69,7 +92,7 @@ public class OpenAiChatServiceTest {
         }
 
         @Override
-        public void deleteConversation(Conversation chat) throws ChatRepositoryException {
+        public void deleteConversation(UUID id) throws ChatRepositoryException {
             
         }
 
@@ -109,6 +132,12 @@ public class OpenAiChatServiceTest {
 
             return null;
             
+        }
+
+        @Override
+        public Conversation retrieveConversation(UUID id) throws ChatRepositoryException {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'retrieveConversation'");
         }
     
     }

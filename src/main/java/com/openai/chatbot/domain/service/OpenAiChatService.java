@@ -2,6 +2,7 @@ package com.openai.chatbot.domain.service;
 
 import java.util.Collection;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import com.openai.chatbot.domain.port.secondary.ChatCompletionsService;
 import com.openai.chatbot.domain.port.secondary.ChatRepository;
 
 import io.vavr.CheckedFunction0;
+import io.vavr.CheckedFunction1;
+import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -55,7 +58,8 @@ public class OpenAiChatService implements ChatService{
         val exception = new ChatServiceException( e );
         return log.throwing( exception );
     };
-    val savedConv = Try.of( saveConv ).getOrElseThrow( chatServiceException );
+    val savedConv = Try.of( saveConv )
+                       .getOrElseThrow( chatServiceException );
     return log.exit( savedConv );
 
   }
@@ -81,7 +85,19 @@ public class OpenAiChatService implements ChatService{
   }
 
   @Override
-  public void deleteConversation( final UUID chatId ){
+  public void deleteConversation( final UUID id )
+    throws ChatServiceException{
+
+    log.entry( id );
+    val deleteConv = ( CheckedRunnable )( ) -> this.repository.deleteConversation( id );
+    val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) -> {
+      log.catching( e );
+      val exception = new ChatServiceException( e );
+      return log.throwing( exception );
+    };
+    Try.run( deleteConv )
+       .getOrElseThrow( chatServiceException );
+    log.exit( );
 
   }
 

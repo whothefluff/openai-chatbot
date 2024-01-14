@@ -1,28 +1,36 @@
 package com.openai.chatbot.application.adapter.rest;
 
+import java.util.Collection;
+import java.util.UUID;
+import java.util.function.Function;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
+
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedRunnable;
-import io.vavr.Function1;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.val;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
-import lombok.val;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.util.Collection;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Controller for chats
@@ -117,9 +125,7 @@ class ConversationController{
   @DeleteMapping( "/conversation/{id}" ) //NON-NLS
   public ResponseEntity<?> deleteConversation( @PathVariable final UUID id ){
     
-    val deleteConversation = ( CheckedRunnable )( ) -> {
-      this.chatService.deleteConversation( id );
-    };
+    val deleteConversation = ( CheckedRunnable )( ) -> this.chatService.deleteConversation( id );
     val returnResponse = ( Function<Void, ResponseEntity<?>> )( v ) -> {
       return ResponseEntity.noContent( ).build( );
     };

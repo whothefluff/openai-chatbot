@@ -6,6 +6,7 @@ import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatRepositoryException;
 
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * A way to access information of the chats
@@ -21,10 +22,13 @@ public interface ChatRepository{
   Conversation saveNewConversation( Conversation chat )
     throws ChatRepositoryException;
 
-  void deleteConversation( Conversation chat )
+  Conversation retrieveConversation( UUID id )
     throws ChatRepositoryException;
 
   Conversation updateConversation( Conversation chat )
+    throws ChatRepositoryException;
+
+  void deleteConversation( UUID id )
     throws ChatRepositoryException;
 
   Conversation addRequestToChat( Conversation chat, ChatRequest chatRequest )
