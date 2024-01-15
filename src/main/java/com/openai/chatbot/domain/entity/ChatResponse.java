@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 /**
  * A chat completion response returned by model, based on the provided input
  */
-@SuppressWarnings( "UseOfConcreteClass" )
+@SuppressWarnings( { "UseOfConcreteClass", "CollectionWithoutInitialCapacity" } )
 @Data
 @EqualsAndHashCode
 @ToString
@@ -34,7 +34,8 @@ public class ChatResponse{
   Collection<ChatResponse.Choice> choices = new LinkedHashSet<>( );
   ChatResponse.Usage usage;
 
-  public ChatResponse addChoice( ChatResponse.Choice choice ){
+  @SuppressWarnings( "MissingJavadoc" )
+  public ChatResponse addChoice( final ChatResponse.Choice choice ){
 
     log.entry( choice );
     this.choices.add( choice );

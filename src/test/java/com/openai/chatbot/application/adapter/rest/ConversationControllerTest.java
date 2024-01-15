@@ -1,13 +1,5 @@
 package com.openai.chatbot.application.adapter.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Collection;
-import java.util.UUID;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
@@ -16,13 +8,20 @@ import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Collection;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings( "MissingJavadoc" )
-@SpringBootTest 
+@SpringBootTest
 public class ConversationControllerTest{
 
   @Test
@@ -36,14 +35,12 @@ public class ConversationControllerTest{
     val mapper = new ConversationBodyMapperStub( fakeConversationBody );
     val conversationStarterBody = new ConversationStarterBody( ).name( someName ).systemMessage( someMsg );
     val createdConversationBody = new ConversationBody( ).id( id ).name( conversationStarterBody.name( ) );
-
     // Act
     val responseEntity = new ConversationController( successfulChatService, mapper ).createConversation( conversationStarterBody );
-
     // Assert
     assertThat( responseEntity.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
     assertThat( responseEntity.getBody( ) ).isEqualTo( createdConversationBody );
-    
+
   }
 
   @Test
@@ -53,10 +50,8 @@ public class ConversationControllerTest{
     val failedChatService = new FailedConversationStartStub( someErrorMsg );
     val mapper = new ConversationMapperDummy( );
     val conversationStarterBody = new ConversationStarterBody( );
-
     // Act
     val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
-
     // Assert
     assertThat( responseEntity.getStatusCode( ).is4xxClientError( ) ).isTrue( );
     assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
@@ -70,10 +65,8 @@ public class ConversationControllerTest{
     val failedChatService = new UnexpectedFailedConversationStartStub( someErrorMsg );
     val mapper = new ConversationMapperDummy( );
     val conversationStarterBody = new ConversationStarterBody( );
-
     // Act
     val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
-
     // Assert
     assertThat( responseEntity.getStatusCode( ).is5xxServerError( ) ).isTrue( );
     assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
@@ -84,12 +77,10 @@ public class ConversationControllerTest{
   public void deleteConversation_SuccessfulDeletion_NoContentReturned( ){
     // Arrange
     val id = UUID.randomUUID( );
-    val successfulChatService = new SuccessfulConversationStartStub( id );
+    val successfulChatService = new SuccessfulConversationDeleteStub( id );
     val mapper = new ConversationMapperDummy( );
-        
     // Act
     val response = new ConversationController( successfulChatService, mapper ).deleteConversation( id );
-
     // Assert
     assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
 
@@ -99,12 +90,10 @@ public class ConversationControllerTest{
   public void deleteConversation_ServiceError_NotFoundReturned( ){
     // Arrange
     val id = UUID.randomUUID( );
-    val failedChatService = new FailedConversationDeleteStub(  );
+    val failedChatService = new FailedConversationDeleteStub( );
     val mapper = new ConversationMapperDummy( );
-
     // Act
     val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
-
     // Assert
     assertThat( response.getStatusCode( ).is4xxClientError( ) ).isTrue( );
 
@@ -117,28 +106,25 @@ public class ConversationControllerTest{
     val someErrorMsg = "Test Server Error Message"; // NON-NLS
     val failedChatService = new UnexpectedFailedConversationDeleteStub( someErrorMsg );
     val mapper = new ConversationMapperDummy( );
-
     // Act
     val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
-
     // Assert
     assertThat( response.getStatusCode( ).is5xxServerError( ) ).isTrue( );
 
-    }
-
+  }
   //##############################################################################################################
 
   private static class ConversationMapperDouble implements ConversationMapper{
 
     @Override
-    public ConversationBody toDto( final Conversation entity ){
+    public @Nullable ConversationBody toDto( final Conversation entity ){
 
       return null;
 
     }
 
     @Override
-    public Conversation toEntity( final ConversationBody dto ){
+    public @Nullable Conversation toEntity( final ConversationBody dto ){
 
       return null;
 
@@ -159,7 +145,7 @@ public class ConversationControllerTest{
     @Override
     public ConversationBody toDto( final Conversation entity ){
 
-      return conversationBody;
+      return this.conversationBody;
 
     }
 
@@ -168,7 +154,7 @@ public class ConversationControllerTest{
   private static class ChatServiceDouble implements ChatService{
 
     @Override
-    public Conversation startConversation( final String name, final String systemMessage )
+    public @Nullable Conversation startConversation( final String name, final String systemMessage )
       throws ChatServiceException{
 
       return null;
@@ -176,21 +162,24 @@ public class ConversationControllerTest{
     }
 
     @Override
-    public Collection<Conversation> getConversations( ){
+    public @Nullable Collection<Conversation> getConversations( ){
 
       return null;
+
     }
 
     @Override
-    public Conversation getConversation( final UUID id ){
+    public @Nullable Conversation getConversation( final UUID id ){
 
       return null;
+
     }
 
     @Override
-    public Conversation updateConversation( final UUID id, final Conversation conversation ){
+    public @Nullable Conversation updateConversation( final UUID id, final Conversation conversation ){
 
       return null;
+
     }
 
     @Override
@@ -200,14 +189,14 @@ public class ConversationControllerTest{
     }
 
     @Override
-    public ChatResponse addUserMessage( final UUID chatId, final ChatRequest userMessage ){
+    public @Nullable ChatResponse addUserMessage( final UUID chatId, final ChatRequest userMessage ){
 
       return null;
 
     }
 
     @Override
-    public Collection<?> getConversationMessages( final UUID chatId ){
+    public @Nullable Collection<?> getConversationMessages( final UUID chatId ){
 
       return null;
 
@@ -232,8 +221,7 @@ public class ConversationControllerTest{
     final UUID id;
 
     @Override
-    public Conversation startConversation( final String name, 
-                                           final String systemMessage )
+    public Conversation startConversation( final String name, final String systemMessage )
       throws ChatServiceException{
 
       return new Conversation( );
@@ -250,9 +238,9 @@ public class ConversationControllerTest{
 
     @Override
     public void deleteConversation( final UUID chatId )
-      throws ChatServiceException{ 
+      throws ChatServiceException{
 
-      return;
+      super.deleteConversation( chatId );
 
     }
 
@@ -265,11 +253,10 @@ public class ConversationControllerTest{
     final String errorMessage;
 
     @Override
-    public Conversation startConversation( final String name, 
-                                           final String systemMessage )
+    public Conversation startConversation( final String name, final String systemMessage )
       throws ChatServiceException{
 
-      throw new ChatServiceException( errorMessage );
+      throw new ChatServiceException( this.errorMessage );
 
     }
 
@@ -280,7 +267,7 @@ public class ConversationControllerTest{
 
     @Override
     public void deleteConversation( final UUID chatId )
-      throws ChatServiceException{ 
+      throws ChatServiceException{
 
       throw new ChatServiceException( );
 
@@ -295,11 +282,10 @@ public class ConversationControllerTest{
     final String errorMessage;
 
     @Override
-    public Conversation startConversation( final String name, 
-                                           final String systemMessage )
+    public Conversation startConversation( final String name, final String systemMessage )
       throws ChatServiceException{
 
-      throw new RuntimeException( errorMessage );
+      throw new RuntimeException( this.errorMessage );
 
     }
 
@@ -313,9 +299,9 @@ public class ConversationControllerTest{
 
     @Override
     public void deleteConversation( final UUID chatId )
-      throws ChatServiceException{ 
+      throws ChatServiceException{
 
-      throw new RuntimeException( errorMessage );
+      throw new RuntimeException( this.errorMessage );
 
     }
 

@@ -15,7 +15,7 @@ public interface ChatRepository{
 
   /**
    * Saves a new chat with a system message
-   * @param chat        the chat to save
+   * @param chat the chat to save
    * @return the saved chat
    * @throws ChatRepositoryException if there is an error saving the chat
    */
@@ -28,6 +28,10 @@ public interface ChatRepository{
   Conversation updateConversation( Conversation chat )
     throws ChatRepositoryException;
 
+  /**
+   * @param id the chat id
+   * @throws ChatRepositoryException if the chat could not be deleted
+   */
   void deleteConversation( UUID id )
     throws ChatRepositoryException;
 

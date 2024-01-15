@@ -13,6 +13,12 @@ import java.util.UUID;
  */
 public interface ChatService{
 
+  /**
+   * @param name          works as natural id
+   * @param systemMessage sets the tone of the conversation
+   * @return the created conversation
+   * @throws ChatServiceException if the conversation could not be created
+   */
   Conversation startConversation( String name, String systemMessage )
     throws ChatServiceException;
 
@@ -22,6 +28,10 @@ public interface ChatService{
 
   Conversation updateConversation( UUID id, Conversation conversation );
 
+  /**
+   * @param id the conversation id
+   * @throws ChatServiceException if the conversation could not be deleted
+   */
   void deleteConversation( UUID id )
     throws ChatServiceException;
 

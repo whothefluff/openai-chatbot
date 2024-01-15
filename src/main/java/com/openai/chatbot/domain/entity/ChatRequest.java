@@ -17,7 +17,7 @@ import java.util.LinkedHashSet;
 /**
  * Asks for a model response for the given chat conversation
  */
-@SuppressWarnings( { "ClassWithTooManyFields", "UseOfConcreteClass" } )
+@SuppressWarnings( { "ClassWithTooManyFields", "UseOfConcreteClass", "CollectionWithoutInitialCapacity" } )
 @Data
 @EqualsAndHashCode
 @ToString
@@ -45,7 +45,8 @@ public class ChatRequest{
   Collection<ChatRequest.FunctionDefinition> functionDefinitions = new LinkedHashSet<>( );
   Collection<ChatRequest.Message> messages = new LinkedHashSet<>( );
 
-  public ChatRequest addMessage( ChatRequest.Message message ){
+  @SuppressWarnings( "MissingJavadoc" )
+  public ChatRequest addMessage( final ChatRequest.Message message ){
 
     log.entry( message );
     this.messages.add( message );
@@ -53,7 +54,8 @@ public class ChatRequest{
 
   }
 
-  public ChatRequest functionDefinition( ChatRequest.FunctionDefinition functionDefinition ){
+  @SuppressWarnings( "MissingJavadoc" )
+  public ChatRequest addFunctionDefinition( final ChatRequest.FunctionDefinition functionDefinition ){
 
     log.entry( functionDefinition );
     this.functionDefinitions.add( functionDefinition );
