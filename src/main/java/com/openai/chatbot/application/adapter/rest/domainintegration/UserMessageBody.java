@@ -36,5 +36,6 @@ public class UserMessageBody{
   private BigDecimal frequencyPenalty;
   private String logitBias;
   private String user;
+  private String content;
 
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -13,8 +12,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral" } )
-@ActiveProfiles( "test" )
 @DataJpaTest
 class JpaChatTest{
 
@@ -94,7 +91,7 @@ class JpaChatTest{
     val maxAllowedDifference = 30L;
     val chat = new JpaChat( );
     // Act
-    val savedChat = this.entityManager.persistAndFlush( chat );
+    this.entityManager.persistAndFlush( chat );
     // Assert
     assertThat( ChronoUnit.SECONDS.between( chat.createdAt( ), Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 
@@ -109,8 +106,8 @@ class JpaChatTest{
     val initialValue = savedChat.createdAt( );
     // Act
     chat.name( "updated" );
-    val updatedchat = this.entityManager.persistAndFlush( chat );
-    val valueAfterUpdate = updatedchat.createdAt( );
+    val updatedChat = this.entityManager.persistAndFlush( chat );
+    val valueAfterUpdate = updatedChat.createdAt( );
     // Assert
     assertThat( initialValue ).isEqualTo( valueAfterUpdate );
 
@@ -125,8 +122,8 @@ class JpaChatTest{
     this.entityManager.refresh( savedChat );
     // Act
     savedChat.name( "updated" );
-    val updatedchat = this.entityManager.persistAndFlush( savedChat );
-    val valueAfterUpdate = updatedchat.createdAt( );
+    val updatedChat = this.entityManager.persistAndFlush( savedChat );
+    val valueAfterUpdate = updatedChat.createdAt( );
     // Assert
     assertThat( ChronoUnit.SECONDS.between( valueAfterUpdate, Instant.now( ) ) ).isLessThan( maxAllowedDifference );
 

@@ -8,6 +8,7 @@ import com.openai.chatbot.domain.port.primary.ChatService;
 import com.openai.chatbot.domain.port.secondary.ChatCompletionsService;
 import com.openai.chatbot.domain.port.secondary.ChatRepository;
 import io.vavr.CheckedFunction0;
+import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -18,8 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Function;
-
-import static com.openai.chatbot.domain.entity.ChatMessageRoles.SYSTEM;
 
 /**
  * Chat related operations using OpenAI
@@ -44,23 +43,17 @@ public class OpenAiChatService implements ChatService{
     log.entry( name, systemMessage );
     val saveConv = ( CheckedFunction0<Conversation> )( ) ->
       {
-        val conversation = new Conversation( ).name( name );
-        val request = new ChatRequest( );
-        conversation.requests( ).add( request );
-        val msgReq = new ChatRequest.Message( ).role( SYSTEM ).content( systemMessage );
-        request.messages( ).add( msgReq );
-        return this.repository.saveNewConversation( conversation, request );
+        val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage ).build( );
+        return this.repository.saveNewConversation( conversation );
       };
     val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) ->
       {
         log.catching( e );
         val exception = new ChatServiceException( e );
-        log.throwing( exception );
-        return exception;
+        return log.throwing( exception );
       };
-    val result = Try.of( saveConv ).getOrElseThrow( chatServiceException );
-    log.exit( result );
-    return result; //TODO test method
+    val savedConv = Try.of( saveConv ).getOrElseThrow( chatServiceException );
+    return log.exit( savedConv );
 
   }
 
@@ -82,10 +75,23 @@ public class OpenAiChatService implements ChatService{
   public Conversation updateConversation( final UUID id, final Conversation conversation ){
 
     return null;
+
   }
 
   @Override
-  public void deleteConversation( final UUID chatId ){
+  public void deleteConversation( final UUID id )
+    throws ChatServiceException{
+
+    log.entry( id );
+    val deleteConv = ( CheckedRunnable )( ) -> this.repository.deleteConversation( id );
+    val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) ->
+      {
+        log.catching( e );
+        val exception = new ChatServiceException( e );
+        return log.throwing( exception );
+      };
+    Try.run( deleteConv ).getOrElseThrow( chatServiceException );
+    log.exit( );
 
   }
 

@@ -4,12 +4,9 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings( { "ClassWithoutLogger", "HardCodedStringLiteral", "AutoBoxing" } )
-@ActiveProfiles( "test" )
 class JpaChatResponseUsageTest{
 
   @SuppressWarnings( "ResultOfMethodCallIgnored" )

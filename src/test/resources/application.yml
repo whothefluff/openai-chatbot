@@ -12,3 +12,6 @@ spring:
     properties:
       hibernate:
         show_sql: true
+openai:
+  api-key: Z
+  endpoint: https://api.openai.com/v1/

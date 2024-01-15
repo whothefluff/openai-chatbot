@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.Collections;
 
-@SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger" } )
+@SuppressWarnings( { "MissingJavadoc", "ClassWithoutLogger", "PublicConstructor" } )
 @SpringBootApplication
 public class ChatbotApplication{
 

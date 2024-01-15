@@ -60,8 +60,7 @@ class ConversationMessageController{
     this.chatService.getConversationMessages( conversationId );
     val messages = ( Collection<HistoryMessage> )new ArrayList<HistoryMessage>( 0 );
     val response = ResponseEntity.ok( messages );
-    log.exit( response );
-    return response;
+    return log.exit( response );
 
   }
 

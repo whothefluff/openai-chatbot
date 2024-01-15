@@ -12,11 +12,12 @@ import lombok.extern.slf4j.XSlf4j;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 /**
  * Asks for a model response for the given chat conversation
  */
-@SuppressWarnings( { "ClassWithTooManyFields", "UseOfConcreteClass" } )
+@SuppressWarnings( { "ClassWithTooManyFields", "UseOfConcreteClass", "CollectionWithoutInitialCapacity" } )
 @Data
 @EqualsAndHashCode
 @ToString
@@ -41,8 +42,26 @@ public class ChatRequest{
   String logitBias;
   String user;
   ChatResponse previousResponse;
-  Collection<FunctionDefinition> functionDefinitions;
-  Collection<ChatRequest.Message> messages;
+  Collection<ChatRequest.FunctionDefinition> functionDefinitions = new LinkedHashSet<>( );
+  Collection<ChatRequest.Message> messages = new LinkedHashSet<>( );
+
+  @SuppressWarnings( "MissingJavadoc" )
+  public ChatRequest addMessage( final ChatRequest.Message message ){
+
+    log.entry( message );
+    this.messages.add( message );
+    return log.exit( this );
+
+  }
+
+  @SuppressWarnings( "MissingJavadoc" )
+  public ChatRequest addFunctionDefinition( final ChatRequest.FunctionDefinition functionDefinition ){
+
+    log.entry( functionDefinition );
+    this.functionDefinitions.add( functionDefinition );
+    return log.exit( this );
+
+  }
 
   /**
    * A function the model may generate JSON inputs for

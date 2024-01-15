@@ -6,6 +6,7 @@ import com.openai.chatbot.application.adapter.rest.domainintegration.Conversatio
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import io.vavr.CheckedFunction0;
+import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -71,8 +72,7 @@ class ConversationController{
                       .map( returnResponse )
                       .recover( ChatServiceException.class, returnServiceError )
                       .getOrElseGet( internalError );
-    log.exit( response );
-    return response; //TODO test method
+    return log.exit( response );
 
   }
 
@@ -82,7 +82,7 @@ class ConversationController{
   @GetMapping( "/conversations" ) //NON-NLS
   public ResponseEntity<Collection<ConversationBody>> getConversations( ){
     //this.chatService.getChats( );
-    return null;
+    return null; //TODO 2
 
   }
 
@@ -94,7 +94,7 @@ class ConversationController{
   @GetMapping( "/conversation/{id}" ) //NON-NLS
   public ResponseEntity<ConversationBody> getConversation( @PathVariable final UUID id ){
     //this.chatService.getChat( id );
-    return null;
+    return null; //TODO 1
 
   }
 
@@ -118,15 +118,27 @@ class ConversationController{
    */
   @DeleteMapping( "/conversation/{id}" ) //NON-NLS
   public ResponseEntity<?> deleteConversation( @PathVariable final UUID id ){
-    //chatService.deleteConversation( null );
-    val deletionSuccessful = true;
-    val optionalTest = java.util.Optional.of( "test" ); // NON-NLS
-    if( deletionSuccessful ){
-      return ResponseEntity.noContent( ).build( );
-    }
-    else{  //chat not found, error during deletion, ...
-      return ResponseEntity.notFound( ).build( );
-    }
+
+    val deleteConversation = ( CheckedRunnable )( ) -> this.chatService.deleteConversation( id );
+    val returnResponse = ( Function<Void, ResponseEntity<?>> )( v ) ->
+      {
+        return ResponseEntity.noContent( ).build( );
+      };
+    val returnServiceError = ( Function<Throwable, ResponseEntity<?>> )( e ) ->
+      {
+        log.catching( e );
+        return ResponseEntity.notFound( ).build( );
+      };
+    val internalError = ( Function<Throwable, ResponseEntity<?>> )( e ) ->
+      {
+        log.catching( e );
+        return ResponseEntity.internalServerError( ).body( e.getMessage( ) );
+      };
+    val response = Try.run( deleteConversation )
+                      .map( returnResponse )
+                      .recover( ChatServiceException.class, returnServiceError )
+                      .getOrElseGet( internalError );
+    return log.exit( response );
 
   }
 

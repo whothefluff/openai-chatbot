@@ -1,20 +1,27 @@
 package com.openai.chatbot.domain.entity;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import io.vavr.Function2;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+import io.vavr.control.Validation;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.UUID;
+import java.util.function.Supplier;
+
+import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 
 /**
  * A conversation
  */
+@SuppressWarnings( { "CollectionWithoutInitialCapacity", "UseOfConcreteClass" } )
 @Data
 @EqualsAndHashCode
 @ToString
@@ -28,7 +35,78 @@ public class Conversation{
   Instant createdAt;
   Instant modifiedAt;
   String name;
-  Collection<ChatRequest> requests;
-  Collection<ChatResponse> responses;
+  Collection<ChatRequest> requests = new LinkedHashSet<>( );
+  Collection<ChatResponse> responses = new LinkedHashSet<>( );
+
+  /**
+   * @return a new {@link InitialStateBuilder} instance
+   */
+  public static InitialStateBuilder initialStateBuilder( ){
+
+    return log.exit( new InitialStateBuilder( ) );
+
+  }
+
+  @SuppressWarnings( "MissingJavadoc" )
+  public Conversation addRequest( final ChatRequest request ){
+
+    log.entry( request );
+    this.requests.add( request );
+    return log.exit( this );
+
+  }
+
+  @SuppressWarnings( "MissingJavadoc" )
+  public Conversation addResponse( final ChatResponse response ){
+
+    log.entry( response );
+    this.responses.add( response );
+    return log.exit( this );
+
+  }
+
+  /**
+   * Helps create a valid initial {@link Conversation} instance
+   */
+  @SuppressWarnings( "PublicConstructor" )
+  @FieldDefaults( level = AccessLevel.PRIVATE )
+  @Accessors( chain = true,
+              fluent = true )
+  @Setter
+  @ToString
+  public static class InitialStateBuilder{
+
+    String name;
+    String systemMessage;
+    private Supplier<IllegalArgumentException> illegalArgs;
+
+    /**
+     * @return a valid {@link Conversation} instance
+     * @throws IllegalArgumentException if the instance is invalid
+     */
+    @SuppressWarnings( "HardCodedStringLiteral" )
+    public Conversation build( ){
+
+      log.entry( );
+      val nameValidation = Option.of( this.name ).filter( StringUtils::hasText ).toValidation( "Name must not be empty" );
+      val systemMessageValidation = Option.of( this.systemMessage ).filter( StringUtils::hasText ).toValidation( "System message must not be empty" );
+      val returnConversation = ( Function2<String, String, Conversation> )( name, systemMessage ) ->
+        {
+          val requestMsg = new ChatRequest.Message( ).role( system ).content( systemMessage );
+          val request = new ChatRequest( ).addMessage( requestMsg );
+          val conv = new Conversation( ).name( name ).addRequest( request );
+          return log.exit( conv );
+        };
+      val validation = Validation.combine( nameValidation, systemMessageValidation ).ap( returnConversation );
+      this.illegalArgs = ( ) ->
+        {
+          val error = new IllegalArgumentException( validation.getError( ).mkString( ", " ) );
+          return log.throwing( error );
+        };
+      return Try.of( validation::get ).getOrElseThrow( this.illegalArgs );
+
+    }
+
+  }
 
 }
