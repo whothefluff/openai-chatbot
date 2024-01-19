@@ -3,6 +3,7 @@ package com.openai.chatbot.application.adapter.rest;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
+import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import io.vavr.CheckedFunction0;
@@ -92,9 +93,19 @@ class ConversationController{
    * @return the conversation
    */
   @GetMapping( "/conversation/{id}" ) //NON-NLS
-  public ResponseEntity<ConversationBody> getConversation( @PathVariable final UUID id ){
-    //this.chatService.getChat( id );
-    return null; //TODO 1
+  public ResponseEntity<?> getConversation( @PathVariable final UUID id ){
+
+    log.entry( id );
+    val convRetrieval = ( CheckedFunction0<Conversation> )( ) -> this.chatService.getConversation( id );
+    val returnResponse = ( Function<Conversation, ResponseEntity<?>> )( conversation ) ->
+      {
+        val conversationBody = this.mapper.toDto( conversation );
+        return ResponseEntity.ok( conversationBody );
+      };
+    val result = Try.of( convRetrieval )
+                    .map( returnResponse )
+                    .get( );
+    return log.exit( result );
 
   }
 

@@ -24,9 +24,11 @@ public interface ChatService{
 
   Collection<Conversation> getConversations( );
 
-  Conversation getConversation( UUID id );
+  Conversation getConversation( UUID id )
+    throws ChatServiceException;
 
-  Conversation updateConversation( UUID id, Conversation conversation );
+  Conversation updateConversation( UUID id, Conversation conversation )
+    throws ChatServiceException;
 
   /**
    * @param id the conversation id
