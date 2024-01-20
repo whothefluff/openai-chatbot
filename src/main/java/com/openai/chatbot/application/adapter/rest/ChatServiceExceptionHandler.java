@@ -1,7 +1,6 @@
 package com.openai.chatbot.application.adapter.rest;
 
 import com.openai.chatbot.domain.exception.ChatServiceException;
-import com.openai.chatbot.domain.exception.ChatServiceNotFoundException;
 import lombok.extern.slf4j.XSlf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -9,8 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @SuppressWarnings( { "MissingJavadoc", "PublicConstructor" } )
 @XSlf4j
@@ -22,16 +20,28 @@ public class ChatServiceExceptionHandler extends ResponseEntityExceptionHandler{
   public String handleParentException( final ChatServiceException e, final WebRequest request ){
 
     log.entry( e, request );
+    log.catching( e );
     return log.exit( e.getMessage( ) );
 
   }
 
-  @ExceptionHandler( ChatServiceNotFoundException.class )
+  @ExceptionHandler( ChatServiceException.NotFound.class )
   @ResponseStatus( NOT_FOUND )
-  public String handleNotFoundException( final ChatServiceNotFoundException e, final WebRequest request ){
+  public String handleNotFoundException( final ChatServiceException.NotFound e, final WebRequest request ){
 
     log.entry( e, request );
+    log.catching( e );
     return log.exit( "The request resource is not found." ); //NON-NLS
+
+  }
+
+  @ExceptionHandler( ChatServiceException.Conflict.class )
+  @ResponseStatus( CONFLICT )
+  public String handleConflictException( final ChatServiceException.Conflict e, final WebRequest request ){
+
+    log.entry( e, request );
+    log.catching( e );
+    return log.exit( e.getMessage( ) );
 
   }
 

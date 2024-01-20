@@ -7,15 +7,18 @@ import com.openai.chatbot.domain.entity.ChatRequest;
 import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatServiceException;
-import com.openai.chatbot.domain.exception.ChatServiceNotFoundException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
 import lombok.val;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -24,16 +27,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings( "MissingJavadoc" )
-@SpringBootTest
 public class ConversationControllerTest{
-/*
-TODO change all methods to use the global exception handler
-TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplicated code
-*/
+
+  @AfterEach
+  public void teardownServletRequest( ){
+
+    RequestContextHolder.resetRequestAttributes( );
+
+  }
 
   @Test
-  public void createConversation_validConversationStart_returnsSuccessfulResponse( ){
+  public void createConversation_ValidConversationStart_ReturnsOkAndNewConversation( ){
     // Arrange
+    this.setupServletRequest( );
     val someName = "Test Name"; // NON-NLS
     val someMsg = "Test System Message"; // NON-NLS
     val id = UUID.randomUUID( );
@@ -50,38 +56,53 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
 
   }
 
-  @Test
-  public void createConversation_wrongConversationStart_returnsBadRequestResponse( ){
-    // Arrange
-    val someErrorMsg = "Test Bad Request Message"; // NON-NLS
-    val failedChatService = new FailedConversationStartStub( someErrorMsg );
-    val mapper = new ConversationMapperDummy( );
-    val conversationStarterBody = new ConversationStarterBody( );
-    // Act
-    val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
-    // Assert
-    assertThat( responseEntity.getStatusCode( ).is4xxClientError( ) ).isTrue( );
-    assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
+  public void setupServletRequest( ){
+
+    RequestContextHolder.setRequestAttributes( new ServletRequestAttributes( new MockHttpServletRequest( ) ) );
 
   }
 
   @Test
-  public void createConversation_UnexpectedExceptionThrown_returnsServerErrorResponse( ){
+  public void createConversation_GenericError_ThrowsParentExc( ){
     // Arrange
-    val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new UnexpectedFailedConversationStartStub( someErrorMsg );
+    val someErrorMsg = "400 Bad Request Message"; // NON-NLS
+    val failedChatService = new ConversationStartExceptionStub( new ChatServiceException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    val conversationStarterBody = new ConversationStarterBody( );
-    // Act
-    val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
-    // Assert
-    assertThat( responseEntity.getStatusCode( ).is5xxServerError( ) ).isTrue( );
-    assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
+    val starterBody = new ConversationStarterBody( );
+    val conversationCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).createConversation( starterBody );
+    // Act & Assert
+    assertThatThrownBy( conversationCreation ).isInstanceOf( ChatServiceException.class ).hasMessage( someErrorMsg );
 
   }
 
   @Test
-  public void deleteConversation_SuccessfulDeletion_NoContentReturned( ){
+  public void createConversation_ConflictError_ThrowsConflictExc( ){
+    // Arrange
+    val someErrorMsg = "409 Bad Request Message"; // NON-NLS
+    val failedChatService = new ConversationStartExceptionStub( new ChatServiceException.Conflict( someErrorMsg ) );
+    val mapper = new ConversationMapperDummy( );
+    val starterBody = new ConversationStarterBody( );
+    val conversationCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).createConversation( starterBody );
+    // Act & Assert
+    assertThatThrownBy( conversationCreation ).isInstanceOf( ChatServiceException.Conflict.class ).hasMessage( someErrorMsg );
+
+  }
+
+  @Test
+  public void createConversation_RuntimeError_ThrowsAsIs( ){
+    // Arrange
+    val someErrorMsg = "500 Server Error Message"; // NON-NLS
+    val failedChatService = new ConversationStartExceptionStub( new RuntimeException( someErrorMsg ) );
+    val mapper = new ConversationMapperDummy( );
+    val starterBody = new ConversationStarterBody( );
+    val conversationCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).createConversation( starterBody );
+    // Act & Assert
+    assertThatThrownBy( conversationCreation ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
+
+  }
+
+  @Test
+  public void deleteConversation_SuccessfulDeletion_ReturnsOk( ){
     // Arrange
     val id = UUID.randomUUID( );
     val successfulChatService = new SuccessfulConversationDeleteStub( id );
@@ -94,34 +115,46 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
   }
 
   @Test
-  public void deleteConversation_ServiceError_NotFoundReturned( ){
+  public void deleteConversation_GenericError_ThrowsParentExc( ){
     // Arrange
+    val someErrorMsg = "400 Bad Request Message"; // NON-NLS
     val id = UUID.randomUUID( );
-    val failedChatService = new FailedConversationDeleteStub( );
+    val failedChatService = new ConversationErasureExceptionStub( new ChatServiceException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    // Act
-    val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
-    // Assert
-    assertThat( response.getStatusCode( ).is4xxClientError( ) ).isTrue( );
+    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).deleteConversation( id );
+    // Act & Assert
+    assertThatThrownBy( conversationDeletion ).isInstanceOf( ChatServiceException.class ).hasMessage( someErrorMsg );
 
   }
 
   @Test
-  public void deleteConversation_InternalError_InternalServerErrorReturned( ){
+  public void deleteConversation_NotFoundError_ThrowsNotFoundExc( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val someErrorMsg = "404 Bad Request Message"; // NON-NLS
+    val failedChatService = new ConversationErasureExceptionStub( new ChatServiceException.NotFound( someErrorMsg ) );
+    val mapper = new ConversationMapperDummy( );
+    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).deleteConversation( id );
+    // Act & Assert
+    assertThatThrownBy( conversationDeletion ).isInstanceOf( ChatServiceException.NotFound.class ).hasMessage( someErrorMsg );
+
+  }
+
+  @Test
+  public void deleteConversation_RuntimeError_ThrowsAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
     val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new UnexpectedFailedConversationDeleteStub( someErrorMsg );
+    val failedChatService = new ConversationErasureExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    // Act
-    val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
-    // Assert
-    assertThat( response.getStatusCode( ).is5xxServerError( ) ).isTrue( );
+    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).deleteConversation( id );
+    // Act & Assert
+    assertThatThrownBy( conversationDeletion ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
 
   }
 
   @Test
-  public void getConversation_SuccessfulGet_OkAndConversationReturned( ){
+  public void getConversation_SuccessfulGet_ReturnsOkAndConversation( ){
     // Arrange
     val id = UUID.randomUUID( );
     val successfulChatService = new SuccessfulConversationRetrievalStub( );
@@ -136,24 +169,25 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
   }
 
   @Test
-  public void getConversation_UnsuccessfulGet_NotFoundReturned( )
+  public void getConversation_NotFoundError_ThrowsNotFoundExc( )
     throws Exception{
     // Arrange
     val id = UUID.randomUUID( );
-    val failedChatService = new NotFoundConversationRetrievalStub( );
+    val someErrorMsg = "404 Bad Request Message"; // NON-NLS
+    val failedChatService = new ConversationRetrievalExceptionStub( new ChatServiceException.NotFound( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
     val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversation( id );
     // Act & Assert
-    assertThatThrownBy( conversationRetrieval ).isInstanceOf( ChatServiceNotFoundException.class );
+    assertThatThrownBy( conversationRetrieval ).isInstanceOf( ChatServiceException.NotFound.class );
 
   }
 
   @Test
-  public void getConversation_GenericServiceError_BadRequestReturned( ){
+  public void getConversation_GenericError_ThrowsParentExc( ){
     // Arrange
     val id = UUID.randomUUID( );
-    val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new UnsuccessfulConversationRetrievalStub( someErrorMsg );
+    val someErrorMsg = "400 Bad Request Message"; // NON-NLS
+    val failedChatService = new ConversationRetrievalExceptionStub( new ChatServiceException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
     val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversation( id );
     // Act & Assert
@@ -162,11 +196,11 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
   }
 
   @Test
-  public void getConversation_RuntimeError_InternalServerErrorReturned( ){
+  public void getConversation_RuntimeError_ThrowsAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
-    val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new UnexpectedFailedConversationRetrievalStub( someErrorMsg );
+    val someErrorMsg = "500 Server Error Message"; // NON-NLS
+    val failedChatService = new ConversationRetrievalExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
     val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversation( id );
     // Act & Assert
@@ -316,13 +350,16 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class NotFoundConversationRetrievalStub extends ChatServiceDouble{
+  private static class ConversationRetrievalExceptionStub extends ChatServiceDouble{
+
+    final Exception exception;
 
     @Override
+    @SneakyThrows
     public Conversation getConversation( final UUID id )
       throws ChatServiceException{
 
-      throw new ChatServiceNotFoundException( );
+      throw this.exception;
 
     }
 
@@ -330,60 +367,16 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class UnsuccessfulConversationRetrievalStub extends ChatServiceDouble{
+  private static class ConversationStartExceptionStub extends ChatServiceDouble{
 
-    final String errorMessage;
-
-    @Override
-    public Conversation getConversation( final UUID id )
-      throws ChatServiceException{
-
-      throw new ChatServiceException( this.errorMessage );
-
-    }
-
-  }
-
-  @EqualsAndHashCode( callSuper = true )
-  @Data
-  private static class UnexpectedFailedConversationRetrievalStub extends ChatServiceDouble{
-
-    final String errorMessage;
+    final Exception exception;
 
     @Override
-    public Conversation getConversation( final UUID id )
-      throws ChatServiceException{
-
-      throw new RuntimeException( this.errorMessage );
-
-    }
-
-  }
-
-  @EqualsAndHashCode( callSuper = true )
-  @Data
-  private static class FailedConversationStartStub extends ChatServiceDouble{
-
-    final String errorMessage;
-
-    @Override
+    @SneakyThrows
     public Conversation startConversation( final String name, final String systemMessage )
       throws ChatServiceException{
 
-      throw new ChatServiceException( this.errorMessage );
-
-    }
-
-  }
-
-  @EqualsAndHashCode( callSuper = true )
-  private static class FailedConversationDeleteStub extends ChatServiceDouble{
-
-    @Override
-    public void deleteConversation( final UUID chatId )
-      throws ChatServiceException{
-
-      throw new ChatServiceException( );
+      throw this.exception;
 
     }
 
@@ -391,31 +384,16 @@ TODO revise all nested classes for: names (stub, double, dummy, etc.) and duplic
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class UnexpectedFailedConversationStartStub extends ChatServiceDouble{
+  private static class ConversationErasureExceptionStub extends ChatServiceDouble{
 
-    final String errorMessage;
-
-    @Override
-    public Conversation startConversation( final String name, final String systemMessage )
-      throws ChatServiceException{
-
-      throw new RuntimeException( this.errorMessage );
-
-    }
-
-  }
-
-  @EqualsAndHashCode( callSuper = true )
-  @Data
-  private static class UnexpectedFailedConversationDeleteStub extends ChatServiceDouble{
-
-    final String errorMessage;
+    final Exception exception;
 
     @Override
+    @SneakyThrows
     public void deleteConversation( final UUID chatId )
       throws ChatServiceException{
 
-      throw new RuntimeException( this.errorMessage );
+      throw this.exception;
 
     }
 

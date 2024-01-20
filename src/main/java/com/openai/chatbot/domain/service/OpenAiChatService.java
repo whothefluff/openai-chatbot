@@ -67,7 +67,7 @@ public class OpenAiChatService implements ChatService{
   @Override
   public Conversation getConversation( final UUID id ){
 
-    return null;
+    return null; //TODO implement and test
 
   }
 

@@ -4,7 +4,6 @@ import com.openai.chatbot.application.adapter.rest.domainintegration.Conversatio
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
 import com.openai.chatbot.domain.entity.Conversation;
-import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedRunnable;
@@ -37,6 +36,7 @@ import java.util.function.Function;
 @RequestMapping( "/api/v1" ) //NON-NLS
 class ConversationController{
 
+  private static final String ID_PATH = "/{id}"; //NON-NLS
   ChatService chatService;
   ConversationMapper mapper;
 
@@ -49,30 +49,19 @@ class ConversationController{
   public ResponseEntity<?> createConversation( @RequestBody final ConversationStarterBody conversationStarterBody ){
 
     log.entry( conversationStarterBody );
-    val getNewConversation = ( CheckedFunction0<ConversationBody> )( ) ->
+    val conversationCreation = ( CheckedFunction0<ConversationBody> )( ) ->
       {
         val createdConversation = this.chatService.startConversation( conversationStarterBody.name( ), conversationStarterBody.systemMessage( ) );
         return this.mapper.toDto( createdConversation );
       };
-    val returnResponse = ( Function<ConversationBody, ResponseEntity<?>> )( conversationBody ) ->
+    val responseReturn = ( Function<ConversationBody, ResponseEntity<?>> )( conversationBody ) ->
       {
-        val location = ServletUriComponentsBuilder.fromCurrentRequest( ).path( "/{id}" ).buildAndExpand( conversationBody.id( ) ).toUri( ); //NON-NLS
+        val location = ServletUriComponentsBuilder.fromCurrentRequest( ).path( ID_PATH ).buildAndExpand( conversationBody.id( ) ).toUri( );
         return ResponseEntity.created( location ).body( conversationBody );
       };
-    val returnServiceError = ( Function<ChatServiceException, ResponseEntity<String>> )( e ) ->
-      {
-        log.catching( e );
-        return ResponseEntity.badRequest( ).body( e.getMessage( ) );
-      };
-    val internalError = ( Function<Throwable, ResponseEntity<?>> )( e ) ->
-      {
-        log.catching( e );
-        return ResponseEntity.internalServerError( ).body( e.getMessage( ) );
-      };
-    val response = Try.of( getNewConversation )
-                      .map( returnResponse )
-                      .recover( ChatServiceException.class, returnServiceError )
-                      .getOrElseGet( internalError );
+    val response = Try.of( conversationCreation )
+                      .map( responseReturn )
+                      .get( );
     return log.exit( response );
 
   }
@@ -83,7 +72,7 @@ class ConversationController{
   @GetMapping( "/conversations" ) //NON-NLS
   public ResponseEntity<Collection<ConversationBody>> getConversations( ){
     //this.chatService.getChats( );
-    return null; //TODO 2
+    return null; //TODO next
 
   }
 
@@ -92,7 +81,7 @@ class ConversationController{
    * @param id the conversation id
    * @return the conversation
    */
-  @GetMapping( "/conversation/{id}" ) //NON-NLS
+  @GetMapping( "/conversation" + ID_PATH ) //NON-NLS
   public ResponseEntity<?> getConversation( @PathVariable final UUID id ){
 
     log.entry( id );
@@ -115,7 +104,7 @@ class ConversationController{
    * @param conversationBody the new information
    * @return the updated conversation
    */
-  @PutMapping( "/conversation/{id}" ) //NON-NLS
+  @PutMapping( "/conversation" + ID_PATH ) //NON-NLS
   public ResponseEntity<ConversationBody> updateConversation( @PathVariable final UUID id, @RequestBody final ConversationBody conversationBody ){
     //this.chatService.updateChat( id, conversationBody );
     return null;
@@ -127,28 +116,15 @@ class ConversationController{
    * @param id the conversation to delete
    * @return 204 No Content if successful, 404 Not Found if not found, 500 Internal Server Error if error during deletion
    */
-  @DeleteMapping( "/conversation/{id}" ) //NON-NLS
+  @DeleteMapping( "/conversation" + ID_PATH ) //NON-NLS
   public ResponseEntity<?> deleteConversation( @PathVariable final UUID id ){
 
-    val deleteConversation = ( CheckedRunnable )( ) -> this.chatService.deleteConversation( id );
-    val returnResponse = ( Function<Void, ResponseEntity<?>> )( v ) ->
-      {
-        return ResponseEntity.noContent( ).build( );
-      };
-    val returnServiceError = ( Function<Throwable, ResponseEntity<?>> )( e ) ->
-      {
-        log.catching( e );
-        return ResponseEntity.notFound( ).build( );
-      };
-    val internalError = ( Function<Throwable, ResponseEntity<?>> )( e ) ->
-      {
-        log.catching( e );
-        return ResponseEntity.internalServerError( ).body( e.getMessage( ) );
-      };
-    val response = Try.run( deleteConversation )
-                      .map( returnResponse )
-                      .recover( ChatServiceException.class, returnServiceError )
-                      .getOrElseGet( internalError );
+    log.entry( id );
+    val conversationRemoval = ( CheckedRunnable )( ) -> this.chatService.deleteConversation( id );
+    val responseReturn = ( Function<Void, ResponseEntity<?>> )( v ) -> ResponseEntity.noContent( ).build( );
+    val response = Try.run( conversationRemoval )
+                      .map( responseReturn )
+                      .get( );
     return log.exit( response );
 
   }
@@ -161,7 +137,7 @@ class ConversationController{
   @GetMapping( "/searchConversations" ) //NON-NLS
   public ResponseEntity<Collection<ConversationBody>> searchByContent( @RequestParam final String searchString ){
 
-    return ResponseEntity.ok( null );
+    return null;
 
   }
 
