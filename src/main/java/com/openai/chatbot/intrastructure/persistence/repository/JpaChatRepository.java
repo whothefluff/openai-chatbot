@@ -55,13 +55,33 @@ public class JpaChatRepository implements ChatRepository{
     val chatRepositoryException = ( Function<Throwable, ChatRepositoryException> )( e ) ->
       {
         log.catching( e );
-        val exception = new ChatRepositoryException( e );
-        log.throwing( exception );
-        return exception;
+        return log.throwing( new ChatRepositoryException( e ) );
       };
-    val result = Try.of( saveConv ).getOrElseThrow( chatRepositoryException );
+    val result = Try.of( saveConv )
+                    .getOrElseThrow( chatRepositoryException );
     log.exit( result );
     return result;
+
+  }
+
+  @Override
+  public Conversation retrieveConversation( final UUID id )
+    throws ChatRepositoryException{
+
+    log.entry( id );
+    val notFound = ( Supplier<ChatRepositoryException.NotFound> )( ) -> log.throwing( new ChatRepositoryException.NotFound( ) );
+    val result = Option.ofOptional( this.JpaRepository.findById( id ) )
+                       .map( this.conversationMapper::toDomain )
+                       .getOrElseThrow( notFound );
+    return log.exit( result );
+
+  }
+
+  @Override
+  public Conversation updateConversation( final Conversation chat )
+    throws ChatRepositoryException{
+
+    return null;
 
   }
 
@@ -75,14 +95,6 @@ public class JpaChatRepository implements ChatRepository{
           .peek( this.JpaRepository::delete )
           .getOrElseThrow( notFound );
     log.exit( );
-
-  }
-
-  @Override
-  public Conversation updateConversation( final Conversation chat )
-    throws ChatRepositoryException{
-
-    return null;
 
   }
 
@@ -118,14 +130,6 @@ public class JpaChatRepository implements ChatRepository{
   public Collection<Conversation> searchChatByContent( final String content )
     throws ChatRepositoryException{
 
-    return null;
-
-  }
-
-  @Override
-  public Conversation retrieveConversation( UUID id ) 
-    throws ChatRepositoryException {
-    
     return null;
 
   }

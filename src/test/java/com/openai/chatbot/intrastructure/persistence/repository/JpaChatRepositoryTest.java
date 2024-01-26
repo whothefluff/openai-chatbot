@@ -1,7 +1,6 @@
 package com.openai.chatbot.intrastructure.persistence.repository;
 
-public class JpaChatRepositoryTest {
-
-  
+public class JpaChatRepositoryTest{
+  // fuuuuuuuuuuuuu
 
 }

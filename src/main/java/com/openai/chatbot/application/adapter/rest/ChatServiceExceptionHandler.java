@@ -10,10 +10,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import static org.springframework.http.HttpStatus.*;
 
-@SuppressWarnings( { "MissingJavadoc", "PublicConstructor" } )
 @XSlf4j
 @RestControllerAdvice
-public class ChatServiceExceptionHandler extends ResponseEntityExceptionHandler{
+class ChatServiceExceptionHandler extends ResponseEntityExceptionHandler{
 
   @ExceptionHandler( ChatServiceException.class )
   @ResponseStatus( BAD_REQUEST )

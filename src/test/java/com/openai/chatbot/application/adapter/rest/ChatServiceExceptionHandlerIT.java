@@ -131,4 +131,21 @@ class ChatServiceExceptionHandlerIT{
 
   }
 
+  @Test
+  public void handleConflictException_ThrownInDeleteConversation_ReturnsNotFound( )
+    throws Exception{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val errorMessage = "Some 409 error occurred";
+    Mockito.doThrow( new ChatServiceException.Conflict( errorMessage ) ).when( this.chatService ).deleteConversation( id );
+    val call = MockMvcRequestBuilders.delete( "/api/v1/conversation/{id}", id );
+    // Act
+    val responseBody = this.mockMvc.perform( call )
+                                   .andExpect( status( ).isConflict( ) )
+                                   .andReturn( ).getResponse( ).getContentAsString( );
+    // Assert
+    assertThat( responseBody ).isEqualTo( errorMessage );
+
+  }
+
 }

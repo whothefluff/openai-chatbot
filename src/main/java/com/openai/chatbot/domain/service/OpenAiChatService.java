@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * Chat related operations using OpenAI
@@ -41,18 +40,13 @@ public class OpenAiChatService implements ChatService{
     throws ChatServiceException{
 
     log.entry( name, systemMessage );
-    val saveConv = ( CheckedFunction0<Conversation> )( ) ->
+    val convInsertion = ( CheckedFunction0<Conversation> )( ) ->
       {
         val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage ).build( );
         return this.repository.saveNewConversation( conversation );
       };
-    val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) ->
-      {
-        log.catching( e );
-        val exception = new ChatServiceException( e );
-        return log.throwing( exception );
-      };
-    val savedConv = Try.of( saveConv ).getOrElseThrow( chatServiceException );
+    val savedConv = Try.of( convInsertion )
+                       .get( );
     return log.exit( savedConv );
 
   }
@@ -65,9 +59,14 @@ public class OpenAiChatService implements ChatService{
   }
 
   @Override
-  public Conversation getConversation( final UUID id ){
+  public Conversation getConversation( final UUID id )
+    throws ChatServiceException{
 
-    return null; //TODO implement and test
+    log.entry( id );
+    val convRetrieval = ( CheckedFunction0<Conversation> )( ) -> this.repository.retrieveConversation( id );
+    val result = Try.of( convRetrieval )
+                    .get( );
+    return log.exit( result );
 
   }
 
@@ -83,14 +82,9 @@ public class OpenAiChatService implements ChatService{
     throws ChatServiceException{
 
     log.entry( id );
-    val deleteConv = ( CheckedRunnable )( ) -> this.repository.deleteConversation( id );
-    val chatServiceException = ( Function<Throwable, ChatServiceException> )( e ) ->
-      {
-        log.catching( e );
-        val exception = new ChatServiceException( e );
-        return log.throwing( exception );
-      };
-    Try.run( deleteConv ).getOrElseThrow( chatServiceException );
+    val convDeletion = ( CheckedRunnable )( ) -> this.repository.deleteConversation( id );
+    Try.run( convDeletion )
+       .get( );
     log.exit( );
 
   }

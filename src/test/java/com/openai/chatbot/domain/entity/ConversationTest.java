@@ -2,7 +2,6 @@ package com.openai.chatbot.domain.entity;
 
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.LinkedHashSet;
 
@@ -10,7 +9,6 @@ import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
 public class ConversationTest{
 
   @Test

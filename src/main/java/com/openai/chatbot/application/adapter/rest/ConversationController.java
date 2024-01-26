@@ -72,7 +72,7 @@ class ConversationController{
   @GetMapping( "/conversations" ) //NON-NLS
   public ResponseEntity<Collection<ConversationBody>> getConversations( ){
     //this.chatService.getChats( );
-    return null; //TODO next
+    return null;
 
   }
 
@@ -137,7 +137,7 @@ class ConversationController{
   @GetMapping( "/searchConversations" ) //NON-NLS
   public ResponseEntity<Collection<ConversationBody>> searchByContent( @RequestParam final String searchString ){
 
-    return null;
+    return null; //TODO
 
   }
 

@@ -26,18 +26,17 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SuppressWarnings( "MissingJavadoc" )
 public class ConversationControllerTest{
 
   @AfterEach
-  public void teardownServletRequest( ){
+  void teardownServletRequest( ){
 
     RequestContextHolder.resetRequestAttributes( );
 
   }
 
   @Test
-  public void createConversation_ValidConversationStart_ReturnsOkAndNewConversation( ){
+  void createConversation_ValidConversationStart_ReturnsOkAndNewConversation( ){
     // Arrange
     this.setupServletRequest( );
     val someName = "Test Name"; // NON-NLS
@@ -56,40 +55,14 @@ public class ConversationControllerTest{
 
   }
 
-  public void setupServletRequest( ){
+  void setupServletRequest( ){
 
     RequestContextHolder.setRequestAttributes( new ServletRequestAttributes( new MockHttpServletRequest( ) ) );
 
   }
 
   @Test
-  public void createConversation_GenericError_ThrowsParentExc( ){
-    // Arrange
-    val someErrorMsg = "400 Bad Request Message"; // NON-NLS
-    val failedChatService = new ConversationStartExceptionStub( new ChatServiceException( someErrorMsg ) );
-    val mapper = new ConversationMapperDummy( );
-    val starterBody = new ConversationStarterBody( );
-    val conversationCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).createConversation( starterBody );
-    // Act & Assert
-    assertThatThrownBy( conversationCreation ).isInstanceOf( ChatServiceException.class ).hasMessage( someErrorMsg );
-
-  }
-
-  @Test
-  public void createConversation_ConflictError_ThrowsConflictExc( ){
-    // Arrange
-    val someErrorMsg = "409 Bad Request Message"; // NON-NLS
-    val failedChatService = new ConversationStartExceptionStub( new ChatServiceException.Conflict( someErrorMsg ) );
-    val mapper = new ConversationMapperDummy( );
-    val starterBody = new ConversationStarterBody( );
-    val conversationCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).createConversation( starterBody );
-    // Act & Assert
-    assertThatThrownBy( conversationCreation ).isInstanceOf( ChatServiceException.Conflict.class ).hasMessage( someErrorMsg );
-
-  }
-
-  @Test
-  public void createConversation_RuntimeError_ThrowsAsIs( ){
+  void createConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
     val failedChatService = new ConversationStartExceptionStub( new RuntimeException( someErrorMsg ) );
@@ -102,7 +75,7 @@ public class ConversationControllerTest{
   }
 
   @Test
-  public void deleteConversation_SuccessfulDeletion_ReturnsOk( ){
+  void deleteConversation_SuccessfulDeletion_ReturnsOk( ){
     // Arrange
     val id = UUID.randomUUID( );
     val successfulChatService = new SuccessfulConversationDeleteStub( id );
@@ -115,33 +88,7 @@ public class ConversationControllerTest{
   }
 
   @Test
-  public void deleteConversation_GenericError_ThrowsParentExc( ){
-    // Arrange
-    val someErrorMsg = "400 Bad Request Message"; // NON-NLS
-    val id = UUID.randomUUID( );
-    val failedChatService = new ConversationErasureExceptionStub( new ChatServiceException( someErrorMsg ) );
-    val mapper = new ConversationMapperDummy( );
-    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).deleteConversation( id );
-    // Act & Assert
-    assertThatThrownBy( conversationDeletion ).isInstanceOf( ChatServiceException.class ).hasMessage( someErrorMsg );
-
-  }
-
-  @Test
-  public void deleteConversation_NotFoundError_ThrowsNotFoundExc( ){
-    // Arrange
-    val id = UUID.randomUUID( );
-    val someErrorMsg = "404 Bad Request Message"; // NON-NLS
-    val failedChatService = new ConversationErasureExceptionStub( new ChatServiceException.NotFound( someErrorMsg ) );
-    val mapper = new ConversationMapperDummy( );
-    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).deleteConversation( id );
-    // Act & Assert
-    assertThatThrownBy( conversationDeletion ).isInstanceOf( ChatServiceException.NotFound.class ).hasMessage( someErrorMsg );
-
-  }
-
-  @Test
-  public void deleteConversation_RuntimeError_ThrowsAsIs( ){
+  void deleteConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
     val someErrorMsg = "Test Server Error Message"; // NON-NLS
@@ -154,7 +101,7 @@ public class ConversationControllerTest{
   }
 
   @Test
-  public void getConversation_SuccessfulGet_ReturnsOkAndConversation( ){
+  void getConversation_SuccessfulGet_ReturnsOkAndConversation( ){
     // Arrange
     val id = UUID.randomUUID( );
     val successfulChatService = new SuccessfulConversationRetrievalStub( );
@@ -169,34 +116,7 @@ public class ConversationControllerTest{
   }
 
   @Test
-  public void getConversation_NotFoundError_ThrowsNotFoundExc( )
-    throws Exception{
-    // Arrange
-    val id = UUID.randomUUID( );
-    val someErrorMsg = "404 Bad Request Message"; // NON-NLS
-    val failedChatService = new ConversationRetrievalExceptionStub( new ChatServiceException.NotFound( someErrorMsg ) );
-    val mapper = new ConversationMapperDummy( );
-    val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversation( id );
-    // Act & Assert
-    assertThatThrownBy( conversationRetrieval ).isInstanceOf( ChatServiceException.NotFound.class );
-
-  }
-
-  @Test
-  public void getConversation_GenericError_ThrowsParentExc( ){
-    // Arrange
-    val id = UUID.randomUUID( );
-    val someErrorMsg = "400 Bad Request Message"; // NON-NLS
-    val failedChatService = new ConversationRetrievalExceptionStub( new ChatServiceException( someErrorMsg ) );
-    val mapper = new ConversationMapperDummy( );
-    val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversation( id );
-    // Act & Assert
-    assertThatThrownBy( conversationRetrieval ).isInstanceOf( ChatServiceException.class ).hasMessage( someErrorMsg );
-
-  }
-
-  @Test
-  public void getConversation_RuntimeError_ThrowsAsIs( ){
+  void getConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
