@@ -1,7 +1,9 @@
 package com.openai.chatbot.application.adapter.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
+import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import lombok.val;
@@ -139,6 +141,78 @@ class ChatServiceExceptionHandlerIT{
     val errorMessage = "Some 409 error occurred";
     Mockito.doThrow( new ChatServiceException.Conflict( errorMessage ) ).when( this.chatService ).deleteConversation( id );
     val call = MockMvcRequestBuilders.delete( "/api/v1/conversation/{id}", id );
+    // Act
+    val responseBody = this.mockMvc.perform( call )
+                                   .andExpect( status( ).isConflict( ) )
+                                   .andReturn( ).getResponse( ).getContentAsString( );
+    // Assert
+    assertThat( responseBody ).isEqualTo( errorMessage );
+
+  }
+
+  @Test
+  public void handleParentException_ThrownInGetConversations_ReturnsBadRequest( )
+    throws Exception{
+    // Arrange
+    val errorMessage = "Some 400 error occurred";
+    Mockito.when( this.chatService.getConversations( ) ).thenThrow( new ChatServiceException( errorMessage ) );
+    val call = MockMvcRequestBuilders.get( "/api/v1/conversations" );
+    // Act
+    val responseBody = this.mockMvc.perform( call )
+                                   .andExpect( status( ).isBadRequest( ) )
+                                   .andReturn( ).getResponse( ).getContentAsString( );
+    // Assert
+    assertThat( responseBody ).isEqualTo( errorMessage );
+
+  }
+
+  @Test
+  public void handleParentException_ThrownInUpdateConversation_ReturnsBadRequest( )
+    throws Exception{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val updatedConv = new Conversation( ).name( "convName" );
+    val errorMessage = "Some 400 error occurred";
+    Mockito.doThrow( new ChatServiceException( errorMessage ) ).when( this.chatService ).updateConversation( id, updatedConv );
+    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationBody( ).name( updatedConv.name( ) ) );
+    val call = MockMvcRequestBuilders.put( "/api/v1/conversation/{id}", id ).contentType( APPLICATION_JSON ).content( requestBody );
+    // Act
+    val responseBody = this.mockMvc.perform( call )
+                                   .andExpect( status( ).isBadRequest( ) )
+                                   .andReturn( ).getResponse( ).getContentAsString( );
+    // Assert
+    assertThat( responseBody ).isEqualTo( errorMessage );
+
+  }
+
+  @Test
+  public void handleNotFoundException_ThrownInUpdateConversation_ReturnsNotFound( )
+    throws Exception{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val updatedConv = new Conversation( ).name( "convName" );
+    Mockito.doThrow( new ChatServiceException.NotFound( "Some 404" ) ).when( this.chatService ).updateConversation( id, updatedConv );
+    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationBody( ).name( updatedConv.name( ) ) );
+    val call = MockMvcRequestBuilders.put( "/api/v1/conversation/{id}", id ).contentType( APPLICATION_JSON ).content( requestBody );
+    // Act
+    val responseBody = this.mockMvc.perform( call )
+                                   .andExpect( status( ).isNotFound( ) )
+                                   .andReturn( ).getResponse( ).getContentAsString( );
+    // Assert
+    assertThat( responseBody ).containsIgnoringCase( "not found" );
+
+  }
+
+  @Test
+  public void handleConflictException_ThrownInUpdateConversation_ReturnsConflict( )
+    throws Exception{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val updatedConv = new Conversation( ).name( "convName" );
+    val errorMessage = "Some 409 error occurred";
+    Mockito.doThrow( new ChatServiceException.Conflict( errorMessage ) ).when( this.chatService ).updateConversation( id, updatedConv );
+    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationBody( ).name( updatedConv.name( ) ) );
+    val call = MockMvcRequestBuilders.put( "/api/v1/conversation/{id}", id ).contentType( APPLICATION_JSON ).content( requestBody );
     // Act
     val responseBody = this.mockMvc.perform( call )
                                    .andExpect( status( ).isConflict( ) )

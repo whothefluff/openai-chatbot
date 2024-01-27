@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class OpenAIConfig{
 
   @Bean
-  public WebClient.Builder webClientBuilder( ){
+  WebClient.Builder webClientBuilder( ){
 
     log.entry( );
     return log.exit( WebClient.builder( ) );
@@ -21,7 +21,7 @@ public class OpenAIConfig{
   }
 
   @Bean
-  public OpenAIProperties openAIProperties( ){
+  OpenAIProperties openAIProperties( ){
 
     log.entry( );
     return log.exit( new OpenAIProperties( ) );

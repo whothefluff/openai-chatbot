@@ -78,6 +78,13 @@ public class JpaChatRepository implements ChatRepository{
   }
 
   @Override
+  public Collection<Conversation> retrieveConversations( )
+    throws ChatRepositoryException{
+
+    return null;
+  }
+
+  @Override
   public Conversation updateConversation( final Conversation chat )
     throws ChatRepositoryException{
 

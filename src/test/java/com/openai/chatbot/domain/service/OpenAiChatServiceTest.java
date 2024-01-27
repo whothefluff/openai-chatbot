@@ -129,6 +129,13 @@ public class OpenAiChatServiceTest{
     }
 
     @Override
+    public @Nullable Collection<Conversation> retrieveConversations( )
+      throws ChatRepositoryException{
+
+      return null;
+    }
+
+    @Override
     public @Nullable Conversation updateConversation( final Conversation chat )
       throws ChatRepositoryException{
 

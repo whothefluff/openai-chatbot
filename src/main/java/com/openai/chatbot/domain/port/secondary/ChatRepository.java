@@ -22,7 +22,21 @@ public interface ChatRepository{
   Conversation saveNewConversation( Conversation chat )
     throws ChatRepositoryException;
 
+  /**
+   * Returns the requested chat
+   * @param id the chat id
+   * @return the chat
+   * @throws ChatRepositoryException if the chat could not be retrieved
+   */
   Conversation retrieveConversation( UUID id )
+    throws ChatRepositoryException;
+
+  /**
+   * Returns all the chats
+   * @return all the chats
+   * @throws ChatRepositoryException if the chats could not be retrieved
+   */
+  Collection<Conversation> retrieveConversations( )
     throws ChatRepositoryException;
 
   Conversation updateConversation( Conversation chat )

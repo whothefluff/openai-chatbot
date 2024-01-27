@@ -3,6 +3,7 @@ package com.openai.chatbot.domain.service;
 import com.openai.chatbot.domain.entity.ChatRequest;
 import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
+import com.openai.chatbot.domain.exception.ChatRepositoryException;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import com.openai.chatbot.domain.port.secondary.ChatCompletionsService;
@@ -16,12 +17,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * Chat related operations using OpenAI
  */
+@SuppressWarnings( "RedundantThrows" )
 @Data
 @EqualsAndHashCode
 @ToString
@@ -52,9 +55,19 @@ public class OpenAiChatService implements ChatService{
   }
 
   @Override
-  public Collection<Conversation> getConversations( ){
+  public SortedSet<Conversation> getConversations( )
+    throws ChatServiceException{
 
-    return null;
+    val creationMoment = ( Function<Conversation, Instant> )Conversation::createdAt;
+    val id = ( Function<Conversation, UUID> )Conversation::id;
+    val compareByCreation = Comparator.comparing( creationMoment ).thenComparing( id );
+    val treeSet = ( SortedSet<Conversation> )new TreeSet<Conversation>( compareByCreation );
+    try{
+      treeSet.addAll( this.repository.retrieveConversations( ) );
+      return treeSet;
+    } catch( final ChatRepositoryException e ){
+      throw new RuntimeException( e );
+    }
 
   }
 
