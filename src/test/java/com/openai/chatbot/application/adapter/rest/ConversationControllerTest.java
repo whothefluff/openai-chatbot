@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatException;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
-public class ConversationControllerTest{
+class ConversationControllerTest{
 
   @AfterEach
   void teardownServletRequest( ){

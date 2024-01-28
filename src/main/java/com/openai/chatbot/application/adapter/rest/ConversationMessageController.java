@@ -24,7 +24,8 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode
 @ToString
-@FieldDefaults( level = AccessLevel.PROTECTED )
+@FieldDefaults( level = AccessLevel.PROTECTED,
+                makeFinal = true )
 @Accessors( chain = true,
             fluent = true )
 @XSlf4j

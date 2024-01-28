@@ -8,10 +8,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
-@SuppressWarnings( "MissingJavadoc" )
 @XSlf4j
 @Component
-public class ConversationUpdateParameterCheckImpl implements ConversationUpdateParameterCheck{
+class ConversationUpdateParameterCheckImpl implements ConversationUpdateParameterCheck{
 
   @Override
   public void validate( final UUID id, final ConversationBody conversationBody ){

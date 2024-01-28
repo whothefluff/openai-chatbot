@@ -15,10 +15,11 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,14 +31,15 @@ import java.util.function.Supplier;
 @Data
 @EqualsAndHashCode
 @ToString
-@FieldDefaults( level = AccessLevel.PROTECTED )
+@FieldDefaults( level = AccessLevel.PROTECTED,
+                makeFinal = true )
 @Accessors( chain = true,
             fluent = true )
 @XSlf4j
 @Component
-public class JpaChatRepository implements ChatRepository{
+class JpaChatRepository implements ChatRepository{
 
-  JpaRepository<JpaChat, UUID> JpaRepository;
+  JpaChatJpaRepo JpaRepository;
   ConversationMapper conversationMapper;
   ChatRequestMapper chatRequestMapper;
 
@@ -78,17 +80,35 @@ public class JpaChatRepository implements ChatRepository{
   }
 
   @Override
-  public Collection<Conversation> retrieveConversations( )
+  public Collection<Conversation> retrieveConversations( final Sort sorting )
     throws ChatRepositoryException{
 
-    return null;
+    log.entry( sorting );
+    val convsRetrieval = ( CheckedFunction0<List<JpaChat>> )( ) -> this.JpaRepository.findAll( sorting );
+    val toEntity = ( Function<List<JpaChat>, List<Conversation>> )( jpaChats ) -> jpaChats.stream( )
+                                                                                          .map( this.conversationMapper::toDomain )
+                                                                                          .toList( );
+    val result = Try.of( convsRetrieval )
+                    .map( toEntity )
+                    .get( );
+    return log.exit( result );
+
   }
 
   @Override
   public Conversation updateConversation( final Conversation chat )
     throws ChatRepositoryException{
 
-    return null;
+    log.entry( chat );
+    val convUpdate = ( CheckedFunction0<JpaChat> )( ) ->
+      {
+        val jpaChat = this.conversationMapper.toJpa( chat );
+        return this.JpaRepository.save( jpaChat );
+      };
+    Try.of( convUpdate )
+       .map( this.conversationMapper::toDomain )
+       .get( );
+    return log.exit( chat );
 
   }
 

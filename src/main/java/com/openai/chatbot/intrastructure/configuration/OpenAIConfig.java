@@ -6,11 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@SuppressWarnings( { "MissingJavadoc", "PublicConstructor" } )
 @XSlf4j
 @Configuration
 @EnableConfigurationProperties( OpenAIProperties.class )
-public class OpenAIConfig{
+class OpenAIConfig{
 
   @Bean
   WebClient.Builder webClientBuilder( ){

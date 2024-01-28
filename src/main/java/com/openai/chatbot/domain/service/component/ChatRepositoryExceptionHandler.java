@@ -1,5 +1,7 @@
-package com.openai.chatbot.domain.exception;
+package com.openai.chatbot.domain.service.component;
 
+import com.openai.chatbot.domain.exception.ChatRepositoryException;
+import com.openai.chatbot.domain.exception.ChatServiceException;
 import io.vavr.Function1;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;

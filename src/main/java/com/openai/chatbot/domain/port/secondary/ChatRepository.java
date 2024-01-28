@@ -4,6 +4,7 @@ import com.openai.chatbot.domain.entity.ChatRequest;
 import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatRepositoryException;
+import org.springframework.data.domain.Sort;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -33,10 +34,11 @@ public interface ChatRepository{
 
   /**
    * Returns all the chats
+   * @param sorting the sort criteria
    * @return all the chats
    * @throws ChatRepositoryException if the chats could not be retrieved
    */
-  Collection<Conversation> retrieveConversations( )
+  Collection<Conversation> retrieveConversations( Sort sorting )
     throws ChatRepositoryException;
 
   /**

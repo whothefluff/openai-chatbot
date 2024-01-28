@@ -9,7 +9,7 @@ import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class ConversationTest{
+class ConversationTest{
 
   @Test
   void addRequest_WithValidRequest_AddsRequestOnce( ){
