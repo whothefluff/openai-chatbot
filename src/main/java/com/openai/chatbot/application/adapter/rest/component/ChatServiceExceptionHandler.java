@@ -1,4 +1,4 @@
-package com.openai.chatbot.application.adapter.rest;
+package com.openai.chatbot.application.adapter.rest.component;
 
 import com.openai.chatbot.domain.exception.ChatServiceException;
 import lombok.extern.slf4j.XSlf4j;

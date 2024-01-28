@@ -1,5 +1,6 @@
 package com.openai.chatbot.application.adapter.rest;
 
+import com.openai.chatbot.application.adapter.rest.component.ConversationUpdateParameterCheck;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
@@ -16,7 +17,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -41,6 +41,7 @@ class ConversationController{
   private static final String ID_PATH = "/{id}"; //NON-NLS
   ChatService chatService;
   ConversationMapper mapper;
+  ConversationUpdateParameterCheck updParamCheck;
 
   /**
    * Starts a conversation
@@ -100,7 +101,7 @@ class ConversationController{
     val convsRetrieval = ( CheckedFunction0<TreeSet<Conversation>> )( ) ->
       {
         val conversations = this.chatService.getConversations( );
-        Assert.notNull( conversations.comparator( ), "The conversations are not ordered" ); //NON-NLS
+        //noinspection DataFlowIssue
         return TreeSet.ofAll( conversations.comparator( ), conversations );
       };
     val returnResponse = ( Function<TreeSet<Conversation>, ResponseEntity<Collection<ConversationBody>>> )( conversations ) ->
@@ -125,10 +126,11 @@ class ConversationController{
   public ResponseEntity<ConversationBody> updateConversation( @PathVariable final UUID id, @RequestBody final ConversationBody conversationBody ){
 
     log.entry( id, conversationBody );
+    this.updParamCheck.validate( id, conversationBody );
     val convUpdate = ( CheckedFunction0<Conversation> )( ) ->
       {
         val conversation = this.mapper.toEntity( conversationBody );
-        return this.chatService.updateConversation( id, conversation );
+        return this.chatService.updateConversation( conversation );
       };
     val returnResponse = ( Function<Conversation, ResponseEntity<ConversationBody>> )( conversation ) ->
       {

@@ -7,7 +7,7 @@ import java.util.LinkedHashSet;
 
 import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ConversationTest{
 
@@ -66,7 +66,7 @@ public class ConversationTest{
     val systemMessage = "Test System Message";
     val conversation = Conversation.initialStateBuilder( ).name( "   " ).systemMessage( systemMessage );
     // Act & Assert
-    assertThatThrownBy( conversation::build ).isInstanceOf( IllegalArgumentException.class ).hasMessageContaining( "Name" );
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build ).withMessageContaining( "Name" );
 
   }
 
@@ -76,7 +76,7 @@ public class ConversationTest{
     val name = "Test Name";
     val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( "   " );
     // Act & Assert
-    assertThatThrownBy( conversation::build ).isInstanceOf( IllegalArgumentException.class ).hasMessageContaining( "System message" );
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build ).withMessageContaining( "System message" );
 
   }
 
@@ -85,7 +85,8 @@ public class ConversationTest{
     // Arrange
     val conversation = Conversation.initialStateBuilder( ).name( "   " ).systemMessage( "   " );
     // Act & Assert
-    assertThatThrownBy( conversation::build ).isInstanceOf( IllegalArgumentException.class ).hasMessageContainingAll( "Name", "System message" );
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build )
+                                                               .withMessageContainingAll( "Name", "System message" );
 
   }
 

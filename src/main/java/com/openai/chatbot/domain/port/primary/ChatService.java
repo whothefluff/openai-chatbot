@@ -41,12 +41,11 @@ public interface ChatService{
 
   /**
    * Updates the conversation
-   * @param id           the conversation id
-   * @param conversation the conversation
+   * @param conversation the new conversation
    * @return the updated conversation
    * @throws ChatServiceException if the conversation could not be updated
    */
-  Conversation updateConversation( UUID id, Conversation conversation )
+  Conversation updateConversation( Conversation conversation )
     throws ChatServiceException;
 
   /**

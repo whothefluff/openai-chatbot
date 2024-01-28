@@ -1,5 +1,6 @@
 package com.openai.chatbot.application.adapter.rest;
 
+import com.openai.chatbot.application.adapter.rest.component.ConversationUpdateParameterCheck;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
@@ -25,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatException;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
@@ -50,8 +51,9 @@ public class ConversationControllerTest{
     val mapper = new ConversationBodyMapperStub( fakeConversationBody );
     val conversationStarterBody = new ConversationStarterBody( ).name( someName ).systemMessage( someMsg );
     val createdConversationBody = new ConversationBody( ).id( id ).name( conversationStarterBody.name( ) );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val responseEntity = new ConversationController( successfulChatService, mapper ).createConversation( conversationStarterBody );
+    val responseEntity = new ConversationController( successfulChatService, mapper, check ).createConversation( conversationStarterBody );
     // Assert
     assertThat( responseEntity.getStatusCode( ) ).isEqualTo( CREATED );
     assertThat( responseEntity.getBody( ) ).isEqualTo( createdConversationBody );
@@ -68,12 +70,13 @@ public class ConversationControllerTest{
   void createConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
-    val failedChatService = new ConversationStartExceptionStub( new RuntimeException( someErrorMsg ) );
+    val failedChatSrv = new ConversationStartExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
     val starterBody = new ConversationStarterBody( );
-    val conversationCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).createConversation( starterBody );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val convCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatSrv, mapper, check ).createConversation( starterBody );
     // Act & Assert
-    assertThatThrownBy( conversationCreation ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
+    assertThatException( ).isThrownBy( convCreation ).withMessage( someErrorMsg );
 
   }
 
@@ -83,8 +86,9 @@ public class ConversationControllerTest{
     val id = UUID.randomUUID( );
     val successfulChatService = new SuccessfulConversationDeleteStub( id );
     val mapper = new ConversationMapperDummy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val response = new ConversationController( successfulChatService, mapper ).deleteConversation( id );
+    val response = new ConversationController( successfulChatService, mapper, check ).deleteConversation( id );
     // Assert
     assertThat( response.getStatusCode( ) ).isEqualTo( NO_CONTENT );
 
@@ -97,9 +101,10 @@ public class ConversationControllerTest{
     val someErrorMsg = "Test Server Error Message"; // NON-NLS
     val failedChatService = new ConversationErasureExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).deleteConversation( id );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper, check ).deleteConversation( id );
     // Act & Assert
-    assertThatThrownBy( conversationDeletion ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
+    assertThatException( ).isThrownBy( conversationDeletion ).withMessage( someErrorMsg );
 
   }
 
@@ -110,8 +115,9 @@ public class ConversationControllerTest{
     val successfulChatService = new SuccessfulConversationRetrievalStub( );
     val conversation = new ConversationBody( ).id( id );
     val mapper = new ConversationBodyMapperStub( conversation );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val response = new ConversationController( successfulChatService, mapper ).getConversation( id );
+    val response = new ConversationController( successfulChatService, mapper, check ).getConversation( id );
     // Assert
     assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
     assertThat( response.getBody( ) ).isEqualTo( conversation );
@@ -125,10 +131,10 @@ public class ConversationControllerTest{
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
     val failedChatService = new ConversationRetrievalExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversation( id );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper, check ).getConversation( id );
     // Act & Assert
-    assertThatThrownBy( conversationRetrieval ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
-
+    assertThatException( ).isThrownBy( conversationRetrieval ).withMessage( someErrorMsg );
   }
 
   @Test
@@ -142,8 +148,9 @@ public class ConversationControllerTest{
                                 .collect( Collectors.toCollection( ( ) -> new TreeSet<>( Comparator.comparing( Conversation::createdAt ) ) ) );
     val successfulChatService = new SuccessfulConversationsRetrievalStub( conversations );
     val mapper = new ConversationBodiesMapperStub( convsDto.stream( ).collect( Collectors.toMap( ConversationBody::id, cb -> cb ) ) );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val response = new ConversationController( successfulChatService, mapper ).getConversations( );
+    val response = new ConversationController( successfulChatService, mapper, check ).getConversations( );
     // Assert
     assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
     assertThat( response.getBody( ) ).isEqualTo( convsDto );
@@ -156,9 +163,10 @@ public class ConversationControllerTest{
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
     val failedChatService = new ConversationsRetrievalExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    val convsRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).getConversations( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val convsRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper, check ).getConversations( );
     // Act & Assert
-    assertThatThrownBy( convsRetrieval ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
+    assertThatException( ).isThrownBy( convsRetrieval ).withMessage( someErrorMsg );
 
   }
 
@@ -169,8 +177,9 @@ public class ConversationControllerTest{
     val successfulChatService = new SuccessfulConversationUpdateStub( );
     val conversation = new ConversationBody( ).id( id );
     val mapper = new ConversationBodyMapperStub( conversation );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val response = new ConversationController( successfulChatService, mapper ).updateConversation( id, conversation );
+    val response = new ConversationController( successfulChatService, mapper, check ).updateConversation( id, conversation );
     // Assert
     assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
     assertThat( response.getBody( ) ).isEqualTo( conversation );
@@ -182,11 +191,12 @@ public class ConversationControllerTest{
     // Arrange
     val id = UUID.randomUUID( );
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
-    val failedChatService = new ConversationUpdateExceptionStub( new RuntimeException( someErrorMsg ) );
+    val failedChatSrv = new ConversationUpdateExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper ).updateConversation( id, null );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val convUpdate = ( ThrowingCallable )( ) -> new ConversationController( failedChatSrv, mapper, check ).updateConversation( id, null );
     // Act & Assert
-    assertThatThrownBy( conversationRetrieval ).isInstanceOf( RuntimeException.class ).hasMessage( someErrorMsg );
+    assertThatException( ).isThrownBy( convUpdate ).withMessage( someErrorMsg );
 
   }
   //##############################################################################################################
@@ -194,7 +204,7 @@ public class ConversationControllerTest{
   private static class ConversationMapperDouble implements ConversationMapper{
 
     @Override
-    public @Nullable ConversationBody toDto( final Conversation entity ){
+    public @Nullable ConversationBody toDto( final com.openai.chatbot.domain.entity.Conversation entity ){
 
       return null;
 
@@ -220,7 +230,7 @@ public class ConversationControllerTest{
     final ConversationBody conversationBody;
 
     @Override
-    public ConversationBody toDto( final Conversation entity ){
+    public ConversationBody toDto( final com.openai.chatbot.domain.entity.Conversation entity ){
 
       return this.conversationBody;
 
@@ -235,7 +245,7 @@ public class ConversationControllerTest{
     final Map<UUID, ConversationBody> conversationBodies;
 
     @Override
-    public ConversationBody toDto( final Conversation entity ){
+    public ConversationBody toDto( final com.openai.chatbot.domain.entity.Conversation entity ){
 
       return this.conversationBodies.get( entity.id( ) );
 
@@ -270,7 +280,7 @@ public class ConversationControllerTest{
     }
 
     @Override
-    public @Nullable Conversation updateConversation( final UUID id, final Conversation conversation )
+    public @Nullable Conversation updateConversation( final com.openai.chatbot.domain.entity.Conversation conversation )
       throws ChatServiceException{
 
       return null;
@@ -330,7 +340,7 @@ public class ConversationControllerTest{
   private static class SuccessfulConversationUpdateStub extends ChatServiceDouble{
 
     @Override
-    public Conversation updateConversation( final UUID id, final Conversation conversation )
+    public Conversation updateConversation( final Conversation conversation )
       throws ChatServiceException{
 
       return conversation;
@@ -401,7 +411,7 @@ public class ConversationControllerTest{
 
     @Override
     @SneakyThrows
-    public Conversation updateConversation( final UUID id, final Conversation conversation )
+    public Conversation updateConversation( final Conversation conversation )
       throws ChatServiceException{
 
       throw this.exception;
@@ -458,6 +468,19 @@ public class ConversationControllerTest{
       throw this.exception;
 
     }
+
+  }
+
+  private static class ConversationUpdateParameterCheckDouble implements ConversationUpdateParameterCheck{
+
+    @Override
+    public void validate( final UUID id, final ConversationBody conversationBody ){
+
+    }
+
+  }
+
+  private static class ConversationUpdateParameterCheckDummy extends ConversationUpdateParameterCheckDouble{
 
   }
 

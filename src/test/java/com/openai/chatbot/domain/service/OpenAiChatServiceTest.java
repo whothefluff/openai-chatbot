@@ -14,15 +14,12 @@ import lombok.val;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import java.util.Collection;
 import java.util.UUID;
 
 import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.*;
 
 public class OpenAiChatServiceTest{
 
@@ -61,10 +58,10 @@ public class OpenAiChatServiceTest{
     throws ChatServiceException{
     // Arrange
     val id = UUID.randomUUID( );
-    val deleteConversation = ( Executable )( ) -> new OpenAiChatService( new ChatCompletionsServiceDummy( ),
-                                                                         new SuccessfulConversationDeleteStub( ) ).deleteConversation( id );
+    val deleteConversation = ( ThrowingCallable )( ) -> new OpenAiChatService( new ChatCompletionsServiceDummy( ),
+                                                                               new SuccessfulConversationDeleteStub( ) ).deleteConversation( id );
     // Act & Assert
-    assertDoesNotThrow( deleteConversation );
+    assertThatNoException( ).isThrownBy( deleteConversation );
 
   }
 

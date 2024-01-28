@@ -39,6 +39,12 @@ public interface ChatRepository{
   Collection<Conversation> retrieveConversations( )
     throws ChatRepositoryException;
 
+  /**
+   * Updates a chat
+   * @param chat the chat to update
+   * @return the updated chat
+   * @throws ChatRepositoryException if the chat could not be updated
+   */
   Conversation updateConversation( Conversation chat )
     throws ChatRepositoryException;
 

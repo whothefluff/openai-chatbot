@@ -61,7 +61,7 @@ public class OpenAiChatService implements ChatService{
     val creationMoment = ( Function<Conversation, Instant> )Conversation::createdAt;
     val id = ( Function<Conversation, UUID> )Conversation::id;
     val compareByCreation = Comparator.comparing( creationMoment ).thenComparing( id );
-    val treeSet = ( SortedSet<Conversation> )new TreeSet<Conversation>( compareByCreation );
+    val treeSet = ( SortedSet<Conversation> )new TreeSet<>( compareByCreation );
     try{
       treeSet.addAll( this.repository.retrieveConversations( ) );
       return treeSet;
@@ -84,8 +84,10 @@ public class OpenAiChatService implements ChatService{
   }
 
   @Override
-  public Conversation updateConversation( final UUID id, final Conversation conversation ){
+  public Conversation updateConversation( final Conversation conversation )
+    throws ChatServiceException{
 
+    log.entry( conversation );
     return null;
 
   }
