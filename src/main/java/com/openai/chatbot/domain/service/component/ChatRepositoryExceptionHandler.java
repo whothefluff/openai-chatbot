@@ -13,7 +13,6 @@ import lombok.val;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.UndeclaredThrowableException;
@@ -30,16 +29,11 @@ import java.lang.reflect.UndeclaredThrowableException;
 class ChatRepositoryExceptionHandler{
 
   @SuppressWarnings( { "PackageVisibleField", "NonConstantFieldWithUpperCaseName" } )
-  static Map<Class<? extends Throwable>, Function1<Throwable, Throwable>> EXCEPTION_HANDLERS = HashMap.of(
+  static Map<Class<? extends Throwable>, Function1<Throwable, ChatServiceException>> EXCEPTION_HANDLERS = HashMap.of(
     ChatRepositoryException.NotFound.class, ChatServiceException.NotFound::new,
     ChatRepositoryException.Conflict.class, ChatServiceException.Conflict::new,
     ChatRepositoryException.class, ChatServiceException::new
   );
-
-  @Pointcut( "execution(* com.openai.chatbot.domain.service.*.*(..))" )
-  public void repositoryPointcut( ){
-
-  }
 
   /**
    * Translates {@link ChatRepositoryException} to the corresponding exception in the service
@@ -47,7 +41,8 @@ class ChatRepositoryExceptionHandler{
    * @param wrapper   the exception thrown by the repository wrapped in an {@link UndeclaredThrowableException}
    * @throws ChatServiceException the exception thrown by the service
    */
-  @AfterThrowing( pointcut = "repositoryPointcut( )",
+  @SuppressWarnings( "RedundantThrows" )
+  @AfterThrowing( pointcut = "execution(* com.openai.chatbot.domain.service.*.*(..))",
                   throwing = "wrapper" )
   @SneakyThrows
   public void translate( final JoinPoint joinPoint, final UndeclaredThrowableException wrapper )
