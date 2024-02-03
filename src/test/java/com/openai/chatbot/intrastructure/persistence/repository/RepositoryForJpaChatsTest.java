@@ -163,6 +163,43 @@ class RepositoryForJpaChatsTest{
     assertThatThrownBy( convUpdate ).isEqualTo( someError );
 
   }
+
+  @Test
+  void deleteConversation_ConversationExists_DeletesConversation( )
+    throws ChatRepositoryException{
+    // Arrange
+    val repository = new RepositoryForJpaChats( new SuccessfulConvDeleteStub( ), new ConversationMapperDummy( ), new ChatRequestMapperDummy( ) );
+    // Act
+    repository.deleteConversation( null );
+    // Assert
+    assertThat( repository ).isNotNull( );
+
+  }
+
+  @Test
+  void deleteConversation_ConversationDoesNotExist_ThrowsNotFound( )
+    throws ChatRepositoryException{
+    // Arrange
+    val repository = new RepositoryForJpaChats( new JpaChatRepositoryDouble( ), new ConversationMapperDummy( ), new ChatRequestMapperDummy( ) );
+    val convDeletion = ( ThrowingCallable )( ) -> repository.deleteConversation( UUID.randomUUID( ) );
+    // Act & Assert
+    assertThatExceptionOfType( ChatRepositoryException.NotFound.class ).isThrownBy( convDeletion );
+
+  }
+
+  @Test
+  void deleteConversation_ErrorOccurs_ThrowsAsIs( )
+    throws ChatRepositoryException{
+    // Arrange
+    val someError = new RuntimeException( "some error" );
+    val repository = new RepositoryForJpaChats( new UnsuccessfulConvDeleteStub( someError ),
+                                                new ConversationMapperDummy( ),
+                                                new ChatRequestMapperDummy( ) );
+    val convDeletion = ( ThrowingCallable )( ) -> repository.deleteConversation( UUID.randomUUID( ) );
+    // Act & Assert
+    assertThatThrownBy( convDeletion ).isEqualTo( someError );
+
+  }
   // ##############################
 
   @SuppressWarnings( { "ReturnOfNull", "NullableProblems" } )
@@ -428,6 +465,35 @@ class RepositoryForJpaChatsTest{
       throw this.exception;
 
     }
+
+    @Override
+    public Optional<JpaChat> findById( final UUID uuid ){
+
+      return Optional.of( new JpaChat( ) );
+
+    }
+
+  }
+
+  @Data
+  @EqualsAndHashCode( callSuper = true )
+  private static class UnsuccessfulConvDeleteStub extends JpaChatRepositoryDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public Optional<JpaChat> findById( final UUID uuid ){
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @Data
+  @EqualsAndHashCode( callSuper = true )
+  private static class SuccessfulConvDeleteStub extends JpaChatRepositoryDouble{
 
     @Override
     public Optional<JpaChat> findById( final UUID uuid ){

@@ -114,7 +114,7 @@ class RepositoryForJpaChats implements ChatRepository{
     throws ChatRepositoryException{
 
     log.entry( id );
-    val notFound = ( Supplier<ChatRepositoryException> )( ) -> log.throwing( new ChatRepositoryException( "Chat not found" ) );
+    val notFound = ( Supplier<ChatRepositoryException> )( ) -> log.throwing( new ChatRepositoryException.NotFound( ) );
     Option.ofOptional( this.jpaRepository.findById( id ) )
           .peek( this.jpaRepository::delete )
           .getOrElseThrow( notFound );
