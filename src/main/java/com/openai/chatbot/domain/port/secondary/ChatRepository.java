@@ -33,7 +33,7 @@ public interface ChatRepository{
     throws ChatRepositoryException;
 
   /**
-   * Returns all the chats
+   * Returns all the chats, if any exist
    * @param sorting the sort criteria
    * @return all the chats
    * @throws ChatRepositoryException if the chats could not be retrieved

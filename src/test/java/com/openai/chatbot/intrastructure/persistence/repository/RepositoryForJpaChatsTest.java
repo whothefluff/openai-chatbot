@@ -20,10 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -41,7 +40,7 @@ class RepositoryForJpaChatsTest{
     // Act
     val savedConv = repository.saveNewConversation( newConv );
     // Assert
-    assertThat( savedConv ).isNotNull( );
+    assertThat( savedConv ).isEqualTo( newConv );
 
   }
 
@@ -87,6 +86,42 @@ class RepositoryForJpaChatsTest{
   }
 
   @Test
+  void retrieveConversations_ConversationsFound_ConversationsReturned( )
+    throws ChatRepositoryException{
+    // Arrange
+    val convs = List.of( new Conversation( ).id( UUID.randomUUID( ) ),
+                         new Conversation( ).id( UUID.randomUUID( ) ) );
+    val mappedConvs = convs.stream( )
+                           .map( conv -> new JpaChat( ).id( conv.id( ) ) )
+                           .toList( );
+    val repository = new RepositoryForJpaChats( new SuccessfulConvsRetrievalStub( mappedConvs ),
+                                                new ConversationsToDomainStub( convs.stream( )
+                                                                                    .collect( Collectors.toMap( Conversation::id,
+                                                                                                                Function.identity( ) ) ) ),
+                                                new ChatRequestMapperDummy( ) );
+    // Act
+    val retrievedConvs = repository.retrieveConversations( null );
+    // Assert
+    assertThat( retrievedConvs ).isEqualTo( convs );
+
+  }
+
+  @Test
+  void retrieveConversations_NoConversations_EmptyCollectionReturned( )
+    throws ChatRepositoryException{
+    // Arrange
+    final List<JpaChat> noConvs = Collections.emptyList( );
+    val repository = new RepositoryForJpaChats( new SuccessfulConvsRetrievalStub( noConvs ),
+                                                new ConversationMapperDummy( ),
+                                                new ChatRequestMapperDummy( ) );
+    // Act
+    val retrievedConvs = repository.retrieveConversations( null );
+    // Assert
+    assertThat( retrievedConvs ).isEmpty( );
+
+  }
+
+  @Test
   void updateConversation_ConversationExists_SavesAndReturnsConversation( )
     throws ChatRepositoryException{
     // Arrange
@@ -98,7 +133,7 @@ class RepositoryForJpaChatsTest{
     // Act
     val savedConv = repository.updateConversation( conv );
     // Assert
-    assertThat( savedConv ).isNotNull( );
+    assertThat( savedConv ).isEqualTo( conv );
 
   }
 
@@ -344,6 +379,21 @@ class RepositoryForJpaChatsTest{
 
   @Data
   @EqualsAndHashCode( callSuper = true )
+  private static class SuccessfulConvsRetrievalStub extends JpaChatRepositoryDouble{
+
+    final List<JpaChat> chats;
+
+    @Override
+    public List<JpaChat> findAll( final Sort sorting ){
+
+      return Collections.unmodifiableList( this.chats );
+
+    }
+
+  }
+
+  @Data
+  @EqualsAndHashCode( callSuper = true )
   private static class SuccessfulConvUpdateStub extends JpaChatRepositoryDouble{
 
     final JpaChat jpaChat;
@@ -462,6 +512,21 @@ class RepositoryForJpaChatsTest{
     public @Nullable Conversation toDomain( final JpaChat jpaChat ){
 
       return this.conversation;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationsToDomainStub extends ConversationMapperDouble{
+
+    final Map<UUID, Conversation> conversations;
+
+    @Override
+    public @Nullable Conversation toDomain( final JpaChat jpaChat ){
+
+      return this.conversations.get( jpaChat.id( ) );
 
     }
 

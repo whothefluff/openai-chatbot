@@ -102,9 +102,9 @@ class RepositoryForJpaChats implements ChatRepository{
         val savedChat = this.jpaRepository.save( jpaChat );
         return this.conversationMapper.toDomain( savedChat );
       };
-    Try.of( convUpdate )
-       .get( );
-    return log.exit( chat );
+    val result = Try.of( convUpdate )
+                    .get( );
+    return log.exit( result );
 
   }
 
