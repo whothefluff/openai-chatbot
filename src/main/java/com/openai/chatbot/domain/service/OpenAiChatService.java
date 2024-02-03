@@ -7,6 +7,7 @@ import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import com.openai.chatbot.domain.port.secondary.ChatCompletionsService;
 import com.openai.chatbot.domain.port.secondary.ChatRepository;
+import com.openai.chatbot.domain.service.component.HandleChatRepositoryExceptions;
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedRunnable;
 import io.vavr.control.Try;
@@ -50,6 +51,7 @@ class OpenAiChatService implements ChatService{
       return new TreeSet<>( byCreationAndModification );
     };
 
+  @HandleChatRepositoryExceptions
   @Override
   public Conversation startConversation( final String name, final String systemMessage )
     throws ChatServiceException{
@@ -66,6 +68,7 @@ class OpenAiChatService implements ChatService{
 
   }
 
+  @HandleChatRepositoryExceptions
   @Override
   public SortedSet<Conversation> getConversations( )
     throws ChatServiceException{
@@ -89,6 +92,7 @@ class OpenAiChatService implements ChatService{
 
   }
 
+  @HandleChatRepositoryExceptions
   @Override
   public Conversation getConversation( final UUID id )
     throws ChatServiceException{
@@ -101,6 +105,7 @@ class OpenAiChatService implements ChatService{
 
   }
 
+  @HandleChatRepositoryExceptions
   @Override
   public Conversation updateConversation( final Conversation conversation )
     throws ChatServiceException{
@@ -114,6 +119,7 @@ class OpenAiChatService implements ChatService{
 
   }
 
+  @HandleChatRepositoryExceptions
   @Override
   public void deleteConversation( final UUID id )
     throws ChatServiceException{

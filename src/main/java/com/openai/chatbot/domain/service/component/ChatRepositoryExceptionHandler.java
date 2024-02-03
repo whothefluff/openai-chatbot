@@ -26,15 +26,9 @@ class ChatRepositoryExceptionHandler{
     ChatRepositoryException.Conflict.class, ChatServiceException.Conflict::new,
     ChatRepositoryException.class, ChatServiceException::new
   );
-
-  /**
-   * Translates {@link ChatRepositoryException} to the corresponding exception in the service
-   * @param joinPoint the join point where the exception was thrown
-   * @param wrapper   the exception thrown by the repository wrapped in an {@link UndeclaredThrowableException}
-   * @throws ChatServiceException the exception thrown by the service
-   */
+  
   @SuppressWarnings( "RedundantThrows" )
-  @AfterThrowing( pointcut = "execution(* com.openai.chatbot.domain.service.*.*(..))",
+  @AfterThrowing( pointcut = "@annotation( HandleChatRepositoryExceptions )",
                   throwing = "wrapper" )
   @SneakyThrows
   void translate( final JoinPoint joinPoint, final UndeclaredThrowableException wrapper )
