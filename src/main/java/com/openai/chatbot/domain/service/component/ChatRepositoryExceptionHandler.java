@@ -5,9 +5,7 @@ import com.openai.chatbot.domain.exception.ChatServiceException;
 import io.vavr.Function1;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
-import lombok.AccessLevel;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.XSlf4j;
 import lombok.val;
 import org.aspectj.lang.JoinPoint;
@@ -17,19 +15,13 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.UndeclaredThrowableException;
 
-/**
- * Contains advice to handle exceptions thrown by the repository
- */
 @SuppressWarnings( "HardCodedStringLiteral" )
 @XSlf4j
-@FieldDefaults( level = AccessLevel.PRIVATE,
-                makeFinal = true )
 @Aspect
 @Component
 class ChatRepositoryExceptionHandler{
 
-  @SuppressWarnings( { "PackageVisibleField", "NonConstantFieldWithUpperCaseName" } )
-  static Map<Class<? extends Throwable>, Function1<Throwable, ChatServiceException>> EXCEPTION_HANDLERS = HashMap.of(
+  private static final Map<Class<? extends Throwable>, Function1<Throwable, ChatServiceException>> EXCEPTION_HANDLERS = HashMap.of(
     ChatRepositoryException.NotFound.class, ChatServiceException.NotFound::new,
     ChatRepositoryException.Conflict.class, ChatServiceException.Conflict::new,
     ChatRepositoryException.class, ChatServiceException::new
@@ -45,7 +37,7 @@ class ChatRepositoryExceptionHandler{
   @AfterThrowing( pointcut = "execution(* com.openai.chatbot.domain.service.*.*(..))",
                   throwing = "wrapper" )
   @SneakyThrows
-  public void translate( final JoinPoint joinPoint, final UndeclaredThrowableException wrapper )
+  void translate( final JoinPoint joinPoint, final UndeclaredThrowableException wrapper )
     throws ChatServiceException{
 
     log.entry( joinPoint, wrapper );

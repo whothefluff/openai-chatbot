@@ -8,6 +8,7 @@ import com.openai.chatbot.domain.port.secondary.ChatRepository;
 import com.openai.chatbot.intrastructure.persistence.db.domainintegration.ChatRequestMapper;
 import com.openai.chatbot.intrastructure.persistence.db.domainintegration.ConversationMapper;
 import com.openai.chatbot.intrastructure.persistence.db.model.JpaChat;
+import com.openai.chatbot.intrastructure.persistence.repository.component.HandleDataAccessExceptions;
 import io.vavr.CheckedFunction0;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -24,10 +25,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/**
- * Access information of the chats through a JPA repository
- */
-@SuppressWarnings( "SerializableStoresNonSerializable" )
+@SuppressWarnings( { "SerializableStoresNonSerializable", "RedundantThrows" } )
 @Data
 @EqualsAndHashCode
 @ToString
@@ -43,6 +41,7 @@ class RepositoryForJpaChats implements ChatRepository{
   ConversationMapper conversationMapper;
   ChatRequestMapper chatRequestMapper;
 
+  @HandleDataAccessExceptions
   @Override
   public Conversation saveNewConversation( final Conversation chat )
     throws ChatRepositoryException{
@@ -51,16 +50,11 @@ class RepositoryForJpaChats implements ChatRepository{
     val saveConv = ( CheckedFunction0<Conversation> )( ) ->
       {
         val jpaChat = this.conversationMapper.toJpa( chat );
-        this.jpaRepository.save( jpaChat );
-        return this.conversationMapper.toDomain( jpaChat );
-      };
-    val chatRepositoryException = ( Function<Throwable, ChatRepositoryException> )( e ) ->
-      {
-        log.catching( e );
-        return log.throwing( new ChatRepositoryException( e ) );
+        val savedChat = this.jpaRepository.save( jpaChat );
+        return this.conversationMapper.toDomain( savedChat );
       };
     val result = Try.of( saveConv )
-                    .getOrElseThrow( chatRepositoryException );
+                    .get( );
     return log.exit( result );
 
   }
@@ -94,23 +88,27 @@ class RepositoryForJpaChats implements ChatRepository{
 
   }
 
+  @HandleDataAccessExceptions
   @Override
   public Conversation updateConversation( final Conversation chat )
     throws ChatRepositoryException{
 
     log.entry( chat );
-    val convUpdate = ( CheckedFunction0<JpaChat> )( ) ->
+    val convUpdate = ( CheckedFunction0<Conversation> )( ) ->
       {
+        Option.ofOptional( this.jpaRepository.findById( chat.id( ) ) )
+              .getOrElseThrow( ( ) -> log.throwing( new ChatRepositoryException.NotFound( ) ) );
         val jpaChat = this.conversationMapper.toJpa( chat );
-        return this.jpaRepository.save( jpaChat );
+        val savedChat = this.jpaRepository.save( jpaChat );
+        return this.conversationMapper.toDomain( savedChat );
       };
     Try.of( convUpdate )
-       .map( this.conversationMapper::toDomain )
        .get( );
     return log.exit( chat );
 
   }
 
+  @HandleDataAccessExceptions
   @Override
   public void deleteConversation( final UUID id )
     throws ChatRepositoryException{

@@ -145,7 +145,7 @@ class ConversationControllerTest{
                             new ConversationBody( ).id( UUID.randomUUID( ) ).createdAt( Instant.now( ).plusSeconds( 1L ) ) );
     val conversations = convsDto.stream( )
                                 .map( c -> new Conversation( ).id( c.id( ) ).createdAt( c.createdAt( ) ) )
-                                .collect( Collectors.toCollection( ( ) -> new TreeSet<>( Comparator.comparing( Conversation::createdAt ) ) ) );
+                                .collect( Collectors.toCollection( ( ) -> new TreeSet<Conversation>( Comparator.comparing( Conversation::createdAt ) ) ) );
     val successfulChatService = new SuccessfulConversationsRetrievalStub( conversations );
     val mapper = new ConversationBodiesMapperStub( convsDto.stream( ).collect( Collectors.toMap( ConversationBody::id, cb -> cb ) ) );
     val check = new ConversationUpdateParameterCheckDummy( );

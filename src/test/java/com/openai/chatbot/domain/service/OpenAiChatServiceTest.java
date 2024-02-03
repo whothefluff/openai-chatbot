@@ -172,7 +172,6 @@ class OpenAiChatServiceTest{
   void updateConversation_ErrorOccurs_ThrowsExceptionAsIs( )
     throws ChatServiceException{
     // Arrange
-    val id = UUID.randomUUID( );
     val someExc = new ChatRepositoryException( );
     val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new ConversationUpdateExceptionStub( someExc ) );
     val failedRetrieval = ( ThrowingCallable )( ) -> service.updateConversation( null );
