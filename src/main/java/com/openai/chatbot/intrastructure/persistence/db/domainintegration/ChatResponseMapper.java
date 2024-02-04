@@ -25,12 +25,12 @@ public interface ChatResponseMapper{
 
   @AfterMapping
   default void initializeChat( @MappingTarget final @NotNull JpaChatResponse jpaEntity ){
-
+    //avoid lazy fetching errors when mapping new chats (since it won't be loaded)
     if( jpaEntity.chat( ) == null ){
       val chat = new JpaChat( );
-      Hibernate.initialize( chat );
-      jpaEntity.chat( chat ); //avoid lazy fetching errors when mapping new chats (since it won't be loaded)
+      jpaEntity.chat( chat );
     }
+    Hibernate.initialize( jpaEntity.chat( ) );
 
   }
 

@@ -46,6 +46,8 @@ public class JpaChatResponse implements Serializable{
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
+  @SequenceGenerator( name = "chat_responses_id_gen",
+                      allocationSize = 1 )
   @Id
   Integer id;
   @CreationTimestamp

@@ -49,6 +49,8 @@ public class JpaChatRequestMessage implements Serializable{
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
+  @SequenceGenerator( name = "chat_request_messages_id_gen",
+                      allocationSize = 1 )
   @Id
   Integer id;
   @CreationTimestamp
