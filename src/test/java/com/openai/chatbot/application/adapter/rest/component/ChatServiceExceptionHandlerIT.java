@@ -36,8 +36,8 @@ class ChatServiceExceptionHandlerIT{
     throws Exception{
     // Arrange
     val errorMessage = "Some 400 error occurred";
-    Mockito.when( this.chatService.startConversation( "a", "b" ) ).thenThrow( new ChatServiceException( errorMessage ) );
-    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationStarterBody( ).name( "a" ).systemMessage( "b" ) );
+    Mockito.when( this.chatService.startConversation( "a", "b", "c" ) ).thenThrow( new ChatServiceException( errorMessage ) );
+    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationStarterBody( ).name( "a" ).model( "b" ).systemMessage( "c" ) );
     val call = MockMvcRequestBuilders.post( "/api/v1/conversation" ).contentType( APPLICATION_JSON ).content( requestBody );
     // Act
     val responseBody = this.mockMvc.perform( call )
@@ -53,10 +53,14 @@ class ChatServiceExceptionHandlerIT{
     throws Exception{
     // Arrange
     val convName = "Test name";
+    val convModel = "Test model";
     val convMessage = "Test message";
     val errorMessage = "Some 409 error occurred";
-    Mockito.when( this.chatService.startConversation( convName, convMessage ) ).thenThrow( new ChatServiceException.Conflict( errorMessage ) );
-    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationStarterBody( ).name( convName ).systemMessage( convMessage ) );
+    Mockito.when( this.chatService.startConversation( convName, convModel, convMessage ) )
+           .thenThrow( new ChatServiceException.Conflict( errorMessage ) );
+    val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationStarterBody( ).name( convName )
+                                                                                            .model( convModel )
+                                                                                            .systemMessage( convMessage ) );
     val call = MockMvcRequestBuilders.post( "/api/v1/conversation" ).contentType( APPLICATION_JSON ).content( requestBody );
     // Act
     val responseBody = this.mockMvc.perform( call )
@@ -171,7 +175,7 @@ class ChatServiceExceptionHandlerIT{
     throws Exception{
     // Arrange
     val id = UUID.randomUUID( );
-    val updatedConv = new Conversation( ).name( "convName" );
+    val updatedConv = new Conversation( ).id( id ).name( "convName" );
     val errorMessage = "Some 400 error occurred";
     Mockito.doThrow( new ChatServiceException( errorMessage ) ).when( this.chatService ).updateConversation( updatedConv );
     val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationBody( ).name( updatedConv.name( ) ) );
@@ -190,7 +194,7 @@ class ChatServiceExceptionHandlerIT{
     throws Exception{
     // Arrange
     val id = UUID.randomUUID( );
-    val updatedConv = new Conversation( ).name( "convName" );
+    val updatedConv = new Conversation( ).id( id ).name( "convName" );
     Mockito.doThrow( new ChatServiceException.NotFound( "Some 404" ) ).when( this.chatService ).updateConversation( updatedConv );
     val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationBody( ).name( updatedConv.name( ) ) );
     val call = MockMvcRequestBuilders.put( "/api/v1/conversation/{id}", id ).contentType( APPLICATION_JSON ).content( requestBody );
@@ -208,7 +212,7 @@ class ChatServiceExceptionHandlerIT{
     throws Exception{
     // Arrange
     val id = UUID.randomUUID( );
-    val updatedConv = new Conversation( ).name( "convName" );
+    val updatedConv = new Conversation( ).id( id ).name( "convName" );
     val errorMessage = "Some 409 error occurred";
     Mockito.doThrow( new ChatServiceException.Conflict( errorMessage ) ).when( this.chatService ).updateConversation( updatedConv );
     val requestBody = new ObjectMapper( ).writeValueAsString( new ConversationBody( ).name( updatedConv.name( ) ) );

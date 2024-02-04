@@ -56,15 +56,18 @@ public class JpaChatRequest implements Serializable{
   Instant createdAt;
   @Version
   @UpdateTimestamp
-  @Column( insertable = false )
+  @Column( nullable = false )
   Instant modifiedAt;
   @Column( nullable = false )
   String model;
   @Column
   String functionCall;
-  @Column( precision = 10 )
+  @Column( precision = 6,
+           scale = 4 )
   BigDecimal temperature;
-  @Column( precision = 10 )
+  @Column( precision = 5,
+           scale = 4,
+           name = "top_p" )
   BigDecimal topP;
   @Column
   Integer n;
@@ -72,9 +75,11 @@ public class JpaChatRequest implements Serializable{
   Boolean stream;
   @Column
   Integer maxTokens;
-  @Column( precision = 10 )
+  @Column( precision = 6,
+           scale = 4 )
   BigDecimal presencePenalty;
-  @Column( precision = 10 )
+  @Column( precision = 6,
+           scale = 4 )
   BigDecimal frequencyPenalty;
   @Column
   String logitBias;

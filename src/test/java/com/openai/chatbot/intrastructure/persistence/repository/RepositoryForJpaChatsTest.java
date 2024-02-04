@@ -540,6 +540,13 @@ class RepositoryForJpaChatsTest{
 
     }
 
+    @Override
+    public @Nullable JpaChat updateRootFromDomain( final Conversation domainEntity, final JpaChat jpaEntity ){
+
+      return null;
+
+    }
+
   }
 
   private static class ChatRequestMapperDouble implements ChatRequestMapper{

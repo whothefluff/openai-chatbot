@@ -17,7 +17,8 @@ class ConversationUpdateParameterCheckImplTest{
   void validate_PathIdAndBodyIdMatch_NoException( ){
     // Arrange
     val id = UUID.randomUUID( );
-    val conversationBody = new ConversationBody( ).id( id );
+    val sameValueId = UUID.fromString( id.toString( ) );
+    val conversationBody = new ConversationBody( ).id( sameValueId );
     val validation = ( ThrowingCallable )( ) -> new ConversationUpdateParameterCheckImpl( ).validate( id, conversationBody );
     // Act & Assert
     assertThatNoException( ).isThrownBy( validation );

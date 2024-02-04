@@ -16,11 +16,12 @@ public interface ChatService{
 
   /**
    * @param name          works as natural id
+   * @param model         the model to use
    * @param systemMessage sets the tone of the conversation
    * @return the created conversation
    * @throws ChatServiceException if the conversation could not be created
    */
-  Conversation startConversation( String name, String systemMessage )
+  Conversation startConversation( String name, String model, String systemMessage )
     throws ChatServiceException;
 
   /**

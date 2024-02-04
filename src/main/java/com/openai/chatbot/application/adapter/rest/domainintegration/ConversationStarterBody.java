@@ -19,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 public class ConversationStarterBody{
 
   String name;
+  String model;
   String systemMessage;
 
 }

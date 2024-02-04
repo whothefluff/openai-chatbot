@@ -45,16 +45,16 @@ class ConversationController{
 
   /**
    * Starts a conversation
-   * @param conversationStarterBody the conversation starter
+   * @param body the conversation starter
    * @return the conversation
    */
   @PostMapping( "/conversation" ) //NON-NLS
-  public ResponseEntity<ConversationBody> createConversation( @RequestBody final ConversationStarterBody conversationStarterBody ){
+  public ResponseEntity<ConversationBody> createConversation( @RequestBody final ConversationStarterBody body ){
 
-    log.entry( conversationStarterBody );
+    log.entry( body );
     val conversationCreation = ( CheckedFunction0<ConversationBody> )( ) ->
       {
-        val createdConversation = this.chatService.startConversation( conversationStarterBody.name( ), conversationStarterBody.systemMessage( ) );
+        val createdConversation = this.chatService.startConversation( body.name( ), body.model( ), body.systemMessage( ) );
         return this.mapper.toDto( createdConversation );
       };
     val responseReturn = ( Function<ConversationBody, ResponseEntity<ConversationBody>> )( conversationBody ) ->
@@ -129,6 +129,7 @@ class ConversationController{
     this.updParamCheck.validate( id, conversationBody );
     val convUpdate = ( CheckedFunction0<Conversation> )( ) ->
       {
+        conversationBody.id( id );
         val conversation = this.mapper.toEntity( conversationBody );
         return this.chatService.updateConversation( conversation );
       };

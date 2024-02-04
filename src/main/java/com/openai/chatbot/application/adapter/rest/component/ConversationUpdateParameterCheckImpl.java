@@ -16,7 +16,7 @@ class ConversationUpdateParameterCheckImpl implements ConversationUpdateParamete
   public void validate( final UUID id, final ConversationBody conversationBody ){
 
     log.entry( id, conversationBody );
-    if( conversationBody.id( ) == null || conversationBody.id( ) == id ){
+    if( conversationBody.id( ) == null || conversationBody.id( ).equals( id ) ){
       log.exit( );
     }
     else{

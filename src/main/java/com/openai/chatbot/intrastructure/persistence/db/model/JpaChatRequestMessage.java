@@ -57,7 +57,7 @@ public class JpaChatRequestMessage implements Serializable{
   Instant createdAt;
   @Version
   @UpdateTimestamp
-  @Column( insertable = false )
+  @Column( nullable = false )
   Instant modifiedAt;
   @Enumerated( EnumType.STRING )
   @Column( nullable = false )
@@ -75,8 +75,10 @@ public class JpaChatRequestMessage implements Serializable{
 
   public JpaChatRequestMessage functionCall( final JpaChatRequestMessageFunctionCall functionCall ){
 
-    this.functionCall = functionCall;
-    functionCall.chatRequestMessage( this );
+    if( functionCall != null ){
+      this.functionCall = functionCall;
+      functionCall.chatRequestMessage( this );
+    }
     return this;
 
   }

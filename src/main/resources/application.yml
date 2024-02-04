@@ -7,6 +7,8 @@ spring:
     properties:
       hibernate:
         show_sql: true
+    hibernate:
+      ddl-auto: update #won't do anything with that user but I will see the SQL difference
     open-in-view: true
 openai:
   api-key: ${OPENAI_API_KEY}

@@ -53,13 +53,13 @@ class OpenAiChatService implements ChatService{
 
   @HandleChatRepositoryExceptions
   @Override
-  public Conversation startConversation( final String name, final String systemMessage )
+  public Conversation startConversation( final String name, final String model, final String systemMessage )
     throws ChatServiceException{
 
     log.entry( name, systemMessage );
     val convInsertion = ( CheckedFunction0<Conversation> )( ) ->
       {
-        val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage ).build( );
+        val conversation = Conversation.initialStateBuilder( ).name( name ).model( model ).systemMessage( systemMessage ).build( );
         return this.repository.saveNewConversation( conversation );
       };
     val savedConv = Try.of( convInsertion )

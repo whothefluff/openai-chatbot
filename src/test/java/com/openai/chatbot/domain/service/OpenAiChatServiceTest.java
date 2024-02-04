@@ -35,13 +35,14 @@ class OpenAiChatServiceTest{
     throws ChatServiceException{
     // Arrange
     val name = "testName";
+    val model = "testModel";
     val systemMessage = "testSystemMessage";
     val msgReq = new ChatRequest.Message( ).role( system ).content( systemMessage );
-    val request = new ChatRequest( ).addMessage( msgReq );
+    val request = new ChatRequest( ).model( model ).addMessage( msgReq );
     val expectedConversation = new Conversation( ).name( name ).addRequest( request );
     val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new SuccessfulConversationSaveStub( ) );
     // Act
-    val createdConversation = service.startConversation( name, systemMessage );
+    val createdConversation = service.startConversation( name, model, systemMessage );
     // Assert
     assertThat( createdConversation ).isEqualTo( expectedConversation );
 
@@ -51,10 +52,11 @@ class OpenAiChatServiceTest{
   void startConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val name = "testName";
+    val model = "testModel";
     val systemMessage = "testSystemMessage";
     val someExc = new ChatRepositoryException( );
     val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new ConversationInsertExceptionStub( someExc ) );
-    val failedInsert = ( ThrowingCallable )( ) -> service.startConversation( name, systemMessage );
+    val failedInsert = ( ThrowingCallable )( ) -> service.startConversation( name, model, systemMessage );
     // Act & Assert
     assertThatThrownBy( failedInsert ).isEqualTo( someExc );
 

@@ -96,10 +96,10 @@ class RepositoryForJpaChats implements ChatRepository{
     log.entry( chat );
     val convUpdate = ( CheckedFunction0<Conversation> )( ) ->
       {
-        Option.ofOptional( this.jpaRepository.findById( chat.id( ) ) )
-              .getOrElseThrow( ( ) -> log.throwing( new ChatRepositoryException.NotFound( ) ) );
-        val jpaChat = this.conversationMapper.toJpa( chat );
-        val savedChat = this.jpaRepository.save( jpaChat );
+        val existingChat = Option.ofOptional( this.jpaRepository.findById( chat.id( ) ) )
+                                 .getOrElseThrow( ( ) -> log.throwing( new ChatRepositoryException.NotFound( ) ) );
+        val updatedChat = this.conversationMapper.updateRootFromDomain( chat, existingChat ); //same instance actually
+        val savedChat = this.jpaRepository.save( updatedChat );
         return this.conversationMapper.toDomain( savedChat );
       };
     val result = Try.of( convUpdate )

@@ -29,7 +29,7 @@ class ChatRepositoryExceptionHandlerIT{
     throws Exception{
     // Arrange
     Mockito.doThrow( new ChatRepositoryException( ) ).when( this.repository ).saveNewConversation( any( ) );
-    val convInsert = ( ThrowingCallable )( ) -> this.service.startConversation( "a", "b" );
+    val convInsert = ( ThrowingCallable )( ) -> this.service.startConversation( "a", "b", "c" );
     // Act & Assert
     assertThatThrownBy( convInsert ).isExactlyInstanceOf( ChatServiceException.class );
 
@@ -40,7 +40,7 @@ class ChatRepositoryExceptionHandlerIT{
     throws ChatRepositoryException{
     // Arrange
     doThrow( new ChatRepositoryException.Conflict( ) ).when( this.repository ).saveNewConversation( any( ) );
-    val convInsert = ( ThrowingCallable )( ) -> this.service.startConversation( "a", "b" );
+    val convInsert = ( ThrowingCallable )( ) -> this.service.startConversation( "a", "b", "c" );
     // Act & Assert
     assertThatThrownBy( convInsert ).isExactlyInstanceOf( ChatServiceException.Conflict.class );
 
@@ -52,7 +52,7 @@ class ChatRepositoryExceptionHandlerIT{
     // Arrange
     val someError = new RuntimeException( );
     doThrow( someError ).when( this.repository ).saveNewConversation( any( ) );
-    val convInsert = ( ThrowingCallable )( ) -> this.service.startConversation( "a", "b" );
+    val convInsert = ( ThrowingCallable )( ) -> this.service.startConversation( "a", "b", "c" );
     // Act & Assert
     assertThatThrownBy( convInsert ).isEqualTo( someError );
 

@@ -48,10 +48,11 @@ class ConversationTest{
   void build_ValidInputs_ReturnsConversation( ){
     // Arrange
     val name = "Test Name";
+    val model = "Test Model";
     val systemMessage = "Test System Message";
-    val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage );
+    val conversation = Conversation.initialStateBuilder( ).name( name ).model( model ).systemMessage( systemMessage );
     val requestMsg = new ChatRequest.Message( ).role( system ).content( systemMessage );
-    val request = new ChatRequest( ).addMessage( requestMsg );
+    val request = new ChatRequest( ).model( model ).addMessage( requestMsg );
     val expectedConversation = new Conversation( ).name( name ).addRequest( request );
     // Act
     val result = conversation.build( );
@@ -81,12 +82,22 @@ class ConversationTest{
   }
 
   @Test
-  void build_EmptyNameAndSystemMessage_ThrowsException( ){
+  void build_EmptyModel_ThrowsException( ){
+    // Arrange
+    val name = "Test Name";
+    val conversation = Conversation.initialStateBuilder( ).name( name ).model( "   " );
+    // Act & Assert
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build ).withMessageContaining( "Model" );
+
+  }
+
+  @Test
+  void build_EmptyNameAndModelAndSystemMessage_ThrowsException( ){
     // Arrange
     val conversation = Conversation.initialStateBuilder( ).name( "   " ).systemMessage( "   " );
     // Act & Assert
     assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build )
-                                                               .withMessageContainingAll( "Name", "System message" );
+                                                               .withMessageContainingAll( "Name", "Model", "System message" );
 
   }
 

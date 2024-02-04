@@ -12,6 +12,7 @@ import com.openai.chatbot.domain.port.primary.ChatService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import lombok.val;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jetbrains.annotations.Nullable;
@@ -190,13 +191,29 @@ class ConversationControllerTest{
   void updateConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
+    val convBody = new ConversationBody( ).id( id );
     val someErrorMsg = "500 Server Error Message"; // NON-NLS
     val failedChatSrv = new ConversationUpdateExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
     val check = new ConversationUpdateParameterCheckDummy( );
-    val convUpdate = ( ThrowingCallable )( ) -> new ConversationController( failedChatSrv, mapper, check ).updateConversation( id, null );
+    val convUpdate = ( ThrowingCallable )( ) -> new ConversationController( failedChatSrv, mapper, check ).updateConversation( id, convBody );
     // Act & Assert
     assertThatException( ).isThrownBy( convUpdate ).withMessage( someErrorMsg );
+
+  }
+
+  @Test
+  void updateConversation_NoIdInBody_TakesIdFromPath( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val service = new ChatServiceDouble( );
+    val conversation = new ConversationBody( );
+    val mapper = new ConversationBodyMapperSpy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    // Act
+    new ConversationController( service, mapper, check ).updateConversation( id, conversation );
+    // Assert
+    assertThat( id ).isEqualTo( mapper.dtoId( ) );
 
   }
   //##############################################################################################################
@@ -230,9 +247,27 @@ class ConversationControllerTest{
     final ConversationBody conversationBody;
 
     @Override
-    public ConversationBody toDto( final com.openai.chatbot.domain.entity.Conversation entity ){
+    public ConversationBody toDto( final Conversation entity ){
 
       return this.conversationBody;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  @Accessors( chain = true,
+              fluent = true )
+  private static class ConversationBodyMapperSpy extends ConversationMapperDouble{
+
+    UUID dtoId;
+
+    @Override
+    public @Nullable Conversation toEntity( final ConversationBody dto ){
+
+      this.dtoId = dto.id( );
+      return null;
 
     }
 
@@ -256,7 +291,7 @@ class ConversationControllerTest{
   private static class ChatServiceDouble implements ChatService{
 
     @Override
-    public @Nullable Conversation startConversation( final String name, final String systemMessage )
+    public @Nullable Conversation startConversation( final String name, final String model, final String systemMessage )
       throws ChatServiceException{
 
       return null;
@@ -326,7 +361,7 @@ class ConversationControllerTest{
     final UUID id;
 
     @Override
-    public Conversation startConversation( final String name, final String systemMessage )
+    public Conversation startConversation( final String name, final String model, final String systemMessage )
       throws ChatServiceException{
 
       return new Conversation( );
@@ -445,7 +480,7 @@ class ConversationControllerTest{
 
     @Override
     @SneakyThrows
-    public Conversation startConversation( final String name, final String systemMessage )
+    public Conversation startConversation( final String name, final String model, final String systemMessage )
       throws ChatServiceException{
 
       throw this.exception;
