@@ -45,6 +45,14 @@ class ConversationMessageController{
   public ResponseEntity<AssistantMessageBody> requestMessage( @PathVariable final UUID conversationId,
                                                               @RequestBody final UserMessageBody userMessageBody ){
 
+    log.entry( conversationId, userMessageBody );
+    // TODO maybe add sent msg + response
+    /*val messageCreation = ( CheckedFunction0<AssistantMessageBody> )( ) ->
+      {
+        val msg = this.mapper.toEntity( userMessageBody );
+        val response = this.chatService.addUserMessage( conversationId, msg );
+        return this.mapper.toDto( response );
+      };*/
     return new ResponseEntity<>( new AssistantMessageBody( ), HttpStatus.CREATED );
 
   }
