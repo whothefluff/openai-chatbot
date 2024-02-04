@@ -4,6 +4,7 @@ import com.openai.chatbot.domain.entity.ChatRequest;
 import com.openai.chatbot.domain.entity.ChatResponse;
 import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatRepositoryException;
+import org.springframework.data.domain.Sort;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -22,9 +23,30 @@ public interface ChatRepository{
   Conversation saveNewConversation( Conversation chat )
     throws ChatRepositoryException;
 
+  /**
+   * Returns the requested chat
+   * @param id the chat id
+   * @return the chat
+   * @throws ChatRepositoryException if the chat could not be retrieved
+   */
   Conversation retrieveConversation( UUID id )
     throws ChatRepositoryException;
 
+  /**
+   * Returns all the chats, if any exist
+   * @param sorting the sort criteria
+   * @return all the chats
+   * @throws ChatRepositoryException if the chats could not be retrieved
+   */
+  Collection<Conversation> retrieveConversations( Sort sorting )
+    throws ChatRepositoryException;
+
+  /**
+   * Updates a chat
+   * @param chat the chat to update
+   * @return the updated chat
+   * @throws ChatRepositoryException if the chat could not be updated
+   */
   Conversation updateConversation( Conversation chat )
     throws ChatRepositoryException;
 

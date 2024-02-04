@@ -2,16 +2,14 @@ package com.openai.chatbot.domain.entity;
 
 import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.LinkedHashSet;
 
 import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@SpringBootTest
-public class ConversationTest{
+class ConversationTest{
 
   @Test
   void addRequest_WithValidRequest_AddsRequestOnce( ){
@@ -50,10 +48,11 @@ public class ConversationTest{
   void build_ValidInputs_ReturnsConversation( ){
     // Arrange
     val name = "Test Name";
+    val model = "Test Model";
     val systemMessage = "Test System Message";
-    val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( systemMessage );
+    val conversation = Conversation.initialStateBuilder( ).name( name ).model( model ).systemMessage( systemMessage );
     val requestMsg = new ChatRequest.Message( ).role( system ).content( systemMessage );
-    val request = new ChatRequest( ).addMessage( requestMsg );
+    val request = new ChatRequest( ).model( model ).addMessage( requestMsg );
     val expectedConversation = new Conversation( ).name( name ).addRequest( request );
     // Act
     val result = conversation.build( );
@@ -68,7 +67,7 @@ public class ConversationTest{
     val systemMessage = "Test System Message";
     val conversation = Conversation.initialStateBuilder( ).name( "   " ).systemMessage( systemMessage );
     // Act & Assert
-    assertThatThrownBy( conversation::build ).isInstanceOf( IllegalArgumentException.class ).hasMessageContaining( "Name" );
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build ).withMessageContaining( "Name" );
 
   }
 
@@ -78,16 +77,27 @@ public class ConversationTest{
     val name = "Test Name";
     val conversation = Conversation.initialStateBuilder( ).name( name ).systemMessage( "   " );
     // Act & Assert
-    assertThatThrownBy( conversation::build ).isInstanceOf( IllegalArgumentException.class ).hasMessageContaining( "System message" );
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build ).withMessageContaining( "System message" );
 
   }
 
   @Test
-  void build_EmptyNameAndSystemMessage_ThrowsException( ){
+  void build_EmptyModel_ThrowsException( ){
+    // Arrange
+    val name = "Test Name";
+    val conversation = Conversation.initialStateBuilder( ).name( name ).model( "   " );
+    // Act & Assert
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build ).withMessageContaining( "Model" );
+
+  }
+
+  @Test
+  void build_EmptyNameAndModelAndSystemMessage_ThrowsException( ){
     // Arrange
     val conversation = Conversation.initialStateBuilder( ).name( "   " ).systemMessage( "   " );
     // Act & Assert
-    assertThatThrownBy( conversation::build ).isInstanceOf( IllegalArgumentException.class ).hasMessageContainingAll( "Name", "System message" );
+    assertThatExceptionOfType( IllegalArgumentException.class ).isThrownBy( conversation::build )
+                                                               .withMessageContainingAll( "Name", "Model", "System message" );
 
   }
 

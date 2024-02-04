@@ -49,6 +49,8 @@ public class JpaChatRequestMessage implements Serializable{
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
+  @SequenceGenerator( name = "chat_request_messages_id_gen",
+                      allocationSize = 1 )
   @Id
   Integer id;
   @CreationTimestamp
@@ -57,7 +59,7 @@ public class JpaChatRequestMessage implements Serializable{
   Instant createdAt;
   @Version
   @UpdateTimestamp
-  @Column( insertable = false )
+  @Column( nullable = false )
   Instant modifiedAt;
   @Enumerated( EnumType.STRING )
   @Column( nullable = false )
@@ -75,8 +77,10 @@ public class JpaChatRequestMessage implements Serializable{
 
   public JpaChatRequestMessage functionCall( final JpaChatRequestMessageFunctionCall functionCall ){
 
-    this.functionCall = functionCall;
-    functionCall.chatRequestMessage( this );
+    if( functionCall != null ){
+      this.functionCall = functionCall;
+      functionCall.chatRequestMessage( this );
+    }
     return this;
 
   }

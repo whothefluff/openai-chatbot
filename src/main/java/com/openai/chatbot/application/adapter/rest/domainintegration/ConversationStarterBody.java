@@ -1,9 +1,7 @@
 package com.openai.chatbot.application.adapter.rest.domainintegration;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
@@ -17,9 +15,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults( level = AccessLevel.PROTECTED )
 @Accessors( chain = true,
             fluent = true )
+@Getter( onMethod = @__( @JsonProperty ) )
 public class ConversationStarterBody{
 
   String name;
+  String model;
   String systemMessage;
 
 }

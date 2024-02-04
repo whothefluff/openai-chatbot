@@ -6,6 +6,7 @@ import com.openai.chatbot.domain.entity.Conversation;
 import com.openai.chatbot.domain.exception.ChatServiceException;
 
 import java.util.Collection;
+import java.util.SortedSet;
 import java.util.UUID;
 
 /**
@@ -15,18 +16,38 @@ public interface ChatService{
 
   /**
    * @param name          works as natural id
+   * @param model         the model to use
    * @param systemMessage sets the tone of the conversation
    * @return the created conversation
    * @throws ChatServiceException if the conversation could not be created
    */
-  Conversation startConversation( String name, String systemMessage )
+  Conversation startConversation( String name, String model, String systemMessage )
     throws ChatServiceException;
 
-  Collection<Conversation> getConversations( );
+  /**
+   * Returns all the conversations ordered by creation date and modification date
+   * @return all the conversations
+   * @throws ChatServiceException if the conversations could not be retrieved
+   */
+  SortedSet<Conversation> getConversations( )
+    throws ChatServiceException;
 
-  Conversation getConversation( UUID id );
+  /**
+   * @param id the conversation id
+   * @return the conversation
+   * @throws ChatServiceException if the conversation could not be retrieved
+   */
+  Conversation getConversation( UUID id )
+    throws ChatServiceException;
 
-  Conversation updateConversation( UUID id, Conversation conversation );
+  /**
+   * Updates the conversation
+   * @param conversation the new conversation
+   * @return the updated conversation
+   * @throws ChatServiceException if the conversation could not be updated
+   */
+  Conversation updateConversation( Conversation conversation )
+    throws ChatServiceException;
 
   /**
    * @param id the conversation id

@@ -47,6 +47,8 @@ public class JpaChatResponseChoice implements Serializable{
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
+  @SequenceGenerator( name = "chat_response_choices_id_gen",
+                      allocationSize = 1 )
   @Id
   Integer id;
   @CreationTimestamp
@@ -55,7 +57,7 @@ public class JpaChatResponseChoice implements Serializable{
   Instant createdAt;
   @Version
   @UpdateTimestamp
-  @Column( insertable = false )
+  @Column( nullable = false )
   Instant modifiedAt;
   @Column
   Integer index;

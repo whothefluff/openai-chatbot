@@ -11,7 +11,10 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
+        id:
+          new_generator_mappings: true
         show_sql: true
+
 openai:
   api-key: Z
   endpoint: https://api.openai.com/v1/

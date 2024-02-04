@@ -52,6 +52,8 @@ public class JpaChatRequestFunctionDefinition implements Serializable{
   @EqualsAndHashCode.Include
   @ToString.Include
   @GeneratedValue( strategy = GenerationType.SEQUENCE )
+  @SequenceGenerator( name = "chat_request_function_definitions_id_gen",
+                      allocationSize = 1 )
   @Id
   Integer id;
   @CreationTimestamp
@@ -60,7 +62,7 @@ public class JpaChatRequestFunctionDefinition implements Serializable{
   Instant createdAt;
   @Version
   @UpdateTimestamp
-  @Column( insertable = false )
+  @Column( nullable = false )
   Instant modifiedAt;
   @Pattern( regexp = "^[a-zA-Z0-9_]{1,64}$",
             message = "Invalid function name. Only a-z, A-Z, 0-9, and underscores are allowed, with a maximum length of 64 characters." )

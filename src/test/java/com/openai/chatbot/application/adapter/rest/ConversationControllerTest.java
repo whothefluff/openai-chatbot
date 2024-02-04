@@ -1,5 +1,6 @@
 package com.openai.chatbot.application.adapter.rest;
 
+import com.openai.chatbot.application.adapter.rest.component.ConversationUpdateParameterCheck;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationBody;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationMapper;
 import com.openai.chatbot.application.adapter.rest.domainintegration.ConversationStarterBody;
@@ -10,23 +11,39 @@ import com.openai.chatbot.domain.exception.ChatServiceException;
 import com.openai.chatbot.domain.port.primary.ChatService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import lombok.val;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collection;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
-@SuppressWarnings( "MissingJavadoc" )
-@SpringBootTest
-public class ConversationControllerTest{
+class ConversationControllerTest{
+
+  @AfterEach
+  void teardownServletRequest( ){
+
+    RequestContextHolder.resetRequestAttributes( );
+
+  }
 
   @Test
-  public void createConversation_validConversationStart_returnsSuccessfulResponse( ){
+  void createConversation_ValidConversationStart_ReturnsOkAndNewConversation( ){
     // Arrange
+    this.setupServletRequest( );
     val someName = "Test Name"; // NON-NLS
     val someMsg = "Test System Message"; // NON-NLS
     val id = UUID.randomUUID( );
@@ -35,81 +52,168 @@ public class ConversationControllerTest{
     val mapper = new ConversationBodyMapperStub( fakeConversationBody );
     val conversationStarterBody = new ConversationStarterBody( ).name( someName ).systemMessage( someMsg );
     val createdConversationBody = new ConversationBody( ).id( id ).name( conversationStarterBody.name( ) );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val responseEntity = new ConversationController( successfulChatService, mapper ).createConversation( conversationStarterBody );
+    val responseEntity = new ConversationController( successfulChatService, mapper, check ).createConversation( conversationStarterBody );
     // Assert
-    assertThat( responseEntity.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
+    assertThat( responseEntity.getStatusCode( ) ).isEqualTo( CREATED );
     assertThat( responseEntity.getBody( ) ).isEqualTo( createdConversationBody );
 
   }
 
-  @Test
-  public void createConversation_wrongConversationStart_returnsBadRequestResponse( ){
-    // Arrange
-    val someErrorMsg = "Test Bad Request Message"; // NON-NLS
-    val failedChatService = new FailedConversationStartStub( someErrorMsg );
-    val mapper = new ConversationMapperDummy( );
-    val conversationStarterBody = new ConversationStarterBody( );
-    // Act
-    val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
-    // Assert
-    assertThat( responseEntity.getStatusCode( ).is4xxClientError( ) ).isTrue( );
-    assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
+  void setupServletRequest( ){
+
+    RequestContextHolder.setRequestAttributes( new ServletRequestAttributes( new MockHttpServletRequest( ) ) );
 
   }
 
   @Test
-  public void createConversation_UnexpectedExceptionThrown_returnsServerErrorResponse( ){
+  void createConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
-    val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new UnexpectedFailedConversationStartStub( someErrorMsg );
+    val someErrorMsg = "500 Server Error Message"; // NON-NLS
+    val failedChatSrv = new ConversationStartExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
-    val conversationStarterBody = new ConversationStarterBody( );
-    // Act
-    val responseEntity = new ConversationController( failedChatService, mapper ).createConversation( conversationStarterBody );
-    // Assert
-    assertThat( responseEntity.getStatusCode( ).is5xxServerError( ) ).isTrue( );
-    assertThat( responseEntity.getBody( ) ).isEqualTo( someErrorMsg );
+    val starterBody = new ConversationStarterBody( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val convCreation = ( ThrowingCallable )( ) -> new ConversationController( failedChatSrv, mapper, check ).createConversation( starterBody );
+    // Act & Assert
+    assertThatException( ).isThrownBy( convCreation ).withMessage( someErrorMsg );
 
   }
 
   @Test
-  public void deleteConversation_SuccessfulDeletion_NoContentReturned( ){
+  void deleteConversation_SuccessfulDeletion_ReturnsOk( ){
     // Arrange
     val id = UUID.randomUUID( );
     val successfulChatService = new SuccessfulConversationDeleteStub( id );
     val mapper = new ConversationMapperDummy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val response = new ConversationController( successfulChatService, mapper ).deleteConversation( id );
+    val response = new ConversationController( successfulChatService, mapper, check ).deleteConversation( id );
     // Assert
-    assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
+    assertThat( response.getStatusCode( ) ).isEqualTo( NO_CONTENT );
 
   }
 
   @Test
-  public void deleteConversation_ServiceError_NotFoundReturned( ){
-    // Arrange
-    val id = UUID.randomUUID( );
-    val failedChatService = new FailedConversationDeleteStub( );
-    val mapper = new ConversationMapperDummy( );
-    // Act
-    val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
-    // Assert
-    assertThat( response.getStatusCode( ).is4xxClientError( ) ).isTrue( );
-
-  }
-
-  @Test
-  public void deleteConversation_InternalError_InternalServerErrorReturned( ){
+  void deleteConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
     val someErrorMsg = "Test Server Error Message"; // NON-NLS
-    val failedChatService = new UnexpectedFailedConversationDeleteStub( someErrorMsg );
+    val failedChatService = new ConversationErasureExceptionStub( new RuntimeException( someErrorMsg ) );
     val mapper = new ConversationMapperDummy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val conversationDeletion = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper, check ).deleteConversation( id );
+    // Act & Assert
+    assertThatException( ).isThrownBy( conversationDeletion ).withMessage( someErrorMsg );
+
+  }
+
+  @Test
+  void getConversation_SuccessfulGet_ReturnsOkAndConversation( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val successfulChatService = new SuccessfulConversationRetrievalStub( );
+    val conversation = new ConversationBody( ).id( id );
+    val mapper = new ConversationBodyMapperStub( conversation );
+    val check = new ConversationUpdateParameterCheckDummy( );
     // Act
-    val response = new ConversationController( failedChatService, mapper ).deleteConversation( id );
+    val response = new ConversationController( successfulChatService, mapper, check ).getConversation( id );
     // Assert
-    assertThat( response.getStatusCode( ).is5xxServerError( ) ).isTrue( );
+    assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
+    assertThat( response.getBody( ) ).isEqualTo( conversation );
+
+  }
+
+  @Test
+  void getConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val someErrorMsg = "500 Server Error Message"; // NON-NLS
+    val failedChatService = new ConversationRetrievalExceptionStub( new RuntimeException( someErrorMsg ) );
+    val mapper = new ConversationMapperDummy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val conversationRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper, check ).getConversation( id );
+    // Act & Assert
+    assertThatException( ).isThrownBy( conversationRetrieval ).withMessage( someErrorMsg );
+  }
+
+  @Test
+  void getConversations_SuccessfulGet_ReturnsOkAndConversations( )
+    throws ChatServiceException{
+    // Arrange
+    val convsDto = List.of( new ConversationBody( ).id( UUID.randomUUID( ) ).createdAt( Instant.now( ) ),
+                            new ConversationBody( ).id( UUID.randomUUID( ) ).createdAt( Instant.now( ).plusSeconds( 1L ) ) );
+    val conversations = convsDto.stream( )
+                                .map( c -> new Conversation( ).id( c.id( ) ).createdAt( c.createdAt( ) ) )
+                                .collect( Collectors.toCollection( ( ) -> new TreeSet<Conversation>( Comparator.comparing( Conversation::createdAt ) ) ) );
+    val successfulChatService = new SuccessfulConversationsRetrievalStub( conversations );
+    val mapper = new ConversationBodiesMapperStub( convsDto.stream( ).collect( Collectors.toMap( ConversationBody::id, cb -> cb ) ) );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    // Act
+    val response = new ConversationController( successfulChatService, mapper, check ).getConversations( );
+    // Assert
+    assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
+    assertThat( response.getBody( ) ).isEqualTo( convsDto );
+
+  }
+
+  @Test
+  void getConversations_ErrorOccurs_ThrowsExceptionAsIs( ){
+    // Arrange
+    val someErrorMsg = "500 Server Error Message"; // NON-NLS
+    val failedChatService = new ConversationsRetrievalExceptionStub( new RuntimeException( someErrorMsg ) );
+    val mapper = new ConversationMapperDummy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val convsRetrieval = ( ThrowingCallable )( ) -> new ConversationController( failedChatService, mapper, check ).getConversations( );
+    // Act & Assert
+    assertThatException( ).isThrownBy( convsRetrieval ).withMessage( someErrorMsg );
+
+  }
+
+  @Test
+  void updateConversation_SuccessfulUpdate_ReturnsOkAndUpdatedConversation( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val successfulChatService = new SuccessfulConversationUpdateStub( );
+    val conversation = new ConversationBody( ).id( id );
+    val mapper = new ConversationBodyMapperStub( conversation );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    // Act
+    val response = new ConversationController( successfulChatService, mapper, check ).updateConversation( id, conversation );
+    // Assert
+    assertThat( response.getStatusCode( ).is2xxSuccessful( ) ).isTrue( );
+    assertThat( response.getBody( ) ).isEqualTo( conversation );
+
+  }
+
+  @Test
+  void updateConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val convBody = new ConversationBody( ).id( id );
+    val someErrorMsg = "500 Server Error Message"; // NON-NLS
+    val failedChatSrv = new ConversationUpdateExceptionStub( new RuntimeException( someErrorMsg ) );
+    val mapper = new ConversationMapperDummy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    val convUpdate = ( ThrowingCallable )( ) -> new ConversationController( failedChatSrv, mapper, check ).updateConversation( id, convBody );
+    // Act & Assert
+    assertThatException( ).isThrownBy( convUpdate ).withMessage( someErrorMsg );
+
+  }
+
+  @Test
+  void updateConversation_NoIdInBody_TakesIdFromPath( ){
+    // Arrange
+    val id = UUID.randomUUID( );
+    val service = new ChatServiceDouble( );
+    val conversation = new ConversationBody( );
+    val mapper = new ConversationBodyMapperSpy( );
+    val check = new ConversationUpdateParameterCheckDummy( );
+    // Act
+    new ConversationController( service, mapper, check ).updateConversation( id, conversation );
+    // Assert
+    assertThat( id ).isEqualTo( mapper.dtoId( ) );
 
   }
   //##############################################################################################################
@@ -117,7 +221,7 @@ public class ConversationControllerTest{
   private static class ConversationMapperDouble implements ConversationMapper{
 
     @Override
-    public @Nullable ConversationBody toDto( final Conversation entity ){
+    public @Nullable ConversationBody toDto( final com.openai.chatbot.domain.entity.Conversation entity ){
 
       return null;
 
@@ -151,10 +255,43 @@ public class ConversationControllerTest{
 
   }
 
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  @Accessors( chain = true,
+              fluent = true )
+  private static class ConversationBodyMapperSpy extends ConversationMapperDouble{
+
+    UUID dtoId;
+
+    @Override
+    public @Nullable Conversation toEntity( final ConversationBody dto ){
+
+      this.dtoId = dto.id( );
+      return null;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationBodiesMapperStub extends ConversationMapperDouble{
+
+    final Map<UUID, ConversationBody> conversationBodies;
+
+    @Override
+    public ConversationBody toDto( final com.openai.chatbot.domain.entity.Conversation entity ){
+
+      return this.conversationBodies.get( entity.id( ) );
+
+    }
+
+  }
+
   private static class ChatServiceDouble implements ChatService{
 
     @Override
-    public @Nullable Conversation startConversation( final String name, final String systemMessage )
+    public @Nullable Conversation startConversation( final String name, final String model, final String systemMessage )
       throws ChatServiceException{
 
       return null;
@@ -162,21 +299,24 @@ public class ConversationControllerTest{
     }
 
     @Override
-    public @Nullable Collection<Conversation> getConversations( ){
+    public @Nullable SortedSet<Conversation> getConversations( )
+      throws ChatServiceException{
 
       return null;
 
     }
 
     @Override
-    public @Nullable Conversation getConversation( final UUID id ){
+    public @Nullable Conversation getConversation( final UUID id )
+      throws ChatServiceException{
 
       return null;
 
     }
 
     @Override
-    public @Nullable Conversation updateConversation( final UUID id, final Conversation conversation ){
+    public @Nullable Conversation updateConversation( final com.openai.chatbot.domain.entity.Conversation conversation )
+      throws ChatServiceException{
 
       return null;
 
@@ -221,10 +361,24 @@ public class ConversationControllerTest{
     final UUID id;
 
     @Override
-    public Conversation startConversation( final String name, final String systemMessage )
+    public Conversation startConversation( final String name, final String model, final String systemMessage )
       throws ChatServiceException{
 
       return new Conversation( );
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class SuccessfulConversationUpdateStub extends ChatServiceDouble{
+
+    @Override
+    public Conversation updateConversation( final Conversation conversation )
+      throws ChatServiceException{
+
+      return conversation;
 
     }
 
@@ -248,28 +402,20 @@ public class ConversationControllerTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class FailedConversationStartStub extends ChatServiceDouble{
-
-    final String errorMessage;
-
-    @Override
-    public Conversation startConversation( final String name, final String systemMessage )
-      throws ChatServiceException{
-
-      throw new ChatServiceException( this.errorMessage );
-
-    }
+  private static class SuccessfulConversationRetrievalStub extends ChatServiceDouble{
 
   }
 
   @EqualsAndHashCode( callSuper = true )
-  private static class FailedConversationDeleteStub extends ChatServiceDouble{
+  @Data
+  private static class SuccessfulConversationsRetrievalStub extends ChatServiceDouble{
+
+    final SortedSet<Conversation> conversations;
 
     @Override
-    public void deleteConversation( final UUID chatId )
-      throws ChatServiceException{
+    public SortedSet<Conversation> getConversations( ){
 
-      throw new ChatServiceException( );
+      return Collections.unmodifiableSortedSet( this.conversations );
 
     }
 
@@ -277,15 +423,16 @@ public class ConversationControllerTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class UnexpectedFailedConversationStartStub extends ChatServiceDouble{
+  private static class ConversationRetrievalExceptionStub extends ChatServiceDouble{
 
-    final String errorMessage;
+    final Exception exception;
 
     @Override
-    public Conversation startConversation( final String name, final String systemMessage )
+    @SneakyThrows
+    public Conversation getConversation( final UUID id )
       throws ChatServiceException{
 
-      throw new RuntimeException( this.errorMessage );
+      throw this.exception;
 
     }
 
@@ -293,17 +440,82 @@ public class ConversationControllerTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class UnexpectedFailedConversationDeleteStub extends ChatServiceDouble{
+  private static class ConversationUpdateExceptionStub extends ChatServiceDouble{
 
-    final String errorMessage;
+    final Exception exception;
 
     @Override
+    @SneakyThrows
+    public Conversation updateConversation( final Conversation conversation )
+      throws ChatServiceException{
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationsRetrievalExceptionStub extends ChatServiceDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public SortedSet<Conversation> getConversations( )
+      throws ChatServiceException{
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationStartExceptionStub extends ChatServiceDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public Conversation startConversation( final String name, final String model, final String systemMessage )
+      throws ChatServiceException{
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationErasureExceptionStub extends ChatServiceDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
     public void deleteConversation( final UUID chatId )
       throws ChatServiceException{
 
-      throw new RuntimeException( this.errorMessage );
+      throw this.exception;
 
     }
+
+  }
+
+  private static class ConversationUpdateParameterCheckDouble implements ConversationUpdateParameterCheck{
+
+    @Override
+    public void validate( final UUID id, final ConversationBody conversationBody ){
+
+    }
+
+  }
+
+  private static class ConversationUpdateParameterCheckDummy extends ConversationUpdateParameterCheckDouble{
 
   }
 

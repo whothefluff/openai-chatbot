@@ -20,12 +20,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Data
 @EqualsAndHashCode
 @ToString
-@FieldDefaults( level = AccessLevel.PROTECTED )
+@FieldDefaults( level = AccessLevel.PROTECTED,
+                makeFinal = true )
 @Accessors( chain = true,
             fluent = true )
 @XSlf4j
 @Service
-public class OpenAIService implements ChatCompletionsService{
+class OpenAIService implements ChatCompletionsService{
 
   final WebClient.Builder webClientBuilder;
   final OpenAIProperties openAIProperties;

@@ -1,6 +1,6 @@
 package com.openai.chatbot.domain.entity;
 
-import io.vavr.Function2;
+import io.vavr.Function3;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import io.vavr.control.Validation;
@@ -77,8 +77,8 @@ public class Conversation{
   public static class InitialStateBuilder{
 
     String name;
+    String model;
     String systemMessage;
-    private Supplier<IllegalArgumentException> illegalArgs;
 
     /**
      * @return a valid {@link Conversation} instance
@@ -89,21 +89,24 @@ public class Conversation{
 
       log.entry( );
       val nameValidation = Option.of( this.name ).filter( StringUtils::hasText ).toValidation( "Name must not be empty" );
+      val modelValidation = Option.of( this.model ).filter( StringUtils::hasText ).toValidation( "Model must not be empty" );
       val systemMessageValidation = Option.of( this.systemMessage ).filter( StringUtils::hasText ).toValidation( "System message must not be empty" );
-      val returnConversation = ( Function2<String, String, Conversation> )( name, systemMessage ) ->
+      val returnConversation = ( Function3<String, String, String, Conversation> )( name, model, systemMessage ) ->
         {
           val requestMsg = new ChatRequest.Message( ).role( system ).content( systemMessage );
-          val request = new ChatRequest( ).addMessage( requestMsg );
+          val request = new ChatRequest( ).model( model ).addMessage( requestMsg );
           val conv = new Conversation( ).name( name ).addRequest( request );
           return log.exit( conv );
         };
-      val validation = Validation.combine( nameValidation, systemMessageValidation ).ap( returnConversation );
-      this.illegalArgs = ( ) ->
+      val validation = Validation.combine( nameValidation, modelValidation, systemMessageValidation )
+                                 .ap( returnConversation );
+      val illegalArgs = ( Supplier<IllegalArgumentException> )( ) ->
         {
           val error = new IllegalArgumentException( validation.getError( ).mkString( ", " ) );
           return log.throwing( error );
         };
-      return Try.of( validation::get ).getOrElseThrow( this.illegalArgs );
+      return Try.of( validation::get )
+                .getOrElseThrow( illegalArgs );
 
     }
 

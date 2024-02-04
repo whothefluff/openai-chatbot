@@ -49,7 +49,7 @@ public class JpaChat implements Serializable{
   Instant createdAt;
   @Version
   @UpdateTimestamp
-  @Column( insertable = false )
+  @Column( nullable = false )
   Instant modifiedAt;
   @Column( unique = true )
   @NaturalId( mutable = true )

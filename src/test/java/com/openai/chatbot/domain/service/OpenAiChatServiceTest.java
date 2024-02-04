@@ -9,51 +9,56 @@ import com.openai.chatbot.domain.port.secondary.ChatCompletionsService;
 import com.openai.chatbot.domain.port.secondary.ChatRepository;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import lombok.val;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static com.openai.chatbot.domain.entity.ChatMessageRole.system;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static org.assertj.core.api.Assertions.*;
 
-@SuppressWarnings( "MissingJavadoc" )
-@SpringBootTest
-public class OpenAiChatServiceTest{
+class OpenAiChatServiceTest{
 
   @Test
   void startConversation_SuccessfulCase_ConversationStarted( )
     throws ChatServiceException{
     // Arrange
     val name = "testName";
+    val model = "testModel";
     val systemMessage = "testSystemMessage";
     val msgReq = new ChatRequest.Message( ).role( system ).content( systemMessage );
-    val request = new ChatRequest( ).addMessage( msgReq );
+    val request = new ChatRequest( ).model( model ).addMessage( msgReq );
     val expectedConversation = new Conversation( ).name( name ).addRequest( request );
     val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new SuccessfulConversationSaveStub( ) );
     // Act
-    val createdConversation = service.startConversation( name, systemMessage );
+    val createdConversation = service.startConversation( name, model, systemMessage );
     // Assert
     assertThat( createdConversation ).isEqualTo( expectedConversation );
 
   }
 
   @Test
-  void startConversation_ErrorOccurs_ThrowsChatServiceException( ){
+  void startConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val name = "testName";
+    val model = "testModel";
     val systemMessage = "testSystemMessage";
-    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new UnsuccessfulConversationSaveStub( ) );
-    val startConversationWithNoName = ( ThrowingCallable )( ) -> service.startConversation( name, systemMessage );
+    val someExc = new ChatRepositoryException( );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new ConversationInsertExceptionStub( someExc ) );
+    val failedInsert = ( ThrowingCallable )( ) -> service.startConversation( name, model, systemMessage );
     // Act & Assert
-    assertThatThrownBy( startConversationWithNoName ).isInstanceOf( ChatServiceException.class );
+    assertThatThrownBy( failedInsert ).isEqualTo( someExc );
 
   }
 
@@ -62,21 +67,118 @@ public class OpenAiChatServiceTest{
     throws ChatServiceException{
     // Arrange
     val id = UUID.randomUUID( );
-    val deleteConversation = ( Executable )( ) -> new OpenAiChatService( new ChatCompletionsServiceDummy( ),
-                                                                         new SuccessfulConversationDeleteStub( ) ).deleteConversation( id );
+    val deleteConversation = ( ThrowingCallable )( ) -> new OpenAiChatService( new ChatCompletionsServiceDummy( ),
+                                                                               new SuccessfulConversationDeleteStub( ) ).deleteConversation( id );
     // Act & Assert
-    assertDoesNotThrow( deleteConversation );
+    assertThatNoException( ).isThrownBy( deleteConversation );
 
   }
 
   @Test
-  void deleteConversation_ErrorOccurs_ThrowsChatServiceException( ){
+  void deleteConversation_ErrorOccurs_ThrowsExceptionAsIs( ){
     // Arrange
     val id = UUID.randomUUID( );
-    val deleteConversation = ( ThrowingCallable )( ) -> new OpenAiChatService( new ChatCompletionsServiceDummy( ),
-                                                                               new UnsuccessfulConversationDeleteStub( ) ).deleteConversation( id );
+    val someExc = new ChatRepositoryException( );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ),
+                                         new ConversationDeletionExceptionStub( someExc ) );
+    val failedDeletion = ( ThrowingCallable )( ) -> service.deleteConversation( id );
     // Act & Assert
-    assertThatThrownBy( deleteConversation ).isInstanceOf( ChatServiceException.class );
+    assertThatThrownBy( failedDeletion ).isEqualTo( someExc );
+
+  }
+
+  @Test
+  void getConversation_SuccessfulCase_ConversationReturned( )
+    throws ChatServiceException{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val expectedConv = new Conversation( ).id( id );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new SuccessfulConversationRetrievalStub( expectedConv ) );
+    // Act
+    val retrievedConv = service.getConversation( id );
+    // Assert
+    assertThat( retrievedConv ).isEqualTo( expectedConv );
+
+  }
+
+  @Test
+  void getConversation_ErrorOccurs_ThrowsExceptionAsIs( )
+    throws ChatServiceException{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val someExc = new ChatRepositoryException( );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ),
+                                         new ConversationRetrievalExceptionStub( someExc ) );
+    val failedRetrieval = ( ThrowingCallable )( ) -> service.getConversation( id );
+    // Act & Assert
+    assertThatThrownBy( failedRetrieval ).isEqualTo( someExc );
+
+  }
+
+  @Test
+  void getConversations_NormalScenario_RepositoryIsCalledWithSorting( )
+    throws ChatServiceException{
+    // Arrange
+    val repository = new ChatRepositoryRetrieveConvsSpy( );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), repository );
+    // Act
+    service.getConversations( );
+    // Assert
+    assertThat( repository.wasCalledWithValidSorting( ) ).isTrue( );
+
+  }
+
+  @Test
+  void getConversations_RepositoryReturnsEntries_SortedSetReturned( )
+    throws ChatServiceException{
+    // Arrange
+    val conversations = Collections.singletonList( new Conversation( )
+                                                     .id( UUID.randomUUID( ) )
+                                                     .createdAt( Instant.now( ) )
+                                                     .modifiedAt( Instant.now( ) ) );
+    val repository = new SuccessfulConversationsRetrievalStub( conversations );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), repository );
+    // Act
+    val sortedConvs = service.getConversations( );
+    // Assert
+    assertThat( sortedConvs ).isNotNull( );
+
+  }
+
+  @Test
+  void getConversations_ErrorOccurs_ThrowsExceptionAsIs( ){
+    // Arrange
+    val someExc = new ChatRepositoryException( );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ),
+                                         new ConversationRetrievalsExceptionStub( someExc ) );
+    // Act & Assert
+    assertThatThrownBy( service::getConversations ).isEqualTo( someExc );
+
+  }
+
+  @Test
+  void updateConversation_SuccessfulCase_ConversationReturned( )
+    throws ChatServiceException{
+    // Arrange
+    val id = UUID.randomUUID( );
+    val conversation = new Conversation( ).id( id );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new SuccessfulConversationUpdateStub( conversation ) );
+    // Act
+    val retrievedConv = service.updateConversation( conversation );
+    // Assert
+    assertThat( retrievedConv ).isEqualTo( conversation );
+
+  }
+
+  @Test
+  void updateConversation_ErrorOccurs_ThrowsExceptionAsIs( )
+    throws ChatServiceException{
+    // Arrange
+    val someExc = new ChatRepositoryException( );
+    val service = new OpenAiChatService( new ChatCompletionsServiceDummy( ), new ConversationUpdateExceptionStub( someExc ) );
+    val failedRetrieval = ( ThrowingCallable )( ) -> service.updateConversation( null );
+    // Act & Assert
+    assertThatThrownBy( failedRetrieval ).isEqualTo( someExc );
 
   }
   //##############################################################################################################
@@ -93,6 +195,14 @@ public class OpenAiChatServiceTest{
 
     @Override
     public @Nullable Conversation retrieveConversation( final UUID id )
+      throws ChatRepositoryException{
+
+      return null;
+
+    }
+
+    @Override
+    public @Nullable Collection<Conversation> retrieveConversations( final Sort sorting )
       throws ChatRepositoryException{
 
       return null;
@@ -149,6 +259,43 @@ public class OpenAiChatServiceTest{
 
   }
 
+  @Data
+  @EqualsAndHashCode( callSuper = true )
+  private static class SuccessfulConversationsRetrievalStub extends ChatRepositoryDouble{
+
+    final List<Conversation> conversations;
+
+    @Override
+    public @Nullable Collection<Conversation> retrieveConversations( final Sort sorting )
+      throws ChatRepositoryException{
+
+      return Collections.unmodifiableList( this.conversations );
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  @Accessors( chain = true,
+              fluent = true )
+  private static class ChatRepositoryRetrieveConvsSpy extends ChatRepositoryDouble{
+
+    Boolean wasCalledWithValidSorting = FALSE;
+
+    @Override
+    public @Nullable Collection<Conversation> retrieveConversations( final Sort sorting )
+      throws ChatRepositoryException{
+
+      if( sorting.isSorted( ) ){
+        this.wasCalledWithValidSorting = TRUE;
+      }
+      return Collections.emptyList( );
+
+    }
+
+  }
+
   private static class ChatCompletionsServiceDummy implements ChatCompletionsService{
 
     @Override
@@ -190,13 +337,15 @@ public class OpenAiChatServiceTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class UnsuccessfulConversationSaveStub extends ChatRepositoryDouble{
+  private static class SuccessfulConversationRetrievalStub extends ChatRepositoryDouble{
+
+    final Conversation conversation;
 
     @Override
-    public Conversation saveNewConversation( final Conversation conversation )
+    public Conversation retrieveConversation( final UUID id )
       throws ChatRepositoryException{
 
-      throw new RuntimeException( );
+      return this.conversation;
 
     }
 
@@ -204,13 +353,100 @@ public class OpenAiChatServiceTest{
 
   @EqualsAndHashCode( callSuper = true )
   @Data
-  private static class UnsuccessfulConversationDeleteStub extends ChatRepositoryDouble{
+  private static class SuccessfulConversationUpdateStub extends ChatRepositoryDouble{
+
+    final Conversation conversation;
 
     @Override
+    public Conversation updateConversation( final Conversation conversation )
+      throws ChatRepositoryException{
+
+      return this.conversation;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationInsertExceptionStub extends ChatRepositoryDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public Conversation saveNewConversation( final Conversation conversation )
+      throws ChatRepositoryException{
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationDeletionExceptionStub extends ChatRepositoryDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
     public void deleteConversation( final UUID id )
       throws ChatRepositoryException{
 
-      throw new RuntimeException( );
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationRetrievalExceptionStub extends ChatRepositoryDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public Conversation retrieveConversation( final UUID id )
+      throws ChatRepositoryException{
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationUpdateExceptionStub extends ChatRepositoryDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public Conversation updateConversation( final Conversation conversation )
+      throws ChatRepositoryException{
+
+      throw this.exception;
+
+    }
+
+  }
+
+  @EqualsAndHashCode( callSuper = true )
+  @Data
+  private static class ConversationRetrievalsExceptionStub extends ChatRepositoryDouble{
+
+    final Exception exception;
+
+    @Override
+    @SneakyThrows
+    public Collection<Conversation> retrieveConversations( final Sort sorting )
+      throws ChatRepositoryException{
+
+      throw this.exception;
 
     }
 
